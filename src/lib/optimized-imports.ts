@@ -155,8 +155,10 @@ export function useOptimizedThrottle<T extends (...args: any[]) => any>(
 /**
  * Lazy load images with intersection observer
  */
+import { useInView } from 'react-intersection-observer';
+
 export function useLazyImage(threshold: number = 0.1) {
-  const [ref, inView] = useIntersectionObserver({
+  const [ref, inView] = useInView({
     threshold,
     triggerOnce: true,
   });
