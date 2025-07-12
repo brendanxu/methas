@@ -1,26 +1,438 @@
 @import "tailwindcss";
 
+/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* South Pole CSS Variables System */
 :root {
+  /* South Pole Brand Colors */
+  --sp-primary: #002145;
+  --sp-secondary: #00875a;
+  --sp-warning: #ff8b00;
+  --sp-success: #00875a;
+  --sp-error: #dc2626;
+  --sp-info: #0ea5e9;
+  
+  /* Light Theme - Semantic Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #374151;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --input: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #374151;
+  --popover: #ffffff;
+  --popover-foreground: #374151;
+  
+  /* Primary Colors - Using South Pole Brand */
+  --primary: var(--sp-primary);
+  --primary-foreground: #ffffff;
+  
+  /* Secondary Colors */
+  --secondary: #f3f4f6;
+  --secondary-foreground: #374151;
+  
+  /* Accent Colors */
+  --accent: #f3f4f6;
+  --accent-foreground: #374151;
+  
+  /* Destructive Colors */
+  --destructive: var(--sp-error);
+  --destructive-foreground: #ffffff;
+  
+  /* Success Colors */
+  --success: var(--sp-success);
+  --success-foreground: #ffffff;
+  
+  /* Warning Colors */
+  --warning: var(--sp-warning);
+  --warning-foreground: #000000;
+  
+  /* Info Colors */
+  --info: var(--sp-info);
+  --info-foreground: #ffffff;
+  
+  /* Ring/Focus - Using brand primary */
+  --ring: var(--sp-primary);
+  
+  /* Design Tokens */
+  --radius: 0.5rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 33, 69, 0.07), 0 10px 20px -2px rgba(0, 33, 69, 0.04);
+  --shadow-medium: 0 4px 25px -5px rgba(0, 33, 69, 0.1), 0 10px 10px -5px rgba(0, 33, 69, 0.04);
+  --shadow-strong: 0 10px 50px -12px rgba(0, 33, 69, 0.25);
+  --shadow-glow: 0 0 20px rgba(0, 33, 69, 0.3);
+  
+  /* Animation */
+  --animation-duration-fast: 150ms;
+  --animation-duration: 200ms;
+  --animation-duration-slow: 300ms;
+  --animation-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-timing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark Theme Variables */
+.dark {
+  /* South Pole Brand Colors - Adapted for Dark Mode */
+  --sp-primary-dark: #4a9eff;
+  --sp-secondary-dark: #4ade80;
+  --sp-warning-dark: #fbbf24;
+  
+  /* Dark Theme - Semantic Colors */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+  --input: #1e293b;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  
+  /* Primary Colors - Adapted for Dark Mode */
+  --primary: var(--sp-primary-dark);
+  --primary-foreground: #0f172a;
+  
+  /* Secondary Colors */
+  --secondary: #334155;
+  --secondary-foreground: #f1f5f9;
+  
+  /* Accent Colors */
+  --accent: #334155;
+  --accent-foreground: #f1f5f9;
+  
+  /* Destructive Colors */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  /* Success Colors */
+  --success: var(--sp-secondary-dark);
+  --success-foreground: #0f172a;
+  
+  /* Warning Colors */
+  --warning: var(--sp-warning-dark);
+  --warning-foreground: #0f172a;
+  
+  /* Info Colors */
+  --info: #38bdf8;
+  --info-foreground: #0f172a;
+  
+  /* Ring/Focus */
+  --ring: var(--sp-primary-dark);
+  
+  /* Dark Mode Shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.3), 0 10px 20px -2px rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 4px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-strong: 0 10px 50px -12px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.4);
+}
+
+/* System Dark Mode Preference */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    /* South Pole Brand Colors - Adapted for Dark Mode */
+    --sp-primary-dark: #4a9eff;
+    --sp-secondary-dark: #4ade80;
+    --sp-warning-dark: #fbbf24;
+    
+    /* Dark Theme - Semantic Colors */
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #334155;
+    --input: #1e293b;
+    --card: #1e293b;
+    --card-foreground: #f1f5f9;
+    --popover: #1e293b;
+    --popover-foreground: #f1f5f9;
+    
+    /* Primary Colors - Adapted for Dark Mode */
+    --primary: var(--sp-primary-dark);
+    --primary-foreground: #0f172a;
+    
+    /* Secondary Colors */
+    --secondary: #334155;
+    --secondary-foreground: #f1f5f9;
+    
+    /* Accent Colors */
+    --accent: #334155;
+    --accent-foreground: #f1f5f9;
+    
+    /* Destructive Colors */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    
+    /* Success Colors */
+    --success: var(--sp-secondary-dark);
+    --success-foreground: #0f172a;
+    
+    /* Warning Colors */
+    --warning: var(--sp-warning-dark);
+    --warning-foreground: #0f172a;
+    
+    /* Info Colors */
+    --info: #38bdf8;
+    --info-foreground: #0f172a;
+    
+    /* Ring/Focus */
+    --ring: var(--sp-primary-dark);
+    
+    /* Dark Mode Shadows */
+    --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.3), 0 10px 20px -2px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 4px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 10px 50px -12px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.4);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Improve default focus styles */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Better scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
+}
+
+/* Improved selection styles */
+::selection {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Ant Design and Tailwind CSS Integration */
+.ant-btn {
+  transition: all var(--animation-duration) var(--animation-timing);
+}
+
+.ant-card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.ant-card-head {
+  border-bottom-color: var(--border);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --background: #FFFFFF;
+    --foreground: #000000;
+    --primary: #0000FF;
+    --secondary: #008000;
+    --warning: #FF8C00;
+    --error: #FF0000;
+    --success: #008000;
+    --border: #000000;
+    --muted: #F5F5F5;
+    --muted-foreground: #000000;
+    --card: #FFFFFF;
+    --card-foreground: #000000;
+  }
+  
+  .dark {
+    --background: #000000;
+    --foreground: #FFFFFF;
+    --primary: #00FFFF;
+    --secondary: #00FF00;
+    --warning: #FFFF00;
+    --error: #FF0000;
+    --success: #00FF00;
+    --border: #FFFFFF;
+    --muted: #1A1A1A;
+    --muted-foreground: #FFFFFF;
+    --card: #000000;
+    --card-foreground: #FFFFFF;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-pulse-slow,
+  .animate-bounce-gentle,
+  .animate-float,
+  .animate-glow,
+  .animate-shimmer {
+    animation: none !important;
+  }
+}
+
+/* Color Blind Accessibility */
+.color-blind-mode {
+  --primary: #0066CC;
+  --secondary: #FF6600;
+  --warning: #FFCC00;
+  --error: #CC0000;
+  --success: #009900;
+  --info: #0099CC;
+}
+
+/* Font Size Accessibility */
+[data-font-size="small"] {
+  font-size: 14px;
+}
+
+[data-font-size="normal"] {
+  font-size: 16px;
+}
+
+[data-font-size="large"] {
+  font-size: 18px;
+}
+
+[data-font-size="x-large"] {
+  font-size: 20px;
+}
+
+/* High Contrast Mode Overrides */
+.high-contrast {
+  --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.8);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.8);
+  --shadow-strong: 0 8px 16px rgba(0, 0, 0, 0.8);
+}
+
+.high-contrast .ant-btn {
+  border-width: 2px !important;
+}
+
+.high-contrast .ant-card {
+  border-width: 2px !important;
+}
+
+/* Focus indicators for accessibility */
+.high-contrast *:focus-visible {
+  outline: 3px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Utility classes */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
 }
