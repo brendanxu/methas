@@ -225,13 +225,13 @@ export function createDynamicComponent<T = any>(
   importFn: () => Promise<{ default: React.ComponentType<T> }>,
   options: {
     ssr?: boolean;
-    loading?: React.ComponentType;
+    loading?: () => React.ReactElement;
     suspense?: boolean;
   } = {}
 ) {
   return dynamic(importFn, {
     ssr: options.ssr ?? false,
-    loading: options.loading ?? DefaultLoadingSkeleton,
+    loading: options.loading ?? (() => <DefaultLoadingSkeleton />),
     ...options
   });
 }
@@ -241,7 +241,7 @@ export function createDynamicComponent<T = any>(
  */
 export function createDynamicRoute<T = any>(
   importFn: () => Promise<{ default: React.ComponentType<T> }>,
-  fallback?: React.ComponentType
+  fallback?: () => React.ReactElement
 ) {
   return dynamic(importFn, {
     ssr: false,
