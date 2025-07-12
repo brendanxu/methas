@@ -9,14 +9,20 @@ import {
   DynamicCaseStudies 
 } from '@/lib/dynamic-imports';
 import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
-
-// Metadata will be handled by layout.tsx with i18n
+import { SEOHead } from '@/components/seo/SEOHead';
+import { HOME_SEO } from '@/lib/seo-config';
+import { getDefaultSchemas } from '@/lib/structured-data';
 
 export default function Home() {
   const { t } = useTranslation(['home']);
 
   return (
     <>
+      <SEOHead 
+        config={HOME_SEO}
+        basePath="/"
+        schemaData={getDefaultSchemas()}
+      />
       
         <div>
           {/* Add padding-top to account for fixed header */}

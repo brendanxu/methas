@@ -6,33 +6,19 @@ import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { DynamicHead } from "@/components/seo/DynamicHead";
 import { PreloadProvider, PreloadMonitor } from "@/components/optimization/PreloadProvider";
+import { generateMetadata as generateSEOMetadata } from "@/components/seo/SEOHead";
+import { HOME_SEO } from "@/lib/seo-config";
+import { SEOChecker } from "@/components/seo/SEOChecker";
 import "./globals.css";
 
-// Use default metadata - will be dynamically updated by i18n system
-export const metadata: Metadata = {
-  title: 'South Pole - Climate Solutions',
-  description: 'Leading climate solutions provider helping organizations achieve carbon neutrality.',
-};
+// Enhanced metadata with proper SEO configuration
+export const metadata: Metadata = generateSEOMetadata(HOME_SEO);
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Basic structured data (will be enhanced by i18n in the future)
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "South Pole",
-    "url": "https://southpole.com"
-  };
-  
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "South Pole",
-    "url": "https://southpole.com"
-  };
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -45,19 +31,6 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
         
-        {/* Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
-          }}
-        />
       </head>
       <body className="font-sans antialiased">
         <Providers defaultTheme="light">
@@ -67,6 +40,7 @@ export default function RootLayout({
               <PageTracker />
               <PreloadMonitor />
               <GlobalSearch />
+              <SEOChecker />
               <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <Header />
                 <main className="flex-1">

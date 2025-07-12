@@ -31,6 +31,24 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'onLoad' | 'onErro
   lazyLoad?: boolean;
   /** Intersection observer options */
   observerOptions?: IntersectionObserverInit;
+  
+  // SEO enhancements
+  /** Image title for SEO and accessibility */
+  title?: string;
+  /** Image caption for semantic markup */
+  caption?: string;
+  /** Loading strategy for performance */
+  loading?: 'lazy' | 'eager';
+  /** Fetch priority hint */
+  fetchPriority?: 'high' | 'low' | 'auto';
+  /** Image decoding hint */
+  decoding?: 'async' | 'sync' | 'auto';
+  /** ARIA label for accessibility */
+  ariaLabel?: string;
+  /** ARIA described by for accessibility */
+  ariaDescribedBy?: string;
+  /** Generate structured data for this image */
+  generateStructuredData?: boolean;
 }
 
 /**
@@ -59,6 +77,14 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   placeholder = 'blur',
   quality = 85,
   sizes,
+  title,
+  caption,
+  loading: loadingProp,
+  fetchPriority = 'auto',
+  decoding = 'async',
+  ariaLabel,
+  ariaDescribedBy,
+  generateStructuredData = false,
   ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -137,6 +163,33 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       )
     : blurDataURL;
 
+  // Determine loading strategy
+  const imageLoading = loadingProp || (priority ? 'eager' : 'lazy');
+
+  // Generate structured data for image
+  const generateImageStructuredData = () => {
+    if (!generateStructuredData) return null;
+
+    const imageObject = {
+      '@context': 'https://schema.org',
+      '@type': 'ImageObject',
+      url: typeof src === 'string' ? src : '',
+      name: title || alt,
+      description: caption || alt,
+      ...(typeof width === 'number' && { width }),
+      ...(typeof height === 'number' && { height }),
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(imageObject),
+        }}
+      />
+    );
+  };
+
   // Loading skeleton component
   const LoadingSkeleton = () => {
     if (skeleton) return <>{skeleton}</>;
@@ -208,7 +261,37 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     </div>
   );
 
-  return (
+  // Main image component with enhanced SEO attributes
+  const imageElement = (
+    <Image
+      src={currentSrc}
+      alt={alt}
+      width={width}
+      height={height}
+      className={cn(
+        'transition-opacity duration-300',
+        isLoaded ? 'opacity-100' : 'opacity-0',
+        className
+      )}
+      placeholder={placeholder}
+      blurDataURL={optimizedBlurDataURL}
+      priority={priority}
+      quality={quality}
+      sizes={sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
+      onLoad={handleLoad}
+      onError={handleError}
+      loading={imageLoading}
+      decoding={decoding}
+      title={title}
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      // @ts-ignore - fetchpriority is a newer HTML attribute
+      fetchpriority={fetchPriority}
+      {...props}
+    />
+  );
+
+  const content = (
     <div 
       ref={imgRef}
       className={cn('relative overflow-hidden', containerClassName)}
@@ -226,25 +309,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             transition={{ duration: 0.4, ease: 'easeOut' }}
             className="relative"
           >
-            <Image
-              src={currentSrc}
-              alt={alt}
-              width={width}
-              height={height}
-              className={cn(
-                'transition-opacity duration-300',
-                isLoaded ? 'opacity-100' : 'opacity-0',
-                className
-              )}
-              placeholder={placeholder}
-              blurDataURL={optimizedBlurDataURL}
-              priority={priority}
-              quality={quality}
-              sizes={sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
-              onLoad={handleLoad}
-              onError={handleError}
-              {...props}
-            />
+            {imageElement}
             
             {/* Loading overlay */}
             {!isLoaded && (
@@ -261,6 +326,31 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         )}
       </AnimatePresence>
     </div>
+  );
+
+  // If there's a caption, wrap in figure element for semantic markup
+  if (caption) {
+    return (
+      <>
+        {generateImageStructuredData()}
+        <figure className="m-0">
+          {content}
+          <figcaption 
+            className="text-sm text-muted-foreground mt-2 text-center"
+            id={ariaDescribedBy}
+          >
+            {caption}
+          </figcaption>
+        </figure>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {generateImageStructuredData()}
+      {content}
+    </>
   );
 };
 
