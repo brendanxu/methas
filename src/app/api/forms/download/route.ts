@@ -198,8 +198,7 @@ async function sendDownloadNotification(data: DownloadFormData, resourceName: st
 export async function POST(request: NextRequest) {
   try {
     // 获取客户端信息
-    const ip = request.ip || 
-               request.headers.get('x-forwarded-for')?.split(',')[0] || 
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
                request.headers.get('x-real-ip') || 
                'unknown';
     

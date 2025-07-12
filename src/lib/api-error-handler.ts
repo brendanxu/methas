@@ -85,16 +85,16 @@ export class APIError extends Error {
     this.requestId = requestId || generateRequestId();
   }
 
-  toJSON() {
+  toJSON(): ErrorResponse {
     return {
       error: {
         code: this.code,
         message: this.message,
         details: this.details,
         timestamp: this.timestamp,
-        requestId: this.requestId,
+        requestId: this.requestId || generateRequestId(),
       },
-      success: false,
+      success: false as const,
     };
   }
 }
@@ -154,7 +154,7 @@ export function createErrorResponse(
     return NextResponse.json(error.toJSON(), {
       status: error.statusCode,
       headers: {
-        'X-Request-Id': error.requestId || '',
+        'X-Request-Id': error.requestId || generateRequestId(),
       },
     });
   }
@@ -170,7 +170,7 @@ export function createErrorResponse(
     return NextResponse.json(apiError.toJSON(), {
       status: 500,
       headers: {
-        'X-Request-Id': apiError.requestId,
+        'X-Request-Id': apiError.requestId || generateRequestId(),
       },
     });
   }
@@ -185,7 +185,7 @@ export function createErrorResponse(
   return NextResponse.json(apiError.toJSON(), {
     status: 500,
     headers: {
-      'X-Request-Id': apiError.requestId,
+      'X-Request-Id': apiError.requestId || generateRequestId(),
     },
   });
 }

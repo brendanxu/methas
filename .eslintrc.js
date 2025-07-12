@@ -1,14 +1,8 @@
-const { createConfig } = require('@eslint/eslintrc');
-
 /** @type {import('eslint').Linter.Config} */
-module.exports = createConfig({
+module.exports = {
   extends: ['next/core-web-vitals'],
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error', { 
-      'argsIgnorePattern': '^_',
-      'varsIgnorePattern': '^_'
-    }],
-    '@typescript-eslint/no-explicit-any': 'warn',
+    'no-unused-vars': 'off',
     '@next/next/no-img-element': 'warn',
   },
   ignorePatterns: [
@@ -17,4 +11,4 @@ module.exports = createConfig({
     'out/',
     'public/',
   ],
-});
+};

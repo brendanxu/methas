@@ -142,15 +142,13 @@ const mockSearchData: SearchResultItem[] = [
 ];
 
 // Add tags property to the mock data (kept for backward compatibility)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockData: (SearchResultItem & { tags: string[] })[] = mockSearchData.map(item => ({
+const _mockData: (SearchResultItem & { tags: string[] })[] = mockSearchData.map(item => ({
   ...item,
   tags: [item.category || '', item.type, ...(item.breadcrumb || [])],
 }));
 
 // 模糊搜索算法 (kept for potential future use)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function fuzzySearch(query: string, text: string): number {
+function _fuzzySearch(query: string, text: string): number {
   if (!query || !text) return 0;
   
   const normalizedQuery = query.toLowerCase().trim();

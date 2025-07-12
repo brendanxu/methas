@@ -289,8 +289,7 @@ export function detectThreats(
   const reasons: string[] = [];
 
   // 获取客户端信息
-  const ip = request.ip || 
-             request.headers.get('x-forwarded-for')?.split(',')[0] || 
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
              request.headers.get('x-real-ip') || 
              'unknown';
   

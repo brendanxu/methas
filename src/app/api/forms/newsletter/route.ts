@@ -142,8 +142,7 @@ async function updateSubscriberPreferences(email: string, preferences: string[])
 export async function POST(request: NextRequest) {
   try {
     // 获取客户端IP
-    const ip = request.ip || 
-               request.headers.get('x-forwarded-for')?.split(',')[0] || 
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
                request.headers.get('x-real-ip') || 
                'unknown';
 

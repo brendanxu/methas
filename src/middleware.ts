@@ -88,8 +88,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 获取客户端IP
-  const ip = request.ip || 
-             request.headers.get('x-forwarded-for')?.split(',')[0] || 
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
              request.headers.get('x-real-ip') || 
              'unknown';
 
