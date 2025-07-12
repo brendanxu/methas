@@ -10,8 +10,6 @@ import { useGlobalSearch } from '@/components/layout/GlobalSearch';
 import { LanguageSwitcherFull } from '@/components/ui/LanguageSwitcher';
 import { cn } from '@/lib/utils';
 
-// Create a motion-enabled Link component
-const MotionLink = motion.create(Link);
 
 // Navigation data structure
 interface NavItem {
@@ -304,7 +302,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <LanguageSwitcherFull className="hidden sm:block" />
 
             {/* CTA Button */}
-            <MotionLink
+            <Link
               href="/contact"
               className={cn(
                 'hidden sm:inline-flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200',
@@ -316,11 +314,9 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
                 color: '#FFFFFF',
                 '--tw-ring-color': colors.primary,
               } as React.CSSProperties}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               {t('common:scheduleCall')}
-            </MotionLink>
+            </Link>
 
             {/* Mobile Menu Button */}
             <button
@@ -425,7 +421,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
   }
 
   return (
-    <MotionLink
+    <Link
       href={item.href || '#'}
       className={cn(
         'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -434,11 +430,9 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
       style={{
         color: isScrolled ? colors.foreground : '#FFFFFF',
       }}
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.2 }}
     >
       {item.label}
-    </MotionLink>
+    </Link>
   );
 };
 
@@ -470,7 +464,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ items, onClose }) => {
         <div className="p-6">
           <div className="grid gap-4">
             {items.map((item, index) => (
-              <MotionLink
+              <Link
                 key={item.label}
                 href={item.href || '#'}
                 className={cn(
@@ -478,13 +472,6 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ items, onClose }) => {
                   'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                 )}
                 onClick={onClose}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: settings.reducedMotion ? 0 : 0.1,
-                  delay: settings.reducedMotion ? 0 : index * 0.05,
-                }}
-                whileHover={{ scale: 1.02 }}
               >
                 {item.icon && (
                   <div 
@@ -513,7 +500,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ items, onClose }) => {
                     </p>
                   )}
                 </div>
-              </MotionLink>
+              </Link>
             ))}
           </div>
         </div>
@@ -580,7 +567,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <LanguageSwitcherFull />
           </div>
 
-          <MotionLink
+          <Link
             href="/contact"
             className={cn(
               'w-full inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200',
@@ -593,11 +580,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               '--tw-ring-color': colors.primary,
             } as React.CSSProperties}
             onClick={onClose}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             {t('common:scheduleCall')}
-          </MotionLink>
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -666,7 +651,7 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
               transition={{ duration: settings.reducedMotion ? 0 : 0.2 }}
             >
               {item.children.map((child) => (
-                <MotionLink
+                <Link
                   key={child.label}
                   href={child.href || '#'}
                   className={cn(
@@ -674,7 +659,6 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
                     'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                   )}
                   onClick={onClose}
-                  whileHover={{ scale: 1.02 }}
                 >
                   <div 
                     className="text-sm font-medium"
@@ -690,7 +674,7 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
                       {child.description}
                     </div>
                   )}
-                </MotionLink>
+                </Link>
               ))}
             </motion.div>
           )}
@@ -700,7 +684,7 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
   }
 
   return (
-    <MotionLink
+    <Link
       href={item.href || '#'}
       className={cn(
         'block p-3 rounded-lg transition-colors',
@@ -708,16 +692,9 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
       )}
       style={{ color: colors.foreground }}
       onClick={onClose}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ 
-        duration: settings.reducedMotion ? 0 : 0.1,
-        delay: settings.reducedMotion ? 0 : index * 0.05,
-      }}
-      whileHover={{ scale: 1.02 }}
     >
       <span className="text-sm font-medium">{item.label}</span>
-    </MotionLink>
+    </Link>
   );
 };
 

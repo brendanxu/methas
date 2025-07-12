@@ -8,8 +8,6 @@ import { useTheme, useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { cn } from '@/lib/utils';
 
-// Create a motion-enabled Link component
-const MotionLink = motion.create(Link);
 
 interface FooterLink {
   label: string;
@@ -253,29 +251,19 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     <ul className="space-y-4">
                       {section.links.map((link, linkIndex) => (
                         <li key={link.label}>
-                          <MotionLink
+                          <Link
                             href={link.href}
                             target={link.external ? '_blank' : undefined}
                             rel={link.external ? 'noopener noreferrer' : undefined}
                             className={cn(
                               'text-sm transition-colors duration-200',
-                              'hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded'
+                              'hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded',
+                              'hover:translate-x-1'
                             )}
                             style={{ 
                               color: colors.mutedForeground,
                               '--hover-color': colors.primary,
                             } as React.CSSProperties}
-                            initial={{ opacity: 0, x: -10 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ 
-                              duration: settings.reducedMotion ? 0 : 0.3,
-                              delay: settings.reducedMotion ? 0 : linkIndex * 0.05,
-                            }}
-                            whileHover={{ 
-                              color: colors.primary,
-                              x: 4,
-                            }}
                           >
                             {link.label}
                             {link.external && (
@@ -288,7 +276,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
                             )}
-                          </MotionLink>
+                          </Link>
                         </li>
                       ))}
                     </ul>

@@ -77,8 +77,7 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({
   const { settings } = useAccessibility();
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const cardRef = React.useRef<HTMLDivElement>(null);
-  const isInView = useInView(cardRef, { once: true, margin: "-100px" });
+  const [cardRef, isInView] = useInView({ once: true });
 
   // Size configurations
   const sizeConfig = {
@@ -296,7 +295,7 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({
 
   return (
     <BaseCard
-      ref={cardRef}
+      ref={cardRef as any}
       padding={config.padding}
       hoverable={true}
       loading={loading}

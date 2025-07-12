@@ -273,7 +273,7 @@ export const generateMetadata = (config: SEOConfig): Metadata => {
     openGraph: {
       title: config.openGraph?.title || config.title,
       description: config.openGraph?.description || config.description,
-      type: config.openGraph?.type || 'website',
+      type: (config.openGraph?.type === 'article' ? 'article' : 'website') as 'article' | 'website',
       siteName: config.openGraph?.siteName || 'South Pole',
       locale: config.openGraph?.locale || 'en',
       url: config.openGraph?.url,

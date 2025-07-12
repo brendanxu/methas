@@ -193,7 +193,7 @@ export const BaseCard = forwardRef<HTMLDivElement, BaseCardProps>(({
       tabIndex={clickable ? 0 : undefined}
       aria-disabled={loading}
       aria-busy={loading}
-      onKeyDown={clickable ? (e) => {
+      onKeyDown={clickable ? (e: React.KeyboardEvent) => {
         if ((e.key === 'Enter' || e.key === ' ') && !loading) {
           e.preventDefault();
           handleClick();

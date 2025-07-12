@@ -61,8 +61,7 @@ export const Hero: React.FC<HeroProps> = ({
   const colors = useThemeColors();
   const { settings } = useAccessibility();
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
-  const heroRef = React.useRef(null);
-  const isInView = useInView(heroRef, { once: true });
+  const [heroRef, isInView] = useInView({ once: true });
   const controls = useAnimation();
 
   // Statistics data with translations
@@ -136,7 +135,7 @@ export const Hero: React.FC<HeroProps> = ({
   // Trigger animations when in view
   useEffect(() => {
     if (isInView) {
-      controls.start('visible');
+      controls.start();
     }
   }, [isInView, controls]);
 
@@ -280,7 +279,7 @@ export const Hero: React.FC<HeroProps> = ({
 
   return (
     <section
-      ref={heroRef}
+      ref={heroRef as any}
       className={cn(
         'relative min-h-screen flex items-center justify-center overflow-hidden',
         className

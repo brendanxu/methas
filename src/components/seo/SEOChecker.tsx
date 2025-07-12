@@ -499,7 +499,6 @@ export const SEOChecker: React.FC<SEOCheckerProps> = ({ enabled = true }) => {
                         type={getIssueColor(issue.type)}
                         showIcon
                         icon={getIssueIcon(issue.type)}
-                        size="small"
                         style={{ fontSize: '12px' }}
                         action={
                           issue.element && (
