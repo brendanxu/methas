@@ -3,9 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import { Statistic } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { formatNumber } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 // TypeScript type definitions
@@ -48,12 +51,13 @@ export const Hero: React.FC<HeroProps> = ({
   backgroundImage = 'https://images.unsplash.com/photo-1569163139394-de4e4f43e4e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
   backgroundVideo,
   showStatistics = true,
-  primaryCTAText = 'Get Started',
-  secondaryCTAText = 'Learn More',
+  primaryCTAText,
+  secondaryCTAText,
   onPrimaryCTA,
   onSecondaryCTA,
   className,
 }) => {
+  const { t } = useTranslation(['home', 'common']);
   const colors = useThemeColors();
   const { settings } = useAccessibility();
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
@@ -61,11 +65,11 @@ export const Hero: React.FC<HeroProps> = ({
   const isInView = useInView(heroRef, { once: true });
   const controls = useAnimation();
 
-  // Statistics data
+  // Statistics data with translations
   const statisticsData: StatisticData[] = [
     {
       value: 1000,
-      title: '项目',
+      title: t('home:hero.stats.projects'),
       suffix: '+',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +79,7 @@ export const Hero: React.FC<HeroProps> = ({
     },
     {
       value: 50000000,
-      title: '减排量',
+      title: t('home:hero.stats.emissions'),
       suffix: '+',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,11 +89,21 @@ export const Hero: React.FC<HeroProps> = ({
     },
     {
       value: 100,
-      title: '国家',
+      title: t('home:hero.stats.countries'),
       suffix: '+',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+    },
+    {
+      value: 5000,
+      title: t('home:hero.stats.clients'),
+      suffix: '+',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
     },
@@ -129,11 +143,11 @@ export const Hero: React.FC<HeroProps> = ({
   // Custom statistic formatter with abbreviations
   const formatStatistic = (value: number, suffix?: string) => {
     if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(0)}M${suffix || ''}`;
+      return `${formatNumber(value / 1000000, { maximumFractionDigits: 0 })}M${suffix || ''}`;
     } else if (value >= 1000) {
-      return `${(value / 1000).toFixed(0)}K${suffix || ''}`;
+      return `${formatNumber(value / 1000, { maximumFractionDigits: 0 })}K${suffix || ''}`;
     }
-    return `${value}${suffix || ''}`;
+    return `${formatNumber(value)}${suffix || ''}`;
   };
 
   // Render background
@@ -160,10 +174,18 @@ export const Hero: React.FC<HeroProps> = ({
           animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.1 }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          <img
+          <OptimizedImage
             src={backgroundImage}
             alt="Climate action background"
-            className="w-full h-full object-cover"
+            fill
+            priority
+            className="object-cover"
+            quality={90}
+            sizes="100vw"
+            placeholder="blur"
+            autoBlur={true}
+            animate={true}
+            style={{ objectFit: 'cover' }}
           />
         </motion.div>
       );
@@ -242,7 +264,7 @@ export const Hero: React.FC<HeroProps> = ({
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-sm font-medium opacity-80">Scroll to explore</span>
+          <span className="text-sm font-medium opacity-80">{t('common:scrollToExplore', 'Scroll to explore')}</span>
           <motion.svg
             className="w-6 h-6 opacity-60"
             fill="none"
@@ -291,7 +313,7 @@ export const Hero: React.FC<HeroProps> = ({
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              Leading Climate Solutions
+              {t('home:hero.subtitle')}
             </motion.p>
 
             {/* Main title with gradient */}
@@ -301,12 +323,7 @@ export const Hero: React.FC<HeroProps> = ({
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              <span className="block">推动企业</span>
-              <span 
-                className="block bg-gradient-to-r from-blue-400 via-green-400 to-blue-500 bg-clip-text text-transparent"
-              >
-                可持续发展
-              </span>
+              <span className="block">{t('home:hero.title')}</span>
             </motion.h1>
 
             {/* Description */}
@@ -316,8 +333,7 @@ export const Hero: React.FC<HeroProps> = ({
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.7 }}
             >
-              我们致力于为企业提供全面的气候解决方案，通过创新技术和科学方法，
-              帮助组织实现碳中和目标，构建更加可持续的商业未来。
+              {t('home:hero.description')}
             </motion.p>
 
             {/* CTA Buttons */}
@@ -339,7 +355,7 @@ export const Hero: React.FC<HeroProps> = ({
                 }
                 iconPosition="right"
               >
-                {primaryCTAText}
+                {primaryCTAText || t('home:hero.primaryCTA')}
               </Button>
               <Button
                 size="large"
@@ -353,7 +369,7 @@ export const Hero: React.FC<HeroProps> = ({
                 }
                 iconPosition="left"
               >
-                {secondaryCTAText}
+                {secondaryCTAText || t('home:hero.secondaryCTA')}
               </Button>
             </motion.div>
           </motion.div>

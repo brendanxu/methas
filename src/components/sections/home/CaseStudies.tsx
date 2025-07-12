@@ -8,6 +8,7 @@ import { CarouselRef } from 'antd/es/carousel';
 import { LeftOutlined, RightOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useThemeColors } from '@/app/providers';
 
 // 类型定义
@@ -139,19 +140,27 @@ const CaseStudyCard: React.FC<{ caseStudy: CaseStudy; loading?: boolean }> = ({
     >
       {/* 项目图片 */}
       <div className="relative h-48 overflow-hidden">
-        <img
+        <OptimizedImage
           src={caseStudy.projectImage}
           alt={caseStudy.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          quality={85}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          lazyLoad
         />
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
         
         {/* 客户Logo */}
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2">
-          <img
+          <OptimizedImage
             src={caseStudy.clientLogo}
             alt={caseStudy.clientName}
+            width={80}
+            height={32}
             className="h-8 w-auto object-contain"
+            quality={90}
+            lazyLoad
           />
         </div>
       </div>

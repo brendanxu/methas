@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ConfigProvider } from 'antd';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { I18nProvider } from '@/components/providers/I18nProvider';
 import { antThemeConfig, antDarkThemeConfig, southPoleColors } from '@/styles/ant-theme';
 import { cssOptimizer, debounce, memoryMonitor } from '@/lib/performance';
 
@@ -118,11 +119,13 @@ export const Providers: React.FC<ProvidersProps> = ({
 }) => {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme={defaultTheme}>
-        <AntdProvider>
-          {children}
-        </AntdProvider>
-      </ThemeProvider>
+      <I18nProvider>
+        <ThemeProvider defaultTheme={defaultTheme}>
+          <AntdProvider>
+            {children}
+          </AntdProvider>
+        </ThemeProvider>
+      </I18nProvider>
     </ErrorBoundary>
   );
 };

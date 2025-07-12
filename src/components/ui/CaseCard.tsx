@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Tag } from 'antd';
 import { motion } from 'framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
+import { OptimizedImage } from './OptimizedImage';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { cn } from '@/lib/utils';
@@ -198,10 +199,13 @@ export const CaseCard = forwardRef<HTMLDivElement, CaseCardProps>(({
           <div className="flex items-center space-x-3">
             {clientLogo && !logoLoadError ? (
               <div className="w-12 h-12 rounded-lg border border-border overflow-hidden bg-background flex items-center justify-center">
-                <img
+                <OptimizedImage
                   src={clientLogo}
                   alt={`${clientName} logo`}
+                  width={48}
+                  height={48}
                   className="max-w-full max-h-full object-contain"
+                  quality={90}
                   onError={() => setLogoLoadError(true)}
                 />
               </div>

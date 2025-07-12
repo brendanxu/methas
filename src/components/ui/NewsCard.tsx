@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { formatDate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 // TypeScript type definitions
@@ -67,15 +68,6 @@ export const NewsCard = forwardRef<HTMLDivElement, NewsCardProps>(({
   const { settings } = useAccessibility();
   const [imageLoadError, setImageLoadError] = useState(false);
 
-  // Format date
-  const formatDate = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   // Get layout classes based on variant
   const getLayoutClasses = () => {

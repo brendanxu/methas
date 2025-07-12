@@ -6,6 +6,7 @@ import { motion, useInView } from 'framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { formatNumber } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 // TypeScript type definitions
@@ -211,7 +212,7 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({
       return formatter(numVal);
     }
     
-    const formattedValue = numVal.toFixed(precision);
+    const formattedValue = formatNumber(numVal, { minimumFractionDigits: precision, maximumFractionDigits: precision });
     return `${prefix || ''}${formattedValue}${suffix || ''}`;
   };
 
@@ -261,7 +262,7 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({
       >
         {trendStyle.icon}
         <span className="font-medium">
-          {trend.percentage.toFixed(1)}%
+          {formatNumber(trend.percentage, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
         </span>
         {trend.label && (
           <span className="text-xs" style={{ color: colors.mutedForeground }}>

@@ -1,0 +1,154 @@
+{
+  "hero": {
+    "title": "引领碳中和之路",
+    "subtitle": "通过创新的气候解决方案和可持续发展专业知识，助力全球组织实现净零排放。",
+    "description": "与数千家企业一起踏上碳中和之旅。我们的综合平台提供工具、专业知识和支持，帮助您有效测量、减少和抵消碳足迹。",
+    "primaryCTA": "开始您的旅程",
+    "secondaryCTA": "探索解决方案",
+    "statsLabel": "值得信赖的领先组织",
+    "stats": {
+      "projects": "已交付项目",
+      "emissions": "减少的CO₂排放量",
+      "countries": "服务国家",
+      "clients": "满意客户"
+    }
+  },
+  "services": {
+    "title": "全面的气候解决方案",
+    "subtitle": "为您的业务需求量身设计的端到端可持续发展服务",
+    "description": "从初步评估到实施和监控，我们为您的碳中和目标提供全方位支持。",
+    "cta": "查看所有服务",
+    "viewDetails": "查看详情",
+    "assessment": {
+      "title": "碳足迹评估",
+      "description": "全面测量和分析您组织在所有范围内的温室气体排放。"
+    },
+    "consulting": {
+      "title": "碳中和咨询",
+      "description": "战略指导和路线图制定，帮助实现净零排放目标。"
+    },
+    "reduction": {
+      "title": "减排策略",
+      "description": "通过运营改善和技术采用定制减排行动计划。"
+    },
+    "offset": {
+      "title": "碳抵消解决方案",
+      "description": "高质量碳信用额度和抵消项目，中和您的剩余排放。"
+    },
+    "reporting": {
+      "title": "可持续发展报告",
+      "description": "ESG披露和利益相关者沟通的综合报告解决方案。"
+    },
+    "risk": {
+      "title": "气候风险评估",
+      "description": "评估气候相关物理和转型风险对您业务运营的影响。"
+    }
+  },
+  "caseStudies": {
+    "title": "成功案例",
+    "subtitle": "我们气候行动合作伙伴关系的真实成果",
+    "description": "了解领先组织如何在我们的支持下实现可持续发展目标。",
+    "viewAll": "查看所有案例研究",
+    "readCase": "阅读案例研究",
+    "results": "成果",
+    "challenge": "挑战",
+    "solution": "解决方案",
+    "impact": "影响",
+    "techCompany": {
+      "title": "全球科技公司实现碳中和",
+      "company": "科技集团国际",
+      "industry": "科技",
+      "challenge": "在2年内减少全球运营中50万吨二氧化碳当量排放。",
+      "result": "提前6个月实现碳中和，减排45%。",
+      "metrics": {
+        "reduction": "45% 减排成果",
+        "savings": "年节省230万美元",
+        "timeline": "18个月实现碳中和"
+      }
+    },
+    "manufacturer": {
+      "title": "制造巨头的可持续转型",
+      "company": "工业解决方案有限公司",
+      "industry": "制造业",
+      "challenge": "转型能源密集型运营以符合净零承诺。",
+      "result": "在保持生产效率的同时减少运营排放60%。",
+      "metrics": {
+        "reduction": "60% 运营排放削减",
+        "efficiency": "15% 能效提升",
+        "investment": "5000万美元绿色投资回报"
+      }
+    },
+    "financial": {
+      "title": "金融机构的气候领导力",
+      "company": "全球金融集团",
+      "industry": "金融服务",
+      "challenge": "整合气候风险评估和可持续融资框架。",
+      "result": "推出10亿美元绿色金融投资组合，全面ESG整合。",
+      "metrics": {
+        "portfolio": "10亿美元绿色金融投资组合",
+        "risk": "100% 气候风险评估",
+        "rating": "获得AA级ESG评级"
+      }
+    }
+  },
+  "features": {
+    "title": "为什么选择 South Pole",
+    "subtitle": "气候行动和可持续发展领域的专业领导者",
+    "proven": {
+      "title": "经验证的成功记录",
+      "description": "15年以上在全球成功交付气候项目的经验。"
+    },
+    "comprehensive": {
+      "title": "全面解决方案",
+      "description": "从评估到实施和持续监控的端到端服务。"
+    },
+    "expertise": {
+      "title": "技术专长",
+      "description": "在气候科学、政策和可持续商业实践方面的深度知识。"
+    },
+    "global": {
+      "title": "全球覆盖",
+      "description": "国际化布局，在全球关键市场拥有本地专业知识。"
+    },
+    "innovation": {
+      "title": "创新专注",
+      "description": "前沿技术和方法论，实现最大影响和效率。"
+    },
+    "partnership": {
+      "title": "真正的合作伙伴",
+      "description": "协作方式确保您在每个步骤都取得成功。"
+    }
+  },
+  "cta": {
+    "title": "准备开始您的气候之旅了吗？",
+    "subtitle": "与领先组织一起迈向可持续未来",
+    "description": "在我们专家指导和经验证的解决方案下，迈出碳中和的第一步。",
+    "primaryButton": "今天就开始",
+    "secondaryButton": "预约咨询",
+    "contact": "或直接联系我们",
+    "phone": "+1 (555) 123-4567",
+    "email": "contact@southpole.com"
+  },
+  "newsletter": {
+    "title": "获取气候行动最新资讯",
+    "subtitle": "订阅我们的新闻简报，获取可持续发展领域的最新洞察、趋势和更新",
+    "placeholder": "输入您的邮箱地址",
+    "button": "立即订阅",
+    "privacy": "我们尊重您的隐私。您可以随时取消订阅。",
+    "benefits": {
+      "insights": "每周气候洞察和市场更新",
+      "resources": "独家报告和资源访问权限",
+      "events": "网络研讨会和活动的早期邀请"
+    }
+  },
+  "sections": {
+    "climateSolutions": "面向美好明天的气候解决方案",
+    "ourImpact": "我们的影响力",
+    "solution": "解决方案",
+    "impactStory": "影响力故事"
+  },
+  "content": {
+    "solutionDescription": "我们致力于为企业和组织提供创新的气候解决方案，帮助实现可持续发展目标。",
+    "impactDescription": "通过专业的咨询服务和技术支持，我们与客户携手应对气候变化挑战，创造积极的环境影响。"
+  }
+}

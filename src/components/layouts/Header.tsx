@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useGlobalSearch } from '@/components/layout/GlobalSearch';
+import { LanguageSwitcherFull } from '@/components/ui/LanguageSwitcher';
 import { cn } from '@/lib/utils';
 
 // Create a motion-enabled Link component
@@ -20,14 +22,15 @@ interface NavItem {
   icon?: React.ReactNode;
 }
 
-const navigationData: NavItem[] = [
+// Navigation configuration - this will be updated to use translations
+const getNavigationData = (t: any): NavItem[] => [
   {
-    label: 'What we do',
+    label: t('nav:ourServices'),
     children: [
       {
-        label: 'Climate Solutions',
-        href: '/solutions/climate',
-        description: 'Comprehensive climate action strategies',
+        label: t('nav:carbonFootprintAssessment'),
+        href: '/services/carbon-footprint-assessment',
+        description: 'Comprehensive measurement and analysis of your organization\'s greenhouse gas emissions',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -35,9 +38,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Carbon Offsetting',
-        href: '/solutions/carbon',
-        description: 'High-quality carbon offset projects',
+        label: t('nav:carbonNeutralityConsulting'),
+        href: '/services/carbon-neutrality-consulting',
+        description: 'Strategic guidance and roadmap development to achieve net-zero emissions',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -45,9 +48,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Renewable Energy',
-        href: '/solutions/renewable',
-        description: 'Clean energy transition support',
+        label: t('nav:emissionReductionStrategy'),
+        href: '/services/emission-reduction',
+        description: 'Tailored action plans to reduce emissions through operational improvements',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -55,9 +58,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Sustainability Consulting',
-        href: '/solutions/consulting',
-        description: 'Expert guidance for your journey',
+        label: t('nav:sustainabilityReporting'),
+        href: '/services/sustainability-reporting',
+        description: 'Comprehensive reporting solutions for ESG disclosure',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -67,12 +70,12 @@ const navigationData: NavItem[] = [
     ],
   },
   {
-    label: 'Our work & impact',
+    label: t('nav:ourSolutions'),
     children: [
       {
-        label: 'Project Portfolio',
-        href: '/projects',
-        description: 'Explore our global impact projects',
+        label: t('nav:netZeroStrategy'),
+        href: '/solutions/net-zero',
+        description: 'Comprehensive net-zero strategy development and implementation',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -80,9 +83,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Impact Stories',
-        href: '/impact',
-        description: 'Real results from real projects',
+        label: t('nav:carbonManagement'),
+        href: '/solutions/carbon-management',
+        description: 'End-to-end carbon management platform and services',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
@@ -90,9 +93,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Case Studies',
-        href: '/case-studies',
-        description: 'Deep dives into successful partnerships',
+        label: t('nav:renewableEnergyTransition'),
+        href: '/solutions/renewable-energy',
+        description: 'Clean energy transition support and project development',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -100,9 +103,9 @@ const navigationData: NavItem[] = [
         ),
       },
       {
-        label: 'Annual Reports',
-        href: '/reports',
-        description: 'Transparency in our progress',
+        label: t('nav:circularEconomy'),
+        href: '/solutions/circular-economy',
+        description: 'Circular economy strategies and implementation support',
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -112,15 +115,15 @@ const navigationData: NavItem[] = [
     ],
   },
   {
-    label: 'About us',
+    label: t('nav:about'),
     href: '/about',
   },
   {
-    label: 'News',
+    label: t('nav:news'),
     href: '/news',
   },
   {
-    label: 'Resources',
+    label: t('nav:resources'),
     href: '/resources',
   },
 ];
@@ -133,11 +136,14 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'zh'>('en');
   
+  const { t } = useTranslation(['nav', 'common']);
   const colors = useThemeColors();
   const { settings } = useAccessibility();
   const { openSearch } = useGlobalSearch();
+  
+  // Get navigation data with translations
+  const navigationData = getNavigationData(t);
 
   // Handle scroll effect with throttling for performance
   useEffect(() => {
@@ -195,10 +201,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const toggleLanguage = () => {
-    setCurrentLanguage(currentLanguage === 'en' ? 'zh' : 'en');
   };
 
   const handleDropdownToggle = (label: string, event: React.MouseEvent) => {
@@ -287,34 +289,19 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               style={{
                 color: isScrolled ? colors.foreground : '#FFFFFF',
               }}
-              aria-label="打开搜索 (Cmd+K)"
+              aria-label={t('common:search')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span className="hidden md:inline">搜索</span>
+              <span className="hidden md:inline">{t('common:search')}</span>
               <span className="hidden lg:inline text-xs opacity-60">
-                {navigator.platform?.includes('Mac') ? '⌘K' : 'Ctrl+K'}
+                {typeof navigator !== 'undefined' && navigator.platform?.includes('Mac') ? '⌘K' : 'Ctrl+K'}
               </span>
             </button>
 
             {/* Language Switcher */}
-            <button
-              onClick={toggleLanguage}
-              className={cn(
-                'hidden sm:flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
-              )}
-              style={{
-                color: isScrolled ? colors.foreground : '#FFFFFF',
-              }}
-              aria-label={`Switch to ${currentLanguage === 'en' ? 'Chinese' : 'English'}`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />
-              </svg>
-              <span>{currentLanguage === 'en' ? 'EN' : '中文'}</span>
-            </button>
+            <LanguageSwitcherFull className="hidden sm:block" />
 
             {/* CTA Button */}
             <MotionLink
@@ -332,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Book a meeting
+              {t('common:scheduleCall')}
             </MotionLink>
 
             {/* Mobile Menu Button */}
@@ -372,8 +359,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
         {isMobileMenuOpen && (
           <MobileMenu
             navigationData={navigationData}
-            currentLanguage={currentLanguage}
-            onLanguageToggle={toggleLanguage}
             onClose={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -540,17 +525,14 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ items, onClose }) => {
 // Mobile Menu Component
 interface MobileMenuProps {
   navigationData: NavItem[];
-  currentLanguage: 'en' | 'zh';
-  onLanguageToggle: () => void;
   onClose: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
   navigationData,
-  currentLanguage,
-  onLanguageToggle,
   onClose,
 }) => {
+  const { t } = useTranslation(['nav', 'common']);
   const colors = useThemeColors();
   const { settings } = useAccessibility();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -591,17 +573,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
         {/* Mobile Actions */}
         <div className="mt-8 pt-6 border-t space-y-4" style={{ borderColor: colors.border }}>
-          <button
-            onClick={onLanguageToggle}
-            className={cn(
-              'w-full flex items-center justify-between p-3 rounded-lg transition-colors',
-              'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
-            )}
-            style={{ color: colors.foreground }}
-          >
-            <span className="text-sm font-medium">Language</span>
-            <span className="text-sm">{currentLanguage === 'en' ? 'English' : '中文'}</span>
-          </button>
+          <div className="flex items-center justify-between p-3">
+            <span className="text-sm font-medium" style={{ color: colors.foreground }}>
+              {t('common:language')}
+            </span>
+            <LanguageSwitcherFull />
+          </div>
 
           <MotionLink
             href="/contact"
@@ -619,7 +596,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Book a meeting
+            {t('common:scheduleCall')}
           </MotionLink>
         </div>
       </div>

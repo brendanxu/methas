@@ -30,6 +30,7 @@ import {
 } from '@ant-design/icons';
 import { NewsCard } from '@/components/ui/NewsCard';
 import { useThemeColors } from '@/app/providers';
+import { formatDate, formatNumber } from '@/lib/i18n';
 import type { NewsArticle } from './page';
 
 const { TextArea } = Input;
@@ -358,7 +359,7 @@ const NewsArticlePage: React.FC<NewsArticlePageProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <CalendarOutlined />
-                  <span>{new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>
+                  <span>{formatDate(article.publishedAt)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockCircleOutlined />
@@ -367,7 +368,7 @@ const NewsArticlePage: React.FC<NewsArticlePageProps> = ({
                 {article.views && (
                   <div className="flex items-center gap-2">
                     <EyeOutlined />
-                    <span>{article.views.toLocaleString()} 次阅读</span>
+                    <span>{formatNumber(article.views)} 次阅读</span>
                   </div>
                 )}
               </div>
@@ -541,7 +542,7 @@ const NewsArticlePage: React.FC<NewsArticlePageProps> = ({
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">发布时间</span>
                     <span className="text-foreground">
-                      {new Date(article.publishedAt).toLocaleDateString('zh-CN')}
+                      {formatDate(article.publishedAt)}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -551,13 +552,13 @@ const NewsArticlePage: React.FC<NewsArticlePageProps> = ({
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">阅读量</span>
                     <span className="text-foreground">
-                      {article.views?.toLocaleString() || '0'}
+                      {formatNumber(article.views || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">字数</span>
                     <span className="text-foreground">
-                      {article.content.length.toLocaleString()}
+                      {formatNumber(article.content.length)}
                     </span>
                   </div>
                 </div>

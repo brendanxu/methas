@@ -1,0 +1,208 @@
+{
+  "generated": "2025-07-12T10:53:07.901Z",
+  "config": {
+    "inputDir": "./public/images/raw",
+    "outputDir": "./public/images",
+    "inputFormats": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".tiff",
+      ".webp"
+    ],
+    "formats": {
+      "webp": {
+        "quality": 85,
+        "effort": 6
+      },
+      "avif": {
+        "quality": 80,
+        "effort": 6
+      },
+      "jpeg": {
+        "quality": 85,
+        "mozjpeg": true
+      },
+      "png": {
+        "compressionLevel": 9,
+        "adaptiveFiltering": true
+      }
+    },
+    "sizes": [
+      {
+        "width": 640,
+        "suffix": "-sm"
+      },
+      {
+        "width": 768,
+        "suffix": "-md"
+      },
+      {
+        "width": 1024,
+        "suffix": "-lg"
+      },
+      {
+        "width": 1280,
+        "suffix": "-xl"
+      },
+      {
+        "width": 1920,
+        "suffix": "-2xl"
+      },
+      {
+        "width": 2560,
+        "suffix": "-3xl"
+      }
+    ],
+    "thumbnails": [
+      {
+        "width": 150,
+        "height": 150,
+        "suffix": "-thumb"
+      },
+      {
+        "width": 300,
+        "height": 300,
+        "suffix": "-thumb-2x"
+      }
+    ],
+    "blurPlaceholder": {
+      "width": 10,
+      "height": 10,
+      "quality": 50
+    }
+  },
+  "stats": {
+    "processed": 2,
+    "optimized": 2,
+    "errors": 0,
+    "totalSizeOriginal": 4525,
+    "totalSizeOptimized": 28169
+  },
+  "images": {
+    "test-hero": {
+      "formats": {},
+      "sizes": {
+        "hero": {
+          "png": "test-hero.png",
+          "jpeg": "test-hero.jpeg",
+          "webp": "test-hero.webp"
+        }
+      },
+      "thumbnails": {},
+      "blur": null
+    },
+    "test-logo": {
+      "formats": {},
+      "sizes": {
+        "logo": {
+          "png": "test-logo.png",
+          "jpeg": "test-logo.jpeg",
+          "webp": "test-logo.webp"
+        }
+      },
+      "thumbnails": {},
+      "blur": null
+    },
+    "test-hero-blur": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {},
+      "blur": "test-hero-blur.json"
+    },
+    "test-hero-md": {
+      "formats": {},
+      "sizes": {
+        "md": {
+          "jpeg": "test-hero-md.jpeg",
+          "png": "test-hero-md.png",
+          "webp": "test-hero-md.webp"
+        }
+      },
+      "thumbnails": {},
+      "blur": null
+    },
+    "test-hero-sm": {
+      "formats": {},
+      "sizes": {
+        "sm": {
+          "jpeg": "test-hero-sm.jpeg",
+          "png": "test-hero-sm.png",
+          "webp": "test-hero-sm.webp"
+        }
+      },
+      "thumbnails": {},
+      "blur": null
+    },
+    "test-hero-thumb-2x": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {
+        "jpeg": [
+          "test-hero-thumb-2x.jpeg"
+        ],
+        "png": [
+          "test-hero-thumb-2x.png"
+        ],
+        "webp": [
+          "test-hero-thumb-2x.webp"
+        ]
+      },
+      "blur": null
+    },
+    "test-hero-thumb": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {
+        "jpeg": [
+          "test-hero-thumb.jpeg"
+        ],
+        "png": [
+          "test-hero-thumb.png"
+        ],
+        "webp": [
+          "test-hero-thumb.webp"
+        ]
+      },
+      "blur": null
+    },
+    "test-logo-blur": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {},
+      "blur": "test-logo-blur.json"
+    },
+    "test-logo-thumb-2x": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {
+        "jpeg": [
+          "test-logo-thumb-2x.jpeg"
+        ],
+        "png": [
+          "test-logo-thumb-2x.png"
+        ],
+        "webp": [
+          "test-logo-thumb-2x.webp"
+        ]
+      },
+      "blur": null
+    },
+    "test-logo-thumb": {
+      "formats": {},
+      "sizes": {},
+      "thumbnails": {
+        "jpeg": [
+          "test-logo-thumb.jpeg"
+        ],
+        "png": [
+          "test-logo-thumb.png"
+        ],
+        "webp": [
+          "test-logo-thumb.webp"
+        ]
+      },
+      "blur": null
+    }
+  }
+}
