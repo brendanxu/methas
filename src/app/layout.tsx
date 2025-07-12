@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Providers, GlobalStylesProvider } from "./providers";
 import { Header } from "@/components/layouts/Header";
 import { Footer } from "@/components/layouts/Footer";
+import { PageTracker } from "@/components/analytics/PageTracker";
+import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -85,6 +87,8 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <Providers defaultTheme="light">
           <GlobalStylesProvider>
+            <PageTracker />
+            <GlobalSearch />
             <div className="min-h-screen flex flex-col bg-background text-foreground">
               <Header />
               <main className="flex-1">

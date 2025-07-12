@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { useGlobalSearch } from '@/components/layout/GlobalSearch';
 import { cn } from '@/lib/utils';
 
 // Create a motion-enabled Link component
@@ -136,6 +137,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   
   const colors = useThemeColors();
   const { settings } = useAccessibility();
+  const { openSearch } = useGlobalSearch();
 
   // Handle scroll effect with throttling for performance
   useEffect(() => {
@@ -275,6 +277,27 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Search Button */}
+            <button
+              onClick={openSearch}
+              className={cn(
+                'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+              )}
+              style={{
+                color: isScrolled ? colors.foreground : '#FFFFFF',
+              }}
+              aria-label="打开搜索 (Cmd+K)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="hidden md:inline">搜索</span>
+              <span className="hidden lg:inline text-xs opacity-60">
+                {navigator.platform?.includes('Mac') ? '⌘K' : 'Ctrl+K'}
+              </span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
