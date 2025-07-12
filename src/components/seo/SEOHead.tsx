@@ -5,59 +5,7 @@ import { Metadata } from 'next';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import { getCurrentLanguage, getLocalizedPath } from '@/lib/i18n';
-
-export interface SEOConfig {
-  title: string;
-  description: string;
-  keywords?: string[];
-  author?: string;
-  canonical?: string;
-  noindex?: boolean;
-  nofollow?: boolean;
-  
-  // Open Graph
-  openGraph?: {
-    title?: string;
-    description?: string;
-    type?: 'website' | 'article' | 'video' | 'music';
-    images?: Array<{
-      url: string;
-      width?: number;
-      height?: number;
-      alt?: string;
-    }>;
-    siteName?: string;
-    locale?: string;
-    url?: string;
-  };
-  
-  // Twitter
-  twitter?: {
-    card?: 'summary' | 'summary_large_image' | 'app' | 'player';
-    site?: string;
-    creator?: string;
-    title?: string;
-    description?: string;
-    images?: string[];
-  };
-  
-  // Article specific
-  article?: {
-    publishedTime?: string;
-    modifiedTime?: string;
-    expirationTime?: string;
-    author?: string[];
-    section?: string;
-    tags?: string[];
-  };
-  
-  // Custom meta tags
-  customMeta?: Array<{
-    name?: string;
-    property?: string;
-    content: string;
-  }>;
-}
+import { SEOConfig } from '@/lib/seo-metadata';
 
 interface SEOHeadProps {
   config: SEOConfig;
@@ -75,7 +23,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://southpole.com';
   
   // Generate canonical URL
-  const canonicalUrl = config.canonical || `${baseUrl}${basePath}`;
+  const canonicalUrl = config.canonical || config.canonicalUrl || `${baseUrl}${basePath}`;
   
   // Default values
   const siteName = 'South Pole';
@@ -155,7 +103,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <title>{seoConfig.title}</title>
       <meta name="description" content={seoConfig.description} />
       {seoConfig.keywords && (
-        <meta name="keywords" content={seoConfig.keywords.join(', ')} />
+        <meta name="keywords" content={Array.isArray(seoConfig.keywords) ? seoConfig.keywords.join(', ') : seoConfig.keywords} />
       )}
       {seoConfig.author && <meta name="author" content={seoConfig.author} />}
       
@@ -204,9 +152,11 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
           {seoConfig.article.expirationTime && (
             <meta property="article:expiration_time" content={seoConfig.article.expirationTime} />
           )}
-          {seoConfig.article.author?.map((author, index) => (
+          {Array.isArray(seoConfig.article.author) ? seoConfig.article.author.map((author, index) => (
             <meta key={index} property="article:author" content={author} />
-          ))}
+          )) : seoConfig.article.author && (
+            <meta property="article:author" content={seoConfig.article.author} />
+          )}
           {seoConfig.article.section && (
             <meta property="article:section" content={seoConfig.article.section} />
           )}
@@ -260,58 +210,5 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   );
 };
 
-// Helper function to generate metadata for Next.js App Router
-export const generateMetadata = (config: SEOConfig): Metadata => {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://southpole.com';
-  
-  return {
-    title: config.title,
-    description: config.description,
-    keywords: config.keywords,
-    authors: config.author ? [{ name: config.author }] : undefined,
-    
-    openGraph: {
-      title: config.openGraph?.title || config.title,
-      description: config.openGraph?.description || config.description,
-      type: (config.openGraph?.type === 'article' ? 'article' : 'website') as 'article' | 'website',
-      siteName: config.openGraph?.siteName || 'South Pole',
-      locale: config.openGraph?.locale || 'en',
-      url: config.openGraph?.url,
-      images: config.openGraph?.images || [
-        {
-          url: `${baseUrl}/og-default.jpg`,
-          width: 1200,
-          height: 630,
-          alt: config.title,
-        },
-      ],
-    },
-    
-    twitter: {
-      card: config.twitter?.card || 'summary_large_image',
-      site: config.twitter?.site || '@SouthPole',
-      creator: config.twitter?.creator,
-      title: config.twitter?.title || config.title,
-      description: config.twitter?.description || config.description,
-      images: config.twitter?.images || config.openGraph?.images?.map(img => img.url),
-    },
-    
-    robots: {
-      index: !config.noindex,
-      follow: !config.nofollow,
-      googleBot: {
-        index: !config.noindex,
-        follow: !config.nofollow,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-    
-    alternates: {
-      canonical: config.canonical,
-    },
-  };
-};
 
 export default SEOHead;

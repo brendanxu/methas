@@ -4,7 +4,7 @@
  * Centralized SEO configurations for different page types
  */
 
-import { SEOConfig } from '@/components/seo/SEOHead';
+import { SEOConfig } from '@/lib/seo-metadata';
 
 // Base configuration
 const BASE_CONFIG: Partial<SEOConfig> = {

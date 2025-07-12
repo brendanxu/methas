@@ -6,7 +6,7 @@ import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { DynamicHead } from "@/components/seo/DynamicHead";
 import { PreloadProvider, PreloadMonitor } from "@/components/optimization/PreloadProvider";
-import { generateMetadata as generateSEOMetadata } from "@/components/seo/SEOHead";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo-metadata";
 import { HOME_SEO } from "@/lib/seo-config";
 import { SEOChecker } from "@/components/seo/SEOChecker";
 import "./globals.css";
