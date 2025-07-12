@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { BaseCard } from '@/components/ui/BaseCard';
 import { ServiceCard } from '@/components/ui/ServiceCard';
 import { CaseCard } from '@/components/ui/CaseCard';

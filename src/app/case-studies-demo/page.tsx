@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { CaseStudies } from '@/components/sections/home/CaseStudies';
 import { Button } from '@/components/ui/Button';
 import { useThemeColors } from '@/app/providers';

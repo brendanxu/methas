@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { DynamicHomeHero } from '@/lib/dynamic-imports';
 import { Section } from '@/components/ui/Section';
 import { BaseCard } from '@/components/ui/BaseCard';

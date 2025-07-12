@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import {
   Input,
   Tabs,

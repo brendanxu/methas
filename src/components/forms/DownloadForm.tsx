@@ -26,7 +26,7 @@ import {
   FileTextOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { useThemeColors } from '@/app/providers';
 import {
   DownloadFormData,

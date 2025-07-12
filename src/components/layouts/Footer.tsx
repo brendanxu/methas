@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { Form, Input, Button, message } from 'antd';
 import { useTheme, useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';

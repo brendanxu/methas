@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, useAnimation, useInView } from 'framer-motion';
+import {  motion, useAnimation, useInView  } from '@/lib/mock-framer-motion';
 import { Statistic } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';

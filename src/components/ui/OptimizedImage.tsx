@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image, { ImageProps } from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import { cn } from '@/lib/utils';
 
 // Extended props for OptimizedImage

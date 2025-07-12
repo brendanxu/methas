@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { Button } from '@/components/ui/Button';
 import { AntButton } from '@/components/ant/AntButton';
 import { AccessibilityPanel } from '@/components/ui/AccessibilityPanel';

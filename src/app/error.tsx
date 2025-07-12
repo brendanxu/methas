@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button as AntButton, Result } from 'antd';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { Button } from '@/components/ui/Button';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { ERROR_SEO } from '@/lib/seo-config';

@@ -79,7 +79,7 @@ async function sendContactNotification(data: ContactFormData): Promise<{ notific
       country: data.country,
       inquiryType: data.inquiryType,
       message: data.message,
-      subscribeNewsletter: data.subscribeNewsletter,
+      subscribeNewsletter: data.subscribeNewsletter || false,
       submissionId,
     });
 

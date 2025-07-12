@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Section } from '@/components/ui/Section';
 import { ServiceCard } from '@/components/ui/ServiceCard';

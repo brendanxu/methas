@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Metadata } from 'next';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';

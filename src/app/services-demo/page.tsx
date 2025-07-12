@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { Services } from '@/components/sections/home/Services';
 import { Button } from '@/components/ui/Button';
 

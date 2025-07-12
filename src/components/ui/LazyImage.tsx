@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import { useLazyImage, useLazyBackgroundImage, useProgressiveImage } from '@/hooks/useLazyImage';
 import { OptimizedImage, OptimizedImageProps } from './OptimizedImage';
 import { cn } from '@/lib/utils';

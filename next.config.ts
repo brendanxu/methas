@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     // 图片断点
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // 图片质量优化
-    quality: 90,
+    // quality: 90, // Next.js 15 中已移除此配置
     // 启用图片优化
     unoptimized: false,
   },

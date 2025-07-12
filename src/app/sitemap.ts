@@ -172,7 +172,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return allPages
     .sort((a, b) => {
       if (b.priority !== a.priority) {
-        return b.priority - a.priority;
+        return (b.priority || 0) - (a.priority || 0);
       }
       return a.url.localeCompare(b.url);
     });

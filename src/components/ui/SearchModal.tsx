@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Input, Tag, Divider, Empty, Spin, InputRef } from 'antd';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import {
   SearchOutlined,
   FileTextOutlined,

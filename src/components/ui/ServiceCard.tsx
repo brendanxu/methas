@@ -2,7 +2,7 @@
 
 import React, { forwardRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';

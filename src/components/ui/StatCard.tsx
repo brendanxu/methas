@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Statistic } from 'antd';
-import { motion, useInView } from 'framer-motion';
+import {  motion, useInView  } from '@/lib/mock-framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';

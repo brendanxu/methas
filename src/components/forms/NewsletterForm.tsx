@@ -23,7 +23,7 @@ import {
   CheckCircleOutlined,
   BellOutlined,
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import { useThemeColors } from '@/app/providers';
 import {
   NewsletterFormData,

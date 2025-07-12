@@ -3,7 +3,7 @@
 import React, { forwardRef, useState } from 'react';
 import Link from 'next/link';
 import { Tag } from 'antd';
-import { motion } from 'framer-motion';
+import {  motion  } from '@/lib/mock-framer-motion';
 import { BaseCard, BaseCardProps } from './BaseCard';
 import { OptimizedImage } from './OptimizedImage';
 import { useThemeColors } from '@/app/providers';
