@@ -2,10 +2,13 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Hero } from '@/components/sections/Hero';
-import { ThemeShowcase } from '@/components/sections/ThemeShowcase';
-import { Services } from '@/components/sections/home/Services';
-import { CaseStudies } from '@/components/sections/home/CaseStudies';
+import { 
+  DynamicHomeHero,
+  DynamicThemeShowcase, 
+  DynamicServices,
+  DynamicCaseStudies 
+} from '@/lib/dynamic-imports';
+import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 
 // Metadata will be handled by layout.tsx with i18n
 
@@ -18,11 +21,34 @@ export default function Home() {
         <div>
           {/* Add padding-top to account for fixed header */}
           <div className="pt-20">
-            <Hero />
+            <DynamicHomeHero />
           </div>
-          <Services />
-          <CaseStudies />
-          <ThemeShowcase />
+          <ComponentPreloader
+            importFn={() => import('@/components/sections/home/Services')}
+            componentName="Services"
+            trigger="scroll"
+            scrollThreshold={30}
+          >
+            <DynamicServices />
+          </ComponentPreloader>
+          
+          <ComponentPreloader
+            importFn={() => import('@/components/sections/home/CaseStudies')}
+            componentName="CaseStudies"
+            trigger="scroll"
+            scrollThreshold={50}
+          >
+            <DynamicCaseStudies />
+          </ComponentPreloader>
+          
+          <ComponentPreloader
+            importFn={() => import('@/components/sections/ThemeShowcase')}
+            componentName="ThemeShowcase"
+            trigger="scroll"
+            scrollThreshold={70}
+          >
+            <DynamicThemeShowcase />
+          </ComponentPreloader>
           
           {/* Test content to verify scroll effects */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

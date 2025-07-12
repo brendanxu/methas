@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Hero } from '@/components/sections/home/Hero';
+import { DynamicHomeHero } from '@/lib/dynamic-imports';
 import { Section } from '@/components/ui/Section';
 import { BaseCard } from '@/components/ui/BaseCard';
 import { useThemeColors } from '@/app/providers';
@@ -33,7 +33,7 @@ const HeroDemo = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <Hero
+      <DynamicHomeHero
         backgroundType={heroConfig.backgroundType as 'image' | 'video' | 'gradient'}
         backgroundImage={heroConfig.backgroundType === 'image' ? backgroundOptions.image : undefined}
         backgroundVideo={heroConfig.backgroundType === 'video' ? backgroundOptions.video : undefined}

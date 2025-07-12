@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Carousel, Tag, Skeleton, Statistic } from 'antd';
 import { CarouselRef } from 'antd/es/carousel';
-import { LeftOutlined, RightOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined, ArrowRightOutlined } from '@/lib/antd-optimized';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';

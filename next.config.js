@@ -1,7 +1,31 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizePackageImports: ['@ant-design/icons'],
+    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es'],
+  },
+
+  // Modularize imports for better tree shaking
+  modularizeImports: {
+    'antd': {
+      transform: 'antd/es/{{member}}',
+      preventFullImport: true,
+    },
+    '@ant-design/icons': {
+      transform: '@ant-design/icons/es/icons/{{member}}',
+      preventFullImport: true,
+    },
+    'lodash-es': {
+      transform: 'lodash-es/{{member}}',
+      preventFullImport: true,
+    },
+    'framer-motion': {
+      transform: 'framer-motion',
+      preventFullImport: false, // Allow full import for motion
+    }
   },
 
   // Image optimization
@@ -84,4 +108,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);

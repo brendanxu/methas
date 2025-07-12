@@ -1,0 +1,107 @@
+{
+  "timestamp": "2025-07-12T11:07:47.814Z",
+  "summary": {
+    "totalSize": "2.27 MB",
+    "totalChunks": 70,
+    "largeChunks": 1
+  },
+  "metrics": {
+    "totalChunks": 70,
+    "totalSize": 2378288,
+    "averageChunkSize": 33975.54285714286,
+    "largestChunk": {
+      "name": "static/chunks/171-07b51b6353fd0ee2.js",
+      "size": 213218,
+      "path": ".next/static/chunks/171-07b51b6353fd0ee2.js"
+    }
+  },
+  "topChunks": [
+    {
+      "name": "static/chunks/171-07b51b6353fd0ee2.js",
+      "size": "208.22 KB",
+      "percentage": "8.97%"
+    },
+    {
+      "name": "static/chunks/1684-5ee8f72435bf6503.js",
+      "size": "171.67 KB",
+      "percentage": "7.39%"
+    },
+    {
+      "name": "static/chunks/4bd1b696-f9b5bbf512201701.js",
+      "size": "164.47 KB",
+      "percentage": "7.08%"
+    },
+    {
+      "name": "static/chunks/6628-28100d8dbcea811c.js",
+      "size": "155.79 KB",
+      "percentage": "6.71%"
+    },
+    {
+      "name": "static/chunks/2099-843ef36673fca75a.js",
+      "size": "151.9 KB",
+      "percentage": "6.54%"
+    },
+    {
+      "name": "static/chunks/framework-2c2be674e67eda3d.js",
+      "size": "136.58 KB",
+      "percentage": "5.88%"
+    },
+    {
+      "name": "static/chunks/main-24e90ad618130929.js",
+      "size": "117.02 KB",
+      "percentage": "5.04%"
+    },
+    {
+      "name": "static/chunks/polyfills-42372ed130431b0a.js",
+      "size": "109.96 KB",
+      "percentage": "4.73%"
+    },
+    {
+      "name": "static/chunks/4209-ffd0f20105d81ecf.js",
+      "size": "86.56 KB",
+      "percentage": "3.73%"
+    },
+    {
+      "name": "static/chunks/8228-93191186cfd0cc66.js",
+      "size": "79.82 KB",
+      "percentage": "3.44%"
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "size",
+      "severity": "high",
+      "message": "Total bundle size (2.27 MB) exceeds recommended threshold (488.28 KB)",
+      "suggestions": [
+        "Implement dynamic imports for large components",
+        "Use tree shaking to eliminate unused code",
+        "Consider code splitting at route level"
+      ]
+    },
+    {
+      "type": "chunks",
+      "severity": "medium",
+      "message": "Found 1 large chunks",
+      "chunks": [
+        {
+          "name": "static/chunks/171-07b51b6353fd0ee2.js",
+          "size": "208.22 KB"
+        }
+      ],
+      "suggestions": [
+        "Split large components using dynamic imports",
+        "Move heavy third-party libraries to separate chunks",
+        "Implement lazy loading for non-critical components"
+      ]
+    }
+  ],
+  "config": {
+    "nextDir": ".next",
+    "outputDir": "./bundle-analysis",
+    "thresholds": {
+      "totalSize": 500000,
+      "chunkSize": 200000,
+      "firstLoadJS": 300000
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { Footer } from "@/components/layouts/Footer";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { DynamicHead } from "@/components/seo/DynamicHead";
+import { PreloadProvider, PreloadMonitor } from "@/components/optimization/PreloadProvider";
 import "./globals.css";
 
 // Use default metadata - will be dynamically updated by i18n system
@@ -60,18 +61,21 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Providers defaultTheme="light">
-          <GlobalStylesProvider>
-            <DynamicHead />
-            <PageTracker />
-            <GlobalSearch />
-            <div className="min-h-screen flex flex-col bg-background text-foreground">
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
-            </div>
-          </GlobalStylesProvider>
+          <PreloadProvider>
+            <GlobalStylesProvider>
+              <DynamicHead />
+              <PageTracker />
+              <PreloadMonitor />
+              <GlobalSearch />
+              <div className="min-h-screen flex flex-col bg-background text-foreground">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+            </GlobalStylesProvider>
+          </PreloadProvider>
         </Providers>
       </body>
     </html>
