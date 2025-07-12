@@ -256,17 +256,17 @@ export class RoutePredictor {
     rule.conditions.forEach(condition => {
       switch (condition.type) {
         case 'scroll':
-          if (behavior.scrollDepth >= condition.value) {
+          if (typeof condition.value === 'number' && behavior.scrollDepth >= condition.value) {
             reasons.push(`User has scrolled ${behavior.scrollDepth}% (threshold: ${condition.value}%)`);
           }
           break;
         case 'time':
-          if (behavior.dwellTime >= condition.value) {
-            reasons.push(`User spent ${Math.round(behavior.dwellTime / 1000)}s on page (threshold: ${condition.value / 1000}s)`);
+          if (typeof condition.value === 'number' && behavior.dwellTime >= condition.value) {
+            reasons.push(`User spent ${Math.round(behavior.dwellTime / 1000)}s on page (threshold: ${Math.round(condition.value / 1000)}s)`);
           }
           break;
         case 'interaction':
-          if (behavior.interactionCount >= condition.value) {
+          if (typeof condition.value === 'number' && behavior.interactionCount >= condition.value) {
             reasons.push(`User made ${behavior.interactionCount} interactions (threshold: ${condition.value})`);
           }
           break;
