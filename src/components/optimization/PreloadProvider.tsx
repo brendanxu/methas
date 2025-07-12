@@ -1,115 +1,25 @@
 'use client';
 
 /**
- * Preload Provider Component
+ * Legacy Preload Provider Component
  * 
- * Provides intelligent preloading capabilities across the application
+ * This file re-exports the new PreloadProvider for backward compatibility
  */
 
+export { 
+  PreloadProvider,
+  usePreload,
+  useRoutePreloader,
+  useHoverPreload,
+  useScrollPreload,
+  usePreloadMetrics,
+  usePreloadDebug
+} from '@/lib/preload-strategy';
+
+// Legacy compatibility components
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { useRoutePreloader, preloadCriticalRoutes } from '@/lib/preload-strategy';
-
-interface PreloadProviderProps {
-  children: React.ReactNode;
-}
-
-/**
- * Main preload provider that handles global preloading strategies
- */
-export const PreloadProvider: React.FC<PreloadProviderProps> = ({ children }) => {
-  const pathname = usePathname();
-  const { preloadRoute, preloadComponent } = useRoutePreloader();
-
-  // Preload critical routes on app initialization
-  preloadCriticalRoutes();
-
-  // Route-specific preloading
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      handleRouteSpecificPreloading(pathname, preloadRoute, preloadComponent);
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [pathname, preloadRoute, preloadComponent]);
-
-  return <>{children}</>;
-};
-
-/**
- * Handle route-specific preloading logic
- */
-function handleRouteSpecificPreloading(
-  pathname: string,
-  preloadRoute: (url: string, options?: any) => void,
-  preloadComponent: (importFn: () => Promise<any>, name: string, options?: any) => void
-) {
-  switch (pathname) {
-    case '/':
-      // Homepage preloading
-      preloadRoute('/services', { priority: 'high' });
-      preloadRoute('/case-studies', { priority: 'medium' });
-      preloadRoute('/news', { priority: 'medium' });
-      
-      // Preload heavy components that might be used
-      preloadComponent(
-        () => import('@/components/sections/home/Services'),
-        'Services',
-        { priority: 'medium', delay: 2000 }
-      );
-      preloadComponent(
-        () => import('@/components/sections/home/CaseStudies'),
-        'CaseStudies',
-        { priority: 'medium', delay: 3000 }
-      );
-      break;
-
-    case '/services':
-      // Services page preloading
-      preloadRoute('/services/carbon-footprint-assessment', { priority: 'high' });
-      preloadRoute('/services/carbon-neutrality-consulting', { priority: 'high' });
-      preloadRoute('/case-studies', { priority: 'medium' });
-      break;
-
-    case '/news':
-      // News page preloading
-      preloadComponent(
-        () => import('@/components/ui/NewsCard'),
-        'NewsCard',
-        { priority: 'medium' }
-      );
-      break;
-
-    case '/hero-demo':
-      // Demo navigation preloading
-      preloadRoute('/cards-demo', { priority: 'medium' });
-      preloadRoute('/forms-demo', { priority: 'low' });
-      break;
-
-    case '/cards-demo':
-      preloadRoute('/hero-demo', { priority: 'medium' });
-      preloadRoute('/forms-demo', { priority: 'medium' });
-      preloadRoute('/section-demo', { priority: 'low' });
-      break;
-
-    case '/forms-demo':
-      preloadRoute('/cards-demo', { priority: 'medium' });
-      preloadRoute('/services-demo', { priority: 'medium' });
-      
-      // Preload form components
-      preloadComponent(
-        () => import('@/lib/antd-optimized').then(mod => ({ default: mod.DynamicAntForm })),
-        'AntForm',
-        { priority: 'high' }
-      );
-      break;
-
-    default:
-      // Default preloading for unknown routes
-      preloadRoute('/', { priority: 'low' });
-      break;
-  }
-}
+import { usePreload } from '@/lib/preload-strategy';
 
 /**
  * Component-level preloader for heavy components
@@ -140,12 +50,17 @@ export const ComponentPreloader: React.FC<ComponentPreloaderProps> = ({
   delay = 0,
   children
 }) => {
-  const { preloadComponent } = useRoutePreloader();
+  const { preloadComponent, isReady } = usePreload();
 
   useEffect(() => {
+    if (!isReady) return;
+
     if (trigger === 'immediate') {
       const timeoutId = setTimeout(() => {
-        preloadComponent(importFn, componentName, { priority: 'low' });
+        preloadComponent(importFn, { 
+          priority: 'low',
+          component: componentName 
+        });
       }, delay);
       return () => clearTimeout(timeoutId);
     }
@@ -161,7 +76,10 @@ export const ComponentPreloader: React.FC<ComponentPreloaderProps> = ({
         const scrollPercent = (scrollTop / docHeight) * 100;
 
         if (scrollPercent > scrollThreshold) {
-          preloadComponent(importFn, componentName, { priority: 'medium' });
+          preloadComponent(importFn, { 
+            priority: 'medium',
+            component: componentName 
+          });
           hasTriggered = true;
           window.removeEventListener('scroll', handleScroll);
         }
@@ -170,7 +88,7 @@ export const ComponentPreloader: React.FC<ComponentPreloaderProps> = ({
       window.addEventListener('scroll', handleScroll, { passive: true });
       return () => window.removeEventListener('scroll', handleScroll);
     }
-  }, [trigger, importFn, componentName, preloadComponent, scrollThreshold, delay]);
+  }, [trigger, importFn, componentName, preloadComponent, scrollThreshold, delay, isReady]);
 
   return <>{children}</>;
 };
@@ -191,10 +109,12 @@ export const PreloadLink: React.FC<PreloadLinkProps> = ({
   className,
   priority = 'medium'
 }) => {
-  const { preloadRoute } = useRoutePreloader();
+  const { preloadRoute, isReady } = usePreload();
 
   const handleMouseEnter = () => {
-    preloadRoute(href, { priority });
+    if (isReady) {
+      preloadRoute(href, { priority });
+    }
   };
 
   return (
@@ -254,5 +174,3 @@ export const PreloadMonitor: React.FC = () => {
 
   return null;
 };
-
-export default PreloadProvider;

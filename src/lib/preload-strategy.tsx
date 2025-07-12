@@ -1,486 +1,434 @@
-/**
- * Intelligent Preload Strategy
- * 
- * Implements smart preloading based on user behavior and route prediction
- */
-
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+/**
+ * Improved Intelligent Preload Strategy System
+ * 
+ * Refactored to use modular components with better error handling and type safety
+ */
 
-// ===== Types =====
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { PreloadConfig, getPreloadConfig } from './preload-config';
+import { BehaviorTracker, UserBehavior } from './behavior-tracker';
+import { RoutePredictor, RoutePrediction } from './route-predictor';
+import { PreloadQueue, PreloadRequest, PreloadStats } from './preload-queue';
+
+// ===== Enhanced Types =====
 
 interface PreloadOptions {
   priority?: 'high' | 'medium' | 'low';
-  delay?: number;
-  condition?: () => boolean;
+  route?: string;
+  component?: string;
+  onSuccess?: (result: any) => void;
+  onError?: (error: Error) => void;
   maxRetries?: number;
 }
 
-interface UserBehavior {
-  scrollDepth: number;
-  timeOnPage: number;
-  interactions: number;
-  previousRoutes: string[];
-  deviceType: 'mobile' | 'tablet' | 'desktop';
-  connectionSpeed: 'slow' | 'fast' | 'unknown';
+interface PerformanceMetrics {
+  memoryUsage: number;
+  loadTime: number;
+  cacheHitRate: number;
+  preloadSuccess: number;
+  preloadFailure: number;
+  routePredictions: RoutePrediction[];
+  engagementScore: number;
 }
 
-interface RoutePredictor {
-  fromRoute: string;
-  toRoute: string;
-  probability: number;
-  conditions: string[];
+interface PreloadContextValue {
+  preloadComponent: (importFn: () => Promise<any>, options?: PreloadOptions) => string;
+  preloadRoute: (route: string, options?: PreloadOptions) => void;
+  getMetrics: () => PerformanceMetrics;
+  getBehavior: () => UserBehavior | null;
+  getPredictions: () => RoutePrediction[];
+  clearCache: () => void;
+  isReady: boolean;
 }
 
-// ===== Core Preload Manager =====
+// ===== Enhanced Preload Manager =====
 
-class PreloadManager {
-  private static instance: PreloadManager;
-  private preloadedRoutes = new Set<string>();
-  private preloadedComponents = new Set<string>();
-  private userBehavior: UserBehavior;
-  private routePredictors: RoutePredictor[] = [];
-  private preloadQueue: Array<{ url: string; options: PreloadOptions }> = [];
-  private isProcessing = false;
+class EnhancedPreloadManager {
+  private static instance: EnhancedPreloadManager;
+  private config: PreloadConfig;
+  private behaviorTracker: BehaviorTracker;
+  private routePredictor: RoutePredictor;
+  private preloadQueue: PreloadQueue;
+  private isInitialized: boolean = false;
+  private routeStartTime: number = Date.now();
 
-  constructor() {
-    this.userBehavior = {
-      scrollDepth: 0,
-      timeOnPage: 0,
-      interactions: 0,
-      previousRoutes: [],
-      deviceType: this.detectDeviceType(),
-      connectionSpeed: this.detectConnectionSpeed()
-    };
-
-    this.initializeRoutePredictors();
-    this.startBehaviorTracking();
+  private constructor() {
+    this.config = getPreloadConfig();
+    this.behaviorTracker = new BehaviorTracker(this.config);
+    this.routePredictor = new RoutePredictor(this.config);
+    this.preloadQueue = new PreloadQueue(this.config);
+    this.setupBehaviorListeners();
+    this.isInitialized = true;
   }
 
-  static getInstance(): PreloadManager {
-    if (!PreloadManager.instance) {
-      PreloadManager.instance = new PreloadManager();
+  public static getInstance(): EnhancedPreloadManager {
+    if (!EnhancedPreloadManager.instance) {
+      EnhancedPreloadManager.instance = new EnhancedPreloadManager();
     }
-    return PreloadManager.instance;
+    return EnhancedPreloadManager.instance;
   }
 
-  // ===== Device and Connection Detection =====
+  private setupBehaviorListeners(): void {
+    // Listen for behavior changes to trigger predictions
+    this.behaviorTracker.addEventListener('scrollDepthChanged', () => {
+      this.handleBehaviorChange();
+    });
 
-  private detectDeviceType(): 'mobile' | 'tablet' | 'desktop' {
-    if (typeof window === 'undefined') return 'desktop';
-    
-    const width = window.innerWidth;
-    if (width < 768) return 'mobile';
-    if (width < 1024) return 'tablet';
-    return 'desktop';
+    this.behaviorTracker.addEventListener('interactionRecorded', () => {
+      this.handleBehaviorChange();
+    });
+
+    this.behaviorTracker.addEventListener('routeChanged', () => {
+      this.handleRouteChange();
+    });
   }
 
-  private detectConnectionSpeed(): 'slow' | 'fast' | 'unknown' {
-    if (typeof navigator === 'undefined' || !('connection' in navigator)) {
-      return 'unknown';
-    }
+  private handleBehaviorChange(): void {
+    if (!this.config.behavior.enablePredictivePreload) return;
 
-    const connection = (navigator as any).connection;
-    if (!connection) return 'unknown';
+    const behavior = this.behaviorTracker.getBehavior();
+    const predictions = this.routePredictor.predictRoutes(behavior);
 
-    // Effective connection type
-    const effectiveType = connection.effectiveType;
-    if (effectiveType === 'slow-2g' || effectiveType === '2g') return 'slow';
-    if (effectiveType === '3g') return 'slow';
-    return 'fast';
-  }
-
-  // ===== Route Prediction =====
-
-  private initializeRoutePredictors() {
-    this.routePredictors = [
-      // Homepage to services
-      {
-        fromRoute: '/',
-        toRoute: '/services',
-        probability: 0.7,
-        conditions: ['scroll > 50%', 'time > 30s']
-      },
-      // Homepage to case studies
-      {
-        fromRoute: '/',
-        toRoute: '/case-studies',
-        probability: 0.6,
-        conditions: ['scroll > 70%', 'interactions > 2']
-      },
-      // Services to specific service
-      {
-        fromRoute: '/services',
-        toRoute: '/services/carbon-footprint-assessment',
-        probability: 0.8,
-        conditions: ['hover on service card']
-      },
-      // Demo pages progression
-      {
-        fromRoute: '/hero-demo',
-        toRoute: '/cards-demo',
-        probability: 0.5,
-        conditions: ['scroll > 80%']
-      },
-      {
-        fromRoute: '/cards-demo',
-        toRoute: '/forms-demo',
-        probability: 0.4,
-        conditions: ['scroll > 80%']
-      },
-      // News to article
-      {
-        fromRoute: '/news',
-        toRoute: '/news/[slug]',
-        probability: 0.9,
-        conditions: ['hover on article card']
-      }
-    ];
-  }
-
-  // ===== Behavior Tracking =====
-
-  private startBehaviorTracking() {
-    if (typeof window === 'undefined') return;
-
-    // Track scroll depth
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      this.userBehavior.scrollDepth = Math.max(this.userBehavior.scrollDepth, scrollPercent);
-    };
-
-    // Track interactions
-    const handleInteraction = () => {
-      this.userBehavior.interactions++;
-    };
-
-    // Track time on page
-    const startTime = Date.now();
-    const updateTimeOnPage = () => {
-      this.userBehavior.timeOnPage = Date.now() - startTime;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('click', handleInteraction);
-    window.addEventListener('keydown', handleInteraction);
-    setInterval(updateTimeOnPage, 1000);
-
-    // Cleanup function would be needed in a real implementation
-  }
-
-  // ===== Preload Logic =====
-
-  preloadRoute(url: string, options: PreloadOptions = {}) {
-    if (this.preloadedRoutes.has(url)) return;
-
-    // Skip preloading on slow connections for low priority
-    if (this.userBehavior.connectionSpeed === 'slow' && options.priority === 'low') {
-      return;
-    }
-
-    // Check condition
-    if (options.condition && !options.condition()) {
-      return;
-    }
-
-    this.preloadQueue.push({ url, options });
-    this.processPreloadQueue();
-  }
-
-  preloadComponent(importFn: () => Promise<any>, componentName: string, options: PreloadOptions = {}) {
-    if (this.preloadedComponents.has(componentName)) return;
-
-    const delay = options.delay || 0;
-    
-    setTimeout(() => {
-      if (options.condition && !options.condition()) return;
-
-      // Use requestIdleCallback for better performance
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => {
-          importFn()
-            .then(() => {
-              this.preloadedComponents.add(componentName);
-              console.log(`Preloaded component: ${componentName}`);
-            })
-            .catch(() => {
-              // Retry logic could be added here
-            });
+    // Preload high-probability routes
+    predictions
+      .filter(prediction => 
+        prediction.probability > 0.7 && 
+        prediction.confidence > 0.6
+      )
+      .slice(0, 2) // Limit to top 2 predictions
+      .forEach(prediction => {
+        this.preloadRoute(prediction.route, { 
+          priority: 'medium',
+          route: prediction.route 
         });
-      } else {
-        // Fallback for browsers without requestIdleCallback
-        setTimeout(() => {
-          importFn()
-            .then(() => {
-              this.preloadedComponents.add(componentName);
-            })
-            .catch(() => {});
-        }, 2000);
-      }
-    }, delay);
-  }
-
-  private async processPreloadQueue() {
-    if (this.isProcessing || this.preloadQueue.length === 0) return;
-    
-    this.isProcessing = true;
-
-    // Sort queue by priority
-    this.preloadQueue.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.options.priority || 'medium'] - priorityOrder[a.options.priority || 'medium'];
-    });
-
-    while (this.preloadQueue.length > 0) {
-      const { url, options } = this.preloadQueue.shift()!;
-      
-      try {
-        await this.performRoutePreload(url, options);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between preloads
-      } catch (error) {
-        console.warn(`Failed to preload route: ${url}`, error);
-      }
-    }
-
-    this.isProcessing = false;
-  }
-
-  private async performRoutePreload(url: string, options: PreloadOptions) {
-    if (this.preloadedRoutes.has(url)) return;
-
-    // Use Next.js router prefetch
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = url;
-    document.head.appendChild(link);
-
-    this.preloadedRoutes.add(url);
-    console.log(`Preloaded route: ${url}`);
-  }
-
-  // ===== Smart Prediction =====
-
-  predictAndPreload(currentRoute: string) {
-    const predictions = this.routePredictors
-      .filter(predictor => predictor.fromRoute === currentRoute)
-      .filter(predictor => this.shouldPreloadBasedOnConditions(predictor.conditions))
-      .sort((a, b) => b.probability - a.probability);
-
-    predictions.forEach(prediction => {
-      this.preloadRoute(prediction.toRoute, {
-        priority: prediction.probability > 0.7 ? 'high' : 'medium',
-        delay: prediction.probability > 0.8 ? 0 : 2000
       });
+  }
+
+  private handleRouteChange(): void {
+    const behavior = this.behaviorTracker.getBehavior();
+    
+    // Record navigation if we have a previous route
+    if (behavior.previousRoutes.length > 0) {
+      const previousRoute = behavior.previousRoutes[behavior.previousRoutes.length - 1];
+      const timeSpent = Date.now() - this.routeStartTime;
+      this.routePredictor.recordNavigation(previousRoute, behavior.currentRoute, timeSpent);
+    }
+
+    this.routeStartTime = Date.now();
+  }
+
+  // Public API
+  public preloadComponent(
+    importFn: () => Promise<any>, 
+    options: PreloadOptions = {}
+  ): string {
+    return this.preloadQueue.enqueue(importFn, {
+      priority: options.priority || 'medium',
+      route: options.route,
+      component: options.component,
+      onSuccess: options.onSuccess,
+      onError: (error) => {
+        console.warn('Component preload failed:', {
+          component: options.component,
+          route: options.route,
+          error: error.message
+        });
+        options.onError?.(error);
+      },
+      maxRetries: options.maxRetries,
     });
   }
 
-  private shouldPreloadBasedOnConditions(conditions: string[]): boolean {
-    return conditions.every(condition => {
-      if (condition.includes('scroll >')) {
-        const threshold = parseInt(condition.match(/\d+/)?.[0] || '0');
-        return this.userBehavior.scrollDepth > threshold;
-      }
-      if (condition.includes('time >')) {
-        const threshold = parseInt(condition.match(/\d+/)?.[0] || '0') * 1000;
-        return this.userBehavior.timeOnPage > threshold;
-      }
-      if (condition.includes('interactions >')) {
-        const threshold = parseInt(condition.match(/\d+/)?.[0] || '0');
-        return this.userBehavior.interactions > threshold;
-      }
-      return true;
-    });
-  }
-
-  // ===== Public Methods =====
-
-  updateRoute(route: string) {
-    this.userBehavior.previousRoutes.push(route);
-    if (this.userBehavior.previousRoutes.length > 5) {
-      this.userBehavior.previousRoutes.shift();
+  public preloadRoute(route: string, options: PreloadOptions = {}): void {
+    // Temporary implementation - only preload existing routes
+    const routeMap: Record<string, () => Promise<any>> = {
+      '/services': () => import('../components/sections/home/Services'),
+      '/search': () => import('../app/search/SearchPageClient'),
+      '/news': () => import('../app/news/page'),
+      // Add more routes as they are implemented
+    };
+    
+    const importFn = routeMap[route];
+    if (!importFn) {
+      console.warn(`Route ${route} is not configured for preloading`);
+      return;
     }
     
-    // Reset behavior metrics for new route
-    this.userBehavior.scrollDepth = 0;
-    this.userBehavior.timeOnPage = 0;
-    this.userBehavior.interactions = 0;
-
-    // Predict and preload
-    setTimeout(() => {
-      this.predictAndPreload(route);
-    }, 1000);
+    this.preloadComponent(importFn, {
+      ...options,
+      route,
+      component: `Route:${route}`,
+    });
   }
 
-  getBehaviorData(): UserBehavior {
-    return { ...this.userBehavior };
+  public updateRoute(newRoute: string): void {
+    this.behaviorTracker.updateRoute(newRoute);
   }
-}
 
-// ===== React Hooks =====
+  public getMetrics(): PerformanceMetrics {
+    const behavior = this.behaviorTracker.getBehavior();
+    const predictions = this.routePredictor.predictRoutes(behavior);
+    const queueStats = this.preloadQueue.getStats();
+    
+    return {
+      memoryUsage: this.getMemoryUsage(),
+      loadTime: queueStats.averageLoadTime,
+      cacheHitRate: queueStats.cacheHitRate,
+      preloadSuccess: queueStats.successfulRequests,
+      preloadFailure: queueStats.failedRequests,
+      routePredictions: predictions,
+      engagementScore: this.behaviorTracker.getEngagementScore(),
+    };
+  }
 
-/**
- * Hook for route-based preloading
- */
-export function useRoutePreloader() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const manager = useRef<PreloadManager>();
+  public getBehavior(): UserBehavior {
+    return this.behaviorTracker.getBehavior();
+  }
 
-  useEffect(() => {
-    manager.current = PreloadManager.getInstance();
-    manager.current.updateRoute(pathname);
-  }, [pathname]);
+  public getPredictions(): RoutePrediction[] {
+    const behavior = this.behaviorTracker.getBehavior();
+    return this.routePredictor.predictRoutes(behavior);
+  }
 
-  const preloadRoute = useCallback((url: string, options?: PreloadOptions) => {
-    manager.current?.preloadRoute(url, options);
-  }, []);
+  public clearCache(): void {
+    this.preloadQueue.clearCache();
+  }
 
-  const preloadComponent = useCallback((importFn: () => Promise<any>, name: string, options?: PreloadOptions) => {
-    manager.current?.preloadComponent(importFn, name, options);
-  }, []);
+  public getQueueStatus() {
+    return this.preloadQueue.getQueueStatus();
+  }
 
-  return {
-    preloadRoute,
-    preloadComponent,
-    behaviorData: manager.current?.getBehaviorData()
-  };
-}
+  public getNavigationStats() {
+    return this.routePredictor.getNavigationStats();
+  }
 
-/**
- * Hook for hover-based preloading
- */
-export function useHoverPreload(url: string, options: PreloadOptions = {}) {
-  const { preloadRoute } = useRoutePreloader();
-  const hasPreloaded = useRef(false);
-
-  const onMouseEnter = useCallback(() => {
-    if (!hasPreloaded.current) {
-      preloadRoute(url, { ...options, priority: 'high' });
-      hasPreloaded.current = true;
+  private getMemoryUsage(): number {
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      const perf = (window.performance as any);
+      if (perf.memory) {
+        return Math.round(perf.memory.usedJSHeapSize / 1024 / 1024); // MB
+      }
     }
-  }, [url, options, preloadRoute]);
+    return 0;
+  }
 
-  return { onMouseEnter };
+  public destroy(): void {
+    this.behaviorTracker.destroy();
+    this.preloadQueue.destroy();
+    this.isInitialized = false;
+  }
+
+  public get ready(): boolean {
+    return this.isInitialized;
+  }
+
+  // Debug utilities
+  public debug(): void {
+    console.group('Preload Manager Debug');
+    console.log('Config:', this.config);
+    console.log('Behavior:', this.getBehavior());
+    console.log('Predictions:', this.getPredictions());
+    console.log('Queue Status:', this.getQueueStatus());
+    console.log('Navigation Stats:', this.getNavigationStats());
+    console.log('Metrics:', this.getMetrics());
+    this.preloadQueue.debugQueue();
+    console.groupEnd();
+  }
 }
 
-/**
- * Hook for scroll-based preloading
- */
-export function useScrollPreload(
-  importFn: () => Promise<any>,
-  componentName: string,
-  threshold: number = 50
-) {
-  const { preloadComponent } = useRoutePreloader();
-  const hasTriggered = useRef(false);
+// ===== React Context =====
+
+const PreloadContext = createContext<PreloadContextValue>({
+  preloadComponent: () => '',
+  preloadRoute: () => {},
+  getMetrics: () => ({
+    memoryUsage: 0,
+    loadTime: 0,
+    cacheHitRate: 0,
+    preloadSuccess: 0,
+    preloadFailure: 0,
+    routePredictions: [],
+    engagementScore: 0,
+  }),
+  getBehavior: () => null,
+  getPredictions: () => [],
+  clearCache: () => {},
+  isReady: false,
+});
+
+// ===== Provider Component =====
+
+export const PreloadProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [manager] = useState(() => EnhancedPreloadManager.getInstance());
+  const [isReady, setIsReady] = useState(false);
+  const pathname = usePathname();
+  const previousPathnameRef = useRef<string>();
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (hasTriggered.current) return;
+    if (manager.ready) {
+      setIsReady(true);
+    }
+  }, [manager]);
 
-      const scrollTop = window.pageYOffset;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
+  useEffect(() => {
+    if (isReady && pathname !== previousPathnameRef.current) {
+      manager.updateRoute(pathname);
+      previousPathnameRef.current = pathname;
+    }
+  }, [pathname, manager, isReady]);
 
-      if (scrollPercent > threshold) {
-        preloadComponent(importFn, componentName, { priority: 'medium' });
-        hasTriggered.current = true;
-        window.removeEventListener('scroll', handleScroll);
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      if (manager) {
+        manager.destroy();
       }
     };
+  }, [manager]);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [importFn, componentName, threshold, preloadComponent]);
-}
+  const contextValue: PreloadContextValue = {
+    preloadComponent: useCallback((importFn, options) => 
+      manager.preloadComponent(importFn, options), [manager]),
+    preloadRoute: useCallback((route, options) => 
+      manager.preloadRoute(route, options), [manager]),
+    getMetrics: useCallback(() => manager.getMetrics(), [manager]),
+    getBehavior: useCallback(() => manager.getBehavior(), [manager]),
+    getPredictions: useCallback(() => manager.getPredictions(), [manager]),
+    clearCache: useCallback(() => manager.clearCache(), [manager]),
+    isReady,
+  };
 
-/**
- * Hook for intersection-based preloading
- */
-export function useIntersectionPreload(
-  importFn: () => Promise<any>,
-  componentName: string,
-  options: IntersectionObserverInit = {}
-) {
-  const { preloadComponent } = useRoutePreloader();
-  const ref = useRef<HTMLElement>(null);
+  return (
+    <PreloadContext.Provider value={contextValue}>
+      {children}
+    </PreloadContext.Provider>
+  );
+};
+
+// ===== Enhanced Hooks =====
+
+export const usePreload = () => {
+  const context = useContext(PreloadContext);
+  if (!context) {
+    throw new Error('usePreload must be used within a PreloadProvider');
+  }
+  return context;
+};
+
+export const useRoutePreloader = (routes: string[], options: PreloadOptions = {}) => {
+  const { preloadRoute, isReady } = usePreload();
+  const [preloadedRoutes, setPreloadedRoutes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const element = ref.current;
+    if (!isReady) return;
+
+    routes.forEach(route => {
+      if (!preloadedRoutes.has(route)) {
+        preloadRoute(route, options);
+        setPreloadedRoutes(prev => new Set(prev).add(route));
+      }
+    });
+  }, [routes, preloadRoute, isReady, preloadedRoutes, options]);
+};
+
+export const useHoverPreload = (
+  importFn: () => Promise<any>,
+  options: PreloadOptions = {}
+) => {
+  const { preloadComponent, isReady } = usePreload();
+  const [isPreloaded, setIsPreloaded] = useState(false);
+
+  const handleMouseEnter = useCallback(() => {
+    if (!isReady || isPreloaded) return;
+
+    preloadComponent(importFn, {
+      ...options,
+      priority: 'high',
+      onSuccess: () => setIsPreloaded(true),
+    });
+  }, [preloadComponent, importFn, options, isReady, isPreloaded]);
+
+  return { onMouseEnter: handleMouseEnter, isPreloaded };
+};
+
+export const useScrollPreload = (
+  importFn: () => Promise<any>,
+  threshold: number = 50,
+  options: PreloadOptions = {}
+) => {
+  const { preloadComponent, isReady } = usePreload();
+  const [isPreloaded, setIsPreloaded] = useState(false);
+  const elementRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isReady || isPreloaded) return;
+
+    const element = elementRef.current;
     if (!element) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            preloadComponent(importFn, componentName, { priority: 'low' });
-            observer.unobserve(element);
+          if (entry.isIntersecting && entry.intersectionRatio >= threshold / 100) {
+            preloadComponent(importFn, {
+              ...options,
+              priority: 'medium',
+              onSuccess: () => setIsPreloaded(true),
+            });
+            observer.disconnect();
           }
         });
       },
-      { threshold: 0.1, ...options }
+      { threshold: threshold / 100 }
     );
 
     observer.observe(element);
 
-    return () => {
-      observer.unobserve(element);
+    return () => observer.disconnect();
+  }, [preloadComponent, importFn, threshold, options, isReady, isPreloaded]);
+
+  return { ref: elementRef, isPreloaded };
+};
+
+// ===== Performance Monitoring Hook =====
+
+export const usePreloadMetrics = (interval: number = 5000) => {
+  const { getMetrics, isReady } = usePreload();
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    const updateMetrics = () => {
+      setMetrics(getMetrics());
     };
-  }, [importFn, componentName, preloadComponent, options]);
 
-  return ref;
-}
+    updateMetrics(); // Initial update
+    const intervalId = setInterval(updateMetrics, interval);
 
-// ===== Preload Strategies =====
+    return () => clearInterval(intervalId);
+  }, [getMetrics, interval, isReady]);
 
-/**
- * Critical route preloading for homepage
- */
-export function preloadCriticalRoutes() {
-  const { preloadRoute } = useRoutePreloader();
+  return metrics;
+};
+
+// ===== Debug Hook =====
+
+export const usePreloadDebug = () => {
+  const context = useContext(PreloadContext);
   
-  useEffect(() => {
-    // Preload most common routes after 2 seconds
-    setTimeout(() => {
-      preloadRoute('/services', { priority: 'high' });
-      preloadRoute('/news', { priority: 'medium' });
-      preloadRoute('/case-studies', { priority: 'medium' });
-    }, 2000);
-  }, [preloadRoute]);
-}
+  return {
+    debug: () => {
+      if (context.isReady) {
+        const manager = EnhancedPreloadManager.getInstance();
+        manager.debug();
+      }
+    },
+    getContext: () => context,
+  };
+};
 
-/**
- * Demo page navigation preloading
- */
-export function preloadDemoNavigation(currentDemo: string) {
-  const { preloadRoute } = useRoutePreloader();
-  
-  useEffect(() => {
-    const demoRoutes = [
-      '/button-demo',
-      '/cards-demo',
-      '/hero-demo',
-      '/forms-demo',
-      '/section-demo',
-      '/services-demo'
-    ];
-    
-    const currentIndex = demoRoutes.indexOf(currentDemo);
-    
-    // Preload next and previous demos
-    if (currentIndex > 0) {
-      preloadRoute(demoRoutes[currentIndex - 1], { priority: 'medium', delay: 1000 });
-    }
-    if (currentIndex < demoRoutes.length - 1) {
-      preloadRoute(demoRoutes[currentIndex + 1], { priority: 'medium', delay: 1000 });
-    }
-  }, [currentDemo, preloadRoute]);
-}
-
-// ===== Export =====
-
-export default PreloadManager;
+export default EnhancedPreloadManager;
