@@ -101,7 +101,7 @@ export const DynamicStatistic = dynamic(() => import('antd/es/statistic'), {
 // ===== Custom Components =====
 
 // Hero components
-export const DynamicHero = dynamic(() => import('@/components/sections/Hero'), {
+export const DynamicHero = dynamic(() => import('@/components/sections/Hero').then(mod => ({ default: mod.Hero })), {
   ssr: true, // Keep SSR for above-the-fold content
   loading: () => (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 animate-pulse">
@@ -119,7 +119,7 @@ export const DynamicHero = dynamic(() => import('@/components/sections/Hero'), {
   )
 });
 
-export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/Hero'), {
+export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/Hero').then(mod => ({ default: mod.Hero })), {
   ssr: true,
   loading: () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-500/10 to-green-500/10 animate-pulse">
@@ -142,7 +142,7 @@ export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/
 });
 
 // Service components
-export const DynamicServices = dynamic(() => import('@/components/sections/home/Services'), {
+export const DynamicServices = dynamic(() => import('@/components/sections/home/Services').then(mod => ({ default: mod.Services })), {
   ssr: false,
   loading: () => (
     <div className="py-16">
@@ -161,7 +161,7 @@ export const DynamicServices = dynamic(() => import('@/components/sections/home/
   )
 });
 
-export const DynamicCaseStudies = dynamic(() => import('@/components/sections/home/CaseStudies'), {
+export const DynamicCaseStudies = dynamic(() => import('@/components/sections/home/CaseStudies').then(mod => ({ default: mod.CaseStudies })), {
   ssr: false,
   loading: () => (
     <div className="py-16">
