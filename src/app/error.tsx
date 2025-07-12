@@ -4,6 +4,8 @@ import React from 'react';
 import { Button as AntButton, Result } from 'antd';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { ERROR_SEO } from '@/lib/seo-config';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -27,7 +29,9 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <>
+      <SEOHead config={ERROR_SEO} basePath="/error" />
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <motion.div
         className="max-w-2xl w-full text-center"
         initial={{ opacity: 0, y: 20 }}
@@ -80,6 +84,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           </motion.div>
         )}
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

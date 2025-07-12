@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateNewsletterForm, sanitizeFormData, type NewsletterFormData } from '@/lib/form-validation';
+import { sendNewsletterWelcome } from '@/lib/email-service';
 
 // 速率限制配置 - 每个IP每小时最多10次订阅
 const limiter = rateLimit({
@@ -328,9 +329,16 @@ export async function PUT(request: NextRequest) {
     foundSubscriber.lastUpdated = new Date().toISOString();
     subscribers.set(foundSubscriber.email, foundSubscriber);
 
+    // 发送欢迎邮件
+    const welcomeEmailSent = await sendNewsletterWelcome({
+      email: foundSubscriber.email,
+      firstName: foundSubscriber.firstName,
+    });
+
     console.log('Newsletter subscription confirmed:', {
       subscriberId: foundSubscriber.id,
       email: foundSubscriber.email,
+      welcomeEmailSent,
       timestamp: new Date().toISOString(),
     });
 

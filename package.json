@@ -5,8 +5,14 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:standalone": "BUILD_STANDALONE=true next build",
+    "build:production": "NODE_ENV=production next build",
     "start": "next start",
+    "start:production": "NODE_ENV=production next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "setup": "node scripts/generate-brand-assets.js && npm install",
     "optimize-images": "node scripts/optimize-images.js",
     "image-utils": "node scripts/image-utils.js",
     "generate-blur": "node scripts/image-utils.js blur",
@@ -23,10 +29,17 @@
     "perf:server": "lhci server",
     "perf:ci": "npm run build && lhci autorun",
     "test:performance": "npm run perf:ci",
-    "monitor:lighthouse": "lhci autorun --config=lighthouserc.js"
+    "monitor:lighthouse": "lhci autorun --config=lighthouserc.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "validate": "npm run type-check && npm run lint && npm run test",
+    "deploy:vercel": "vercel --prod",
+    "clean": "rm -rf .next && rm -rf out && rm -rf dist"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@sendgrid/mail": "^8.1.5",
     "@tailwindcss/typography": "^0.5.16",
     "antd": "^5.26.4",
     "clsx": "^2.1.1",

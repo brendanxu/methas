@@ -1,0 +1,48 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#002145;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00875A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E8F4F8;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#F5F7FA;stop-opacity:0.2" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  <rect width="1200" height="630" fill="url(#overlayGradient)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="60" fill="#E8F4F8" opacity="0.1"/>
+  <circle cx="1100" cy="530" r="80" fill="#F5F7FA" opacity="0.1"/>
+  
+  <!-- Main content area -->
+  <rect x="60" y="150" width="1080" height="330" fill="rgba(255, 255, 255, 0.05)" rx="12"/>
+  
+  <!-- Title -->
+  <text x="80" y="220" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="#FFFFFF">
+    South Pole
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="80" y="300" font-family="Arial, sans-serif" font-size="42" font-weight="normal" fill="#E8F4F8">
+    Climate Solutions
+  </text>
+  
+  <!-- Description -->
+  <text x="80" y="380" font-family="Arial, sans-serif" font-size="28" font-weight="normal" fill="#F5F7FA">
+    Leading provider of climate solutions
+  </text>
+  
+  <!-- Brand mark -->
+  <circle cx="1080" cy="120" r="40" fill="#E8F4F8" opacity="0.3"/>
+  <rect x="1060" y="100" width="40" height="40" fill="#00875A" opacity="0.8"/>
+  
+  <!-- Website URL -->
+  <text x="80" y="550" font-family="Arial, sans-serif" font-size="24" fill="#F5F7FA">
+    southpole.com
+  </text>
+</svg>

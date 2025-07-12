@@ -50,13 +50,13 @@ function validateRequest(request: NextRequest): { isValid: boolean; error?: stri
   return { isValid: true };
 }
 
-// 发送邮件通知函数（模拟）
-async function sendContactNotification(data: ContactFormData): Promise<boolean> {
+// Import email service
+import { sendContactNotification as sendNotificationEmail, sendContactConfirmation } from '@/lib/email-service';
+
+// 发送邮件通知函数
+async function sendContactNotification(data: ContactFormData): Promise<{ notificationSent: boolean; confirmationSent: boolean }> {
   try {
-    // 在实际生产环境中，这里应该集成真实的邮件服务
-    // 例如：SendGrid, AWS SES, Nodemailer 等
-    
-    console.log('Contact form submission:', {
+    console.log('Sending contact form notifications:', {
       from: data.email,
       name: `${data.firstName} ${data.lastName}`,
       company: data.company,
@@ -65,24 +65,35 @@ async function sendContactNotification(data: ContactFormData): Promise<boolean> 
       timestamp: new Date().toISOString(),
     });
 
-    // 模拟邮件发送延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Generate submission ID for tracking
+    const submissionId = `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // 发送给内部团队的邮件内容
-    // 在生产环境中启用邮件发送
-    // const emailContent = {
-    //   to: process.env.CONTACT_EMAIL || 'contact@southpole.com',
-    //   subject: `新的联系表单提交 - ${data.inquiryType}`,
-    //   html: `邮件模板内容`
-    // };
+    // Send notification to internal team
+    const notificationSent = await sendNotificationEmail({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      company: data.company,
+      position: data.position,
+      phone: data.phone,
+      country: data.country,
+      inquiryType: data.inquiryType,
+      message: data.message,
+      subscribeNewsletter: data.subscribeNewsletter,
+      submissionId,
+    });
 
-    // 在实际环境中发送邮件
-    // await sendEmail(emailContent);
+    // Send confirmation to customer
+    const confirmationSent = await sendContactConfirmation({
+      email: data.email,
+      firstName: data.firstName,
+      inquiryType: data.inquiryType,
+    });
 
-    return true;
+    return { notificationSent, confirmationSent };
   } catch (error) {
-    console.error('Failed to send contact notification:', error);
-    return false;
+    console.error('Failed to send contact notifications:', error);
+    return { notificationSent: false, confirmationSent: false };
   }
 }
 
@@ -233,7 +244,7 @@ export async function POST(request: NextRequest) {
     const submissionId = await saveContactSubmission(sanitizedData);
 
     // 发送邮件通知
-    const emailSent = await sendContactNotification(sanitizedData);
+    const emailResults = await sendContactNotification(sanitizedData);
 
     // 如果用户同意订阅newsletter，添加到订阅列表
     if (sanitizedData.subscribeNewsletter) {
@@ -271,7 +282,10 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Contact form submitted successfully',
       submissionId,
-      emailSent,
+      notifications: {
+        internal: emailResults.notificationSent,
+        confirmation: emailResults.confirmationSent,
+      },
     });
 
   } catch (error) {

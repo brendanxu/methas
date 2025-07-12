@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       'images.unsplash.com',
       'source.unsplash.com',
       'southpole.com',
+      'www.southpole.com',
+      'cdn.southpole.com',
       'localhost'
     ],
     // 图片格式优化
@@ -16,21 +18,79 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     // 图片断点
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // 图片质量优化
+    quality: 90,
+    // 启用图片优化
+    unoptimized: false,
   },
   
   // 性能优化
   compress: true,
+  poweredByHeader: false,
   
   // 实验性功能
   experimental: {
     // 优化包导入
-    optimizePackageImports: ['antd', 'framer-motion'],
-    // 部分预渲染
-    ppr: false,
+    optimizePackageImports: ['antd', 'framer-motion', 'lodash-es'],
+    // 启用 turbo 模式
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   
   // 构建优化
-  output: 'standalone',
+  output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
+  
+  // Webpack 配置优化
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // 生产环境优化
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+            antd: {
+              test: /[\\/]node_modules[\\/]antd[\\/]/,
+              name: 'antd',
+              chunks: 'all',
+              priority: 10,
+            },
+            framerMotion: {
+              test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+              name: 'framer-motion',
+              chunks: 'all',
+              priority: 10,
+            },
+          },
+        },
+      };
+    }
+
+    // Bundle analyzer
+    if (process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+          reportFilename: 'bundle-analyzer.html',
+        })
+      );
+    }
+
+    return config;
+  },
   
   // 重定向配置
   async redirects() {

@@ -4,12 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { Button as AntButton, Result } from 'antd';
 import { Button } from '@/components/ui/Button';
-
-// Metadata will be handled by layout.tsx
+import { SEOHead } from '@/components/seo/SEOHead';
+import { NOT_FOUND_SEO } from '@/lib/seo-config';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <>
+      <SEOHead config={NOT_FOUND_SEO} basePath="/404" />
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center">
         <Result
           status="404"
@@ -46,7 +48,8 @@ export default function NotFound() {
             </a>
           </p>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
