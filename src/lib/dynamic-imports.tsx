@@ -181,7 +181,7 @@ export const DynamicCaseStudies = dynamic(() => import('@/components/sections/ho
 });
 
 // Demo pages (non-critical)
-export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase'), {
+export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase').then(mod => ({ default: mod.ThemeShowcase })), {
   ssr: false,
   loading: DefaultLoadingSkeleton
 });
