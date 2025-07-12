@@ -204,10 +204,10 @@ export function useShallowEqual<T>(obj: T): T {
 export function useRenderPerformance(componentName: string) {
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      const start = performance.now();
+      const start = globalThis.performance.now();
       
       return () => {
-        const end = performance.now();
+        const end = globalThis.performance.now();
         console.log(`${componentName} render time: ${end - start}ms`);
       };
     }
@@ -236,7 +236,7 @@ export const animations = {
 };
 
 // Performance utilities
-export const performance = {
+export const performanceUtils = {
   useOptimizedDebounce,
   useOptimizedThrottle,
   useLazyImage,
@@ -247,6 +247,6 @@ export const performance = {
 
 export default {
   animations,
-  performance,
+  performanceUtils,
   dayjs
 };
