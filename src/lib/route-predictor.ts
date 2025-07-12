@@ -101,9 +101,9 @@ export class RoutePredictor {
     
     switch (operator) {
       case 'gt':
-        return actualValue > value;
+        return typeof value === 'number' && actualValue > value;
       case 'lt':
-        return actualValue < value;
+        return typeof value === 'number' && actualValue < value;
       case 'eq':
         return actualValue === value;
       case 'includes':
