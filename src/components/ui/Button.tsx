@@ -231,7 +231,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
         style={{
           height: config.height,
           ...variantStyles.style,
-        } satisfies React.CSSProperties}
+        } as React.CSSProperties}
         disabled={isInteractionDisabled}
         onClick={handleClick}
         
