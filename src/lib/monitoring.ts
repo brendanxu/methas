@@ -255,10 +255,12 @@ export class MonitoringContext {
 // Export singleton instance
 export const monitoring = MonitoringContext.getInstance();
 
-export default {
+const monitoringService = {
   initializeMonitoring,
   logError,
   logPerformanceMetric,
   logUserInteraction,
   monitoring,
 };
+
+export default monitoringService;

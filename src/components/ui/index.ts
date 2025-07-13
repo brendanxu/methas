@@ -9,9 +9,6 @@ export {
   OptimizedImage,
   HeroImage,
   CardImage,
-  ThumbnailImage,
   AvatarImage,
-  GalleryImage,
-  OptimizedImagePresets,
-  createOptimizedImage
+  IconImage
 } from './OptimizedImage';

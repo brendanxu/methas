@@ -147,7 +147,6 @@ const CaseStudyCard: React.FC<{ caseStudy: CaseStudy; loading?: boolean }> = ({
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           quality={85}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          lazyLoad
         />
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
         
@@ -160,7 +159,6 @@ const CaseStudyCard: React.FC<{ caseStudy: CaseStudy; loading?: boolean }> = ({
             height={32}
             className="h-8 w-auto object-contain"
             quality={90}
-            lazyLoad
           />
         </div>
       </div>

@@ -22,10 +22,79 @@ interface PageView {
 class Analytics {
   private isEnabled: boolean;
   private debug: boolean;
+  private isInitialized: boolean;
+  private eventQueue: Array<{ type: string; data: any }>;
   
   constructor() {
     this.isEnabled = process.env.NODE_ENV === 'production';
     this.debug = process.env.NODE_ENV === 'development';
+    this.isInitialized = false;
+    this.eventQueue = [];
+  }
+
+  // 异步初始化分析服务
+  async init() {
+    if (this.isInitialized || typeof window === 'undefined') return;
+
+    try {
+      // 延迟加载 Google Analytics
+      if (this.isEnabled && process.env.NEXT_PUBLIC_GA_ID) {
+        await this.loadGoogleAnalytics();
+      }
+
+      this.isInitialized = true;
+
+      // 处理队列中的事件
+      this.processEventQueue();
+      
+      if (this.debug) {
+        console.log('📊 Analytics initialized');
+      }
+    } catch (error) {
+      console.warn('Analytics initialization failed:', error);
+    }
+  }
+
+  // 加载 Google Analytics
+  private async loadGoogleAnalytics() {
+    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    if (!gaId) return;
+
+    // 动态加载 GA 脚本
+    const script = document.createElement('script');
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    script.async = true;
+    document.head.appendChild(script);
+
+    // 等待脚本加载
+    await new Promise((resolve) => {
+      script.onload = resolve;
+    });
+
+    // 初始化 gtag
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    function gtag(...args: any[]) {
+      (window as any).dataLayer.push(arguments);
+    }
+    
+    gtag('js', new Date());
+    gtag('config', gaId, {
+      page_title: document.title,
+      page_location: window.location.href,
+    });
+
+    // 挂载到 window 对象
+    (window as any).gtag = gtag;
+  }
+
+  // 处理事件队列
+  private processEventQueue() {
+    while (this.eventQueue.length > 0) {
+      const event = this.eventQueue.shift();
+      if (event) {
+        this.sendToAnalytics(event.type, event.data);
+      }
+    }
   }
 
   // 页面浏览追踪
@@ -45,8 +114,12 @@ class Analytics {
       console.log('📊 Page View:', pageData);
     }
 
-    // 未来在这里集成真实的分析服务
-    // 例如：gtag('event', 'page_view', pageData);
+    // 如果尚未初始化，添加到队列
+    if (!this.isInitialized) {
+      this.eventQueue.push({ type: 'page_view', data: pageData });
+      return;
+    }
+
     this.sendToAnalytics('page_view', pageData);
   }
 
@@ -63,6 +136,12 @@ class Analytics {
 
     if (this.debug) {
       console.log('📊 Event:', enrichedData);
+    }
+
+    // 如果尚未初始化，添加到队列
+    if (!this.isInitialized) {
+      this.eventQueue.push({ type: 'custom_event', data: enrichedData });
+      return;
     }
 
     this.sendToAnalytics('custom_event', enrichedData);

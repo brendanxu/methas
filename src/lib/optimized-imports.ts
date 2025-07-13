@@ -245,8 +245,10 @@ export const performanceUtils = {
   logChunkLoad
 };
 
-export default {
+const optimizedImports = {
   animations,
   performanceUtils,
   dayjs
 };
+
+export default optimizedImports;
