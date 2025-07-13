@@ -103,19 +103,23 @@ const nextConfig = {
       config.optimization.moduleIds = 'deterministic';
       config.optimization.chunkIds = 'deterministic';
       
-      // 简化入口点配置
+      // 简化polyfill注入，避免递归问题
+      const originalEntry = config.entry;
       config.entry = async () => {
-        const entries = await (typeof config.entry === 'function' ? config.entry() : config.entry);
-        // 确保每个入口都是简单的数组形式
-        const processedEntries = {};
-        for (const [key, value] of Object.entries(entries)) {
-          if (Array.isArray(value)) {
-            processedEntries[key] = ['./src/polyfills/server.js', ...value];
-          } else {
-            processedEntries[key] = ['./src/polyfills/server.js', value];
+        const entries = typeof originalEntry === 'function' ? await originalEntry() : originalEntry;
+        // 只在entries为对象时处理
+        if (entries && typeof entries === 'object') {
+          const processedEntries = {};
+          for (const [key, value] of Object.entries(entries)) {
+            if (Array.isArray(value)) {
+              processedEntries[key] = ['./src/polyfills/server.js', ...value];
+            } else {
+              processedEntries[key] = ['./src/polyfills/server.js', value];
+            }
           }
+          return processedEntries;
         }
-        return processedEntries;
+        return entries;
       };
     }
 
@@ -294,7 +298,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
     optimizeCss: true,
-    staticWorkerRequestDeduping: false,
   },
 
   // Security headers
