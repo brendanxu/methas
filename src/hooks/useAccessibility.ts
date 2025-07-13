@@ -18,6 +18,9 @@ export function useAccessibility() {
   });
 
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') return;
+    
     // Check system preferences
     const highContrastQuery = window.matchMedia('(prefers-contrast: high)');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -52,7 +55,9 @@ export function useAccessibility() {
   ) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     
-    // Apply changes to document
+    // Apply changes to document (only on client side)
+    if (typeof document === 'undefined') return;
+    
     if (key === 'highContrast') {
       document.documentElement.classList.toggle('high-contrast', value as boolean);
     }

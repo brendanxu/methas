@@ -40,14 +40,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  // 启动性能监控
+  // 启动性能监控 (client-side only)
   useEffect(() => {
-    memoryMonitor.start();
-    return () => memoryMonitor.stop();
+    if (typeof window !== 'undefined') {
+      memoryMonitor.start();
+      return () => memoryMonitor.stop();
+    }
   }, []);
 
-  // Initialize theme from localStorage or default
+  // Initialize theme from localStorage or default (client-side only)
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') return;
+    
     const savedTheme = localStorage.getItem('southpole-theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -66,8 +71,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const toggleTheme = debounce(() => {
     const newTheme = !isDark;
     setIsDark(newTheme);
-    localStorage.setItem('southpole-theme', newTheme ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', newTheme);
+    
+    // Only access browser APIs on client side
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('southpole-theme', newTheme ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', newTheme);
+    }
   }, 100);
 
   // Theme context value
