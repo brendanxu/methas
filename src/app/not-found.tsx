@@ -1,4 +1,8 @@
 // 极简化的404页面，避免复杂依赖导致的webpack-runtime问题
+// 强制动态渲染，避免预渲染问题
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export const metadata = {
   title: '页面未找到 | South Pole',
   description: '抱歉，您访问的页面不存在。',

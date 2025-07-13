@@ -30,18 +30,7 @@ const nextConfig = {
   webpack: (config, { dev, isServer, webpack }) => {
     // Server-side specific configurations
     if (isServer) {
-      // Inject polyfills at the very beginning of server bundle
-      const originalEntry = config.entry;
-      config.entry = async () => {
-        const entries = await originalEntry();
-        // Add polyfill to all server entries
-        for (const key of Object.keys(entries)) {
-          if (Array.isArray(entries[key])) {
-            entries[key].unshift('./src/polyfills/server.js');
-          }
-        }
-        return entries;
-      };
+      // 注释掉原有的entry配置，使用下面新的简化版本
 
       // Configure fallbacks for Node.js environment
       config.resolve.fallback = {
@@ -113,6 +102,25 @@ const nextConfig = {
       config.optimization = config.optimization || {};
       config.optimization.splitChunks = false;
       config.optimization.runtimeChunk = false;
+      
+      // 禁用模块联邦和其他可能导致runtime问题的特性
+      config.optimization.moduleIds = 'deterministic';
+      config.optimization.chunkIds = 'deterministic';
+      
+      // 简化入口点配置
+      config.entry = async () => {
+        const entries = await (typeof config.entry === 'function' ? config.entry() : config.entry);
+        // 确保每个入口都是简单的数组形式
+        const processedEntries = {};
+        for (const [key, value] of Object.entries(entries)) {
+          if (Array.isArray(value)) {
+            processedEntries[key] = ['./src/polyfills/server.js', ...value];
+          } else {
+            processedEntries[key] = ['./src/polyfills/server.js', value];
+          }
+        }
+        return processedEntries;
+      };
     }
 
     // Client-side optimizations
@@ -286,10 +294,10 @@ const nextConfig = {
   // 禁用有问题页面的静态生成
   output: 'standalone',
   
-  // 跳过预渲染错误，继续构建
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+  // 完全禁用静态生成，使用动态渲染
+  experimental: {
+    ...nextConfig.experimental,
+    staticWorkerRequestDeduping: false,
   },
 
   // Security headers

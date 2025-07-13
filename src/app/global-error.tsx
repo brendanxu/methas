@@ -1,6 +1,10 @@
 'use client';
 
 // 极简化的全局错误页面，避免webpack-runtime问题
+// 强制动态渲染，避免预渲染问题
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export default function GlobalError({
   error,
   reset,
