@@ -46,6 +46,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       memoryMonitor.start();
       return () => memoryMonitor.stop();
     }
+    return undefined; // Explicit return for server-side
   }, []);
 
   // Initialize theme from localStorage or default (client-side only)
