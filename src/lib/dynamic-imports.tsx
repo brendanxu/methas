@@ -119,7 +119,7 @@ export const DynamicHero = dynamic(() => import('@/components/sections/Hero').th
   )
 });
 
-export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/Hero').then(mod => ({ default: mod.Hero })), {
+export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/Hero'), {
   ssr: true,
   loading: () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-500/10 to-green-500/10 animate-pulse">
@@ -142,7 +142,7 @@ export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/
 });
 
 // Service components
-export const DynamicServices = dynamic(() => import('@/components/sections/home/Services').then(mod => ({ default: mod.Services })), {
+export const DynamicServices = dynamic(() => import('@/components/sections/home/Services'), {
   ssr: false,
   loading: () => (
     <div className="py-16">
@@ -161,7 +161,7 @@ export const DynamicServices = dynamic(() => import('@/components/sections/home/
   )
 });
 
-export const DynamicCaseStudies = dynamic(() => import('@/components/sections/home/CaseStudies').then(mod => ({ default: mod.CaseStudies })), {
+export const DynamicCaseStudies = dynamic(() => import('@/components/sections/home/CaseStudies'), {
   ssr: false,
   loading: () => (
     <div className="py-16">
@@ -181,7 +181,7 @@ export const DynamicCaseStudies = dynamic(() => import('@/components/sections/ho
 });
 
 // Demo pages (non-critical)
-export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase').then(mod => ({ default: mod.ThemeShowcase })), {
+export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase'), {
   ssr: false,
   loading: DefaultLoadingSkeleton
 });

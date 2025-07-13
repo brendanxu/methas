@@ -62,6 +62,7 @@ export const generateMetadata = (config: SEOConfig): Metadata => {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://southpole.com';
   
   return {
+    metadataBase: new URL(baseUrl),
     title: config.title,
     description: config.description,
     keywords: Array.isArray(config.keywords) ? config.keywords.join(', ') : config.keywords,

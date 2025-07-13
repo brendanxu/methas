@@ -243,3 +243,5 @@ export const ThemeShowcase: React.FC<ThemeShowcaseProps> = ({ className }) => {
     </section>
   );
 };
+
+export default ThemeShowcase;

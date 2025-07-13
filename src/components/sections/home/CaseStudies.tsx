@@ -440,3 +440,5 @@ export const CaseStudies: React.FC = () => {
     </Section>
   );
 };
+
+export default CaseStudies;
