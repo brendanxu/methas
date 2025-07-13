@@ -1,16 +1,4 @@
-'use client';
-
-import nextDynamic from 'next/dynamic';
-
-// Dynamically import the client component with NO SSR
-const ButtonDemoClient = nextDynamic(() => import('./ButtonDemoClient'), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-    </div>
-  ),
-});
+import ButtonDemoClient from './ButtonDemoClient';
 
 export default function ButtonDemoPage() {
   return <ButtonDemoClient />;

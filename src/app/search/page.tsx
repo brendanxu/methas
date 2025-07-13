@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import SearchClientWrapper from './SearchClientWrapper';
+import SearchPageClient from './SearchPageClient';
 
 // 动态生成metadata，支持搜索查询的SEO优化
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
@@ -34,5 +34,5 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 }
 
 export default function SearchPage() {
-  return <SearchClientWrapper />;
+  return <SearchPageClient />;
 }
