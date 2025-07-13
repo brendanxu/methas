@@ -83,9 +83,12 @@ export default function NotFound() {
             <p className="error-description">
               抱歉，您访问的页面不存在。可能是链接错误或页面已被移动。
             </p>
-            <a href="/" className="home-button">
+            <button 
+              className="home-button"
+              onClick={() => window.location.href = '/'}
+            >
               返回首页
-            </a>
+            </button>
             
             <div className="contact-info">
               <p>如果您认为这是一个错误，请联系我们的客服团队。</p>

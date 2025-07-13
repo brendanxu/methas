@@ -94,9 +94,12 @@ export default function GlobalError({
               >
                 重试
               </button>
-              <a href="/" className="button button-secondary">
+              <button
+                className="button button-secondary"
+                onClick={() => window.location.href = '/'}
+              >
                 返回首页
-              </a>
+              </button>
             </div>
           </div>
         </div>
