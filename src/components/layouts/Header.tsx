@@ -9,6 +9,7 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 import { useBackgroundDetection } from '@/hooks/useBackgroundDetection';
 import { useGlobalSearch } from '@/components/layout/GlobalSearch';
 import { LanguageSwitcherFull } from '@/components/ui/LanguageSwitcher';
+import { EnhancedMobileMenu } from '@/components/navigation/EnhancedMobileMenu';
 import { cn } from '@/lib/utils';
 
 
@@ -353,15 +354,12 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <MobileMenu
-            navigationData={navigationData}
-            onClose={() => setIsMobileMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Enhanced Mobile Navigation Menu */}
+      <EnhancedMobileMenu
+        navigationData={navigationData}
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
     </motion.header>
   );
 };

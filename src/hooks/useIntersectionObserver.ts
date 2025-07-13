@@ -1,22 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface UseIntersectionObserverProps {
-  onIntersect: () => void;
+  onIntersect?: () => void;
   threshold?: number;
   rootMargin?: string;
   triggerOnce?: boolean;
   enabled?: boolean;
 }
 
-export const useIntersectionObserver = ({
-  onIntersect,
-  threshold = 0.1,
-  rootMargin = '0px',
-  triggerOnce = false,
-  enabled = true,
-}: UseIntersectionObserverProps) => {
+// Simplified hook with consistent return type
+export function useIntersectionObserver(
+  options?: { 
+    threshold?: number; 
+    rootMargin?: string;
+    onIntersect?: () => void;
+    triggerOnce?: boolean;
+    enabled?: boolean;
+  }
+): {
+  ref: React.RefObject<HTMLDivElement>;
+  isIntersecting: boolean;
+  hasIntersected: boolean;
+};
+
+export function useIntersectionObserver(
+  options: { 
+    threshold?: number; 
+    rootMargin?: string;
+    onIntersect?: () => void;
+    triggerOnce?: boolean;
+    enabled?: boolean;
+  } = {}
+) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const [hasIntersected, setHasIntersected] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
+
+  const {
+    onIntersect,
+    threshold = 0.1,
+    rootMargin = '0px',
+    triggerOnce = false,
+    enabled = true,
+  } = options;
 
   useEffect(() => {
     if (!enabled || (triggerOnce && hasTriggered)) return;
@@ -27,7 +54,14 @@ export const useIntersectionObserver = ({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          const intersecting = entry.isIntersecting;
+          setIsIntersecting(intersecting);
+          
+          if (intersecting && !hasIntersected) {
+            setHasIntersected(true);
+          }
+          
+          if (intersecting && onIntersect) {
             onIntersect();
             if (triggerOnce) {
               setHasTriggered(true);
@@ -47,7 +81,7 @@ export const useIntersectionObserver = ({
     return () => {
       observer.unobserve(element);
     };
-  }, [onIntersect, threshold, rootMargin, triggerOnce, enabled, hasTriggered]);
+  }, [onIntersect, threshold, rootMargin, triggerOnce, enabled, hasTriggered, hasIntersected]);
 
-  return { ref };
-};
+  return { ref, isIntersecting, hasIntersected };
+}

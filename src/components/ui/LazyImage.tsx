@@ -49,8 +49,8 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   } = useLazyImage({
     rootMargin: observerOptions.rootMargin || '100px',
     threshold: observerOptions.threshold || 0.1,
-    onLoad: onLoad ? () => onLoad({} as any) : undefined,
-    onError: onError ? (error: Event) => onError({} as any) : undefined,
+    onLoad: onLoad || undefined,
+    onError: onError || undefined,
   });
 
   // Progressive image loading

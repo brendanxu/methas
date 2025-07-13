@@ -3,7 +3,7 @@
 import React from 'react';
 
 // Type definitions for motion components
-type MotionProps = {
+export type MotionProps = {
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;

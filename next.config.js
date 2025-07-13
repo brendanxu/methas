@@ -5,7 +5,94 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es'],
+    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
+    optimizeCss: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+
+  // Webpack optimization
+  webpack: (config, { dev, isServer }) => {
+    // Production optimizations
+    if (!dev) {
+      // Enable tree shaking
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+      
+      // Split chunks for better caching
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
+          },
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: 'react',
+            priority: 20,
+            chunks: 'all',
+          },
+          antd: {
+            test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
+            name: 'antd',
+            priority: 15,
+            chunks: 'all',
+          },
+          framer: {
+            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            name: 'framer-motion',
+            priority: 15,
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            priority: 5,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      };
+
+      // Module concatenation for smaller bundles
+      config.optimization.concatenateModules = true;
+      
+      // Remove unused code
+      config.optimization.innerGraph = true;
+    }
+
+    // SVG optimization
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+
+    // Bundle analysis in development
+    if (dev && process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server',
+          openAnalyzer: true,
+        })
+      );
+    }
+
+    return config;
   },
 
   // Modularize imports for better tree shaking
@@ -20,6 +107,10 @@ const nextConfig = {
     },
     'lodash-es': {
       transform: 'lodash-es/{{member}}',
+      preventFullImport: true,
+    },
+    'react-icons': {
+      transform: 'react-icons/{{member}}',
       preventFullImport: true,
     },
     'framer-motion': {

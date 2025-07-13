@@ -268,7 +268,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
     const now = Date.now();
     if (now - lastCall >= delay) {
       lastCall = now;
-      return func(...args);
+      func(...args);
     }
   };
 }

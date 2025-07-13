@@ -11,7 +11,9 @@ import { PreloadStrategy, RoutePreloader } from "@/components/optimization/Prelo
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo-metadata";
 import { HOME_SEO } from "@/lib/seo-config";
 import { SEOChecker } from "@/components/seo/SEOChecker";
+import { ProgressBar } from "@/components/common/ProgressBar";
 import "./globals.css";
+import "../styles/nprogress.css";
 
 // Enhanced metadata with proper SEO configuration
 export const metadata: Metadata = generateSEOMetadata(HOME_SEO);
@@ -60,6 +62,9 @@ export default function RootLayout({
           <PreloadProvider>
             <PreloadStrategy>
               <GlobalStylesProvider>
+                <Suspense fallback={null}>
+                  <ProgressBar />
+                </Suspense>
                 <DynamicHead />
                 <Suspense fallback={null}>
                   <PageTracker />
