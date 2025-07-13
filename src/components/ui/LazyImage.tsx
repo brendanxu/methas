@@ -15,6 +15,8 @@ export interface LazyImageProps extends OptimizedImageProps {
   loadingAnimation?: 'fade' | 'scale' | 'slide' | 'none';
   /** Custom loading indicator */
   loadingIndicator?: React.ReactNode;
+  /** Container CSS class */
+  containerClassName?: string;
   /** Intersection observer options */
   observerOptions?: {
     rootMargin?: string;
@@ -47,8 +49,8 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   } = useLazyImage({
     rootMargin: observerOptions.rootMargin || '100px',
     threshold: observerOptions.threshold || 0.1,
-    onLoad,
-    onError,
+    onLoad: onLoad ? () => onLoad({} as any) : undefined,
+    onError: onError ? (error: Event) => onError({} as any) : undefined,
   });
 
   // Progressive image loading
@@ -128,7 +130,6 @@ export const LazyImage: React.FC<LazyImageProps> = ({
               src={currentSrc}
               alt={alt}
               className={className}
-              animate={loadingAnimation !== 'none'}
               {...props}
             />
             
@@ -298,7 +299,6 @@ export const LazyImageGallery: React.FC<LazyImageGalleryProps> = ({
             progressive={progressive}
             loadingAnimation={loadingAnimation === 'stagger' ? 'none' : loadingAnimation}
             className={imageClassName}
-            lazyLoad
           />
         </motion.div>
       ))}

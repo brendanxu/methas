@@ -30,8 +30,17 @@ const nextConfig: NextConfig = {
   
   // 实验性功能
   experimental: {
-    // 优化包导入
-    optimizePackageImports: ['antd', 'framer-motion', 'lodash-es'],
+    // 优化包导入 - 减少bundle大小
+    optimizePackageImports: [
+      'antd', 
+      '@ant-design/icons',
+      'framer-motion', 
+      'lodash-es',
+      'react-i18next',
+      'dayjs'
+    ],
+    // 启用优化CSS导入
+    optimizeCss: true,
     // 启用 turbo 模式
     turbo: {
       rules: {
@@ -54,21 +63,47 @@ const nextConfig: NextConfig = {
         ...config.optimization,
         splitChunks: {
           chunks: 'all',
+          minSize: 20000,
+          maxSize: 250000,
           cacheGroups: {
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name: 'vendors',
+              priority: -10,
               chunks: 'all',
             },
             antd: {
               test: /[\\/]node_modules[\\/]antd[\\/]/,
               name: 'antd',
               chunks: 'all',
-              priority: 10,
+              priority: 20,
+            },
+            antdIcons: {
+              test: /[\\/]node_modules[\\/]@ant-design[\\/]icons[\\/]/,
+              name: 'antd-icons',
+              chunks: 'all',
+              priority: 25,
             },
             framerMotion: {
               test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
               name: 'framer-motion',
+              chunks: 'all',
+              priority: 15,
+            },
+            react: {
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+              name: 'react',
+              chunks: 'all',
+              priority: 30,
+            },
+            i18n: {
+              test: /[\\/]node_modules[\\/](i18next|react-i18next)[\\/]/,
+              name: 'i18n',
               chunks: 'all',
               priority: 10,
             },
@@ -108,7 +143,28 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        // 静态资源 - 长期缓存
+        source: '/(.*)\\.(js|css|woff2|woff|ttf|otf|eot)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // 图片资源 - 中期缓存
+        source: '/(.*)\\.(jpg|jpeg|png|gif|svg|webp|avif|ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // HTML 页面 - 短期缓存
+        source: '/((?!api).*)',
         headers: [
           // 安全头
           {
@@ -120,22 +176,35 @@ const nextConfig: NextConfig = {
             value: 'nosniff',
           },
           {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
           // 缓存头
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=3600, stale-while-revalidate=86400',
           },
         ],
       },
       {
+        // API 路由 - 无缓存
         source: '/api/(.*)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'no-store, no-cache, must-revalidate',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },

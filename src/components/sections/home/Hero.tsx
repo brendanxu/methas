@@ -182,8 +182,6 @@ export const Hero: React.FC<HeroProps> = ({
             quality={90}
             sizes="100vw"
             placeholder="blur"
-            autoBlur={true}
-            animate={true}
             style={{ objectFit: 'cover' }}
           />
         </motion.div>

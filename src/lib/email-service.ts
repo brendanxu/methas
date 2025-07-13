@@ -379,10 +379,12 @@ export async function sendNewsletterWelcome(data: {
   });
 }
 
-export default {
+const emailService = {
   sendEmail,
   sendTemplateEmail,
   sendContactNotification,
   sendContactConfirmation,
   sendNewsletterWelcome,
 };
+
+export default emailService;

@@ -284,7 +284,7 @@ export {
   CardLoading
 };
 
-export default {
+const dynamicImports = {
   // Ant Design
   DynamicForm,
   DynamicTable,
@@ -304,3 +304,5 @@ export default {
   createDynamicRoute,
   preloadComponent
 };
+
+export default dynamicImports;
