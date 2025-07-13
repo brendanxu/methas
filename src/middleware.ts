@@ -56,28 +56,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if there is any supported locale in the pathname
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  if (pathnameHasLocale) {
-    // Extract locale and set cookie
-    const locale = pathname.split('/')[1] as Locale;
-    const response = NextResponse.next();
-    response.cookies.set('locale', locale, {
-      maxAge: 365 * 24 * 60 * 60, // 1 year
-      path: '/',
-      sameSite: 'lax',
-    });
-    return response;
-  }
-
-  // Redirect if there is no locale
-  const locale = getLocale(request);
-  const newUrl = new URL(`/${locale}${pathname}`, request.url);
+  // For now, disable locale redirects to fix deployment issues
+  // TODO: Implement proper i18n routing later
   
-  const response = NextResponse.redirect(newUrl);
+  // Just set locale cookie based on preference without redirecting
+  const locale = getLocale(request);
+  const response = NextResponse.next();
   response.cookies.set('locale', locale, {
     maxAge: 365 * 24 * 60 * 60, // 1 year
     path: '/',
