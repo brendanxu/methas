@@ -249,6 +249,26 @@ const nextConfig = {
   // 禁用有问题页面的静态生成
   output: 'standalone',
   
+  // 暂时跳过有问题的页面生成
+  async generateStaticParams() {
+    return [];
+  },
+  
+  // 排除有问题的路由
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [
+        // 临时重定向accessibility-demo到主页
+        {
+          source: '/accessibility-demo',
+          destination: '/?temp=accessibility-demo',
+        },
+      ],
+    };
+  },
+  
   // 完全禁用静态生成，使用动态渲染
   experimental: {
     optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
