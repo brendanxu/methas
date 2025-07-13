@@ -38,3 +38,4 @@ if (typeof global !== 'undefined') {
   module.exports = globalThis;
 } else {
   module.exports = {};
+}
