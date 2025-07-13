@@ -20,7 +20,7 @@ const nextConfig = {
 
   // Webpack optimization
   webpack: (config, { dev, isServer }) => {
-    // Fallback for server-side node modules
+    // Fix for server-side rendering issues
     if (isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -28,6 +28,16 @@ const nextConfig = {
         path: false,
         crypto: false,
       };
+      
+      // Add global polyfills for server-side compatibility
+      const webpack = require('webpack');
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'typeof self': JSON.stringify('undefined'),
+          'typeof window': JSON.stringify('undefined'),
+          'typeof global': JSON.stringify('object'),
+        })
+      );
     }
 
     // Production optimizations

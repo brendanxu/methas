@@ -15,14 +15,6 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import "./globals.css";
 import "../styles/nprogress.css";
 
-// Polyfill for SSR compatibility with browser-only libraries
-if (typeof globalThis !== 'undefined' && !(globalThis as any).self) {
-  (globalThis as any).self = globalThis;
-}
-if (typeof global !== 'undefined' && !(global as any).self) {
-  (global as any).self = global;
-}
-
 // Enhanced metadata with proper SEO configuration
 export const metadata: Metadata = generateSEOMetadata(HOME_SEO);
 

@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-const NewsArticlePage = dynamic(() => import('./NewsArticlePage'));
+// Temporarily using static import to avoid dynamic import issues
+import NewsArticlePage from './NewsArticlePage';
 
 // 类型定义
 export interface NewsArticle {
