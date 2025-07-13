@@ -1,3 +1,5 @@
+'use client';
+
 import nextDynamic from 'next/dynamic';
 
 // Force dynamic rendering to prevent ALL server-side rendering issues
