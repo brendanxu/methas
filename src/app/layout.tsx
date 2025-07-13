@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Providers, GlobalStylesProvider } from "./providers";
 import { Header } from "@/components/layouts/Header";
 import { Footer } from "@/components/layouts/Footer";
@@ -60,7 +61,9 @@ export default function RootLayout({
             <PreloadStrategy>
               <GlobalStylesProvider>
                 <DynamicHead />
-                <PageTracker />
+                <Suspense fallback={null}>
+                  <PageTracker />
+                </Suspense>
                 <PreloadMonitor />
                 <RoutePreloader />
                 <GlobalSearch />
@@ -68,7 +71,11 @@ export default function RootLayout({
                 <div className="min-h-screen flex flex-col bg-background text-foreground">
                   <Header />
                   <main className="flex-1">
-                    {children}
+                    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                    </div>}>
+                      {children}
+                    </Suspense>
                   </main>
                   <Footer />
                 </div>

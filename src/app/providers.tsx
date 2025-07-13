@@ -77,9 +77,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     colors: southPoleColors,
   };
 
-  // Don't render until mounted to avoid hydration mismatch
+  // Provide consistent SSR/client rendering to avoid hydration mismatch
   if (!mounted) {
-    return null;
+    return (
+      <ThemeContext.Provider value={{
+        isDark: defaultTheme === 'dark',
+        toggleTheme: () => {},
+        colors: southPoleColors,
+      }}>
+        {children}
+      </ThemeContext.Provider>
+    );
   }
 
   return (

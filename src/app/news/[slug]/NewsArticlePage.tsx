@@ -42,8 +42,15 @@ interface NewsArticlePageProps {
 
 // 分享功能
 const ShareButtons: React.FC<{ article: NewsArticle }> = ({ article }) => {
-  const articleUrl = `${window.location.origin}/news/${article.slug}`;
+  const [articleUrl, setArticleUrl] = useState('');
   const shareText = `${article.title} - ${article.excerpt}`;
+  
+  useEffect(() => {
+    // 只在客户端设置 URL
+    if (typeof window !== 'undefined') {
+      setArticleUrl(`${window.location.origin}/news/${article.slug}`);
+    }
+  }, [article.slug]);
 
   const shareToTwitter = () => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(articleUrl)}`;

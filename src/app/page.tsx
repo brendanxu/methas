@@ -12,6 +12,7 @@ import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_SEO } from '@/lib/seo-config';
 import { getDefaultSchemas } from '@/lib/structured-data';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function Home() {
   const { t } = useTranslation(['home']);
@@ -26,35 +27,52 @@ export default function Home() {
       
         <div>
           {/* Add padding-top to account for fixed header */}
-          <div className="pt-20">
-            <DynamicHomeHero />
-          </div>
-          <ComponentPreloader
-            importFn={() => import('@/components/sections/home/Services')}
-            componentName="Services"
-            trigger="scroll"
-            scrollThreshold={30}
-          >
-            <DynamicServices />
-          </ComponentPreloader>
+          <ErrorBoundary fallback={<div className="pt-20 min-h-[50vh] flex items-center justify-center">
+            <p className="text-lg text-muted-foreground">Failed to load hero section</p>
+          </div>}>
+            <div className="pt-20">
+              <DynamicHomeHero />
+            </div>
+          </ErrorBoundary>
           
-          <ComponentPreloader
-            importFn={() => import('@/components/sections/home/CaseStudies')}
-            componentName="CaseStudies"
-            trigger="scroll"
-            scrollThreshold={50}
-          >
-            <DynamicCaseStudies />
-          </ComponentPreloader>
+          <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
+            <p className="text-lg text-muted-foreground">Failed to load services section</p>
+          </div>}>
+            <ComponentPreloader
+              importFn={() => import('@/components/sections/home/Services')}
+              componentName="Services"
+              trigger="scroll"
+              scrollThreshold={30}
+            >
+              <DynamicServices />
+            </ComponentPreloader>
+          </ErrorBoundary>
           
-          <ComponentPreloader
-            importFn={() => import('@/components/sections/ThemeShowcase')}
-            componentName="ThemeShowcase"
-            trigger="scroll"
-            scrollThreshold={70}
-          >
-            <DynamicThemeShowcase />
-          </ComponentPreloader>
+          <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
+            <p className="text-lg text-muted-foreground">Failed to load case studies section</p>
+          </div>}>
+            <ComponentPreloader
+              importFn={() => import('@/components/sections/home/CaseStudies')}
+              componentName="CaseStudies"
+              trigger="scroll"
+              scrollThreshold={50}
+            >
+              <DynamicCaseStudies />
+            </ComponentPreloader>
+          </ErrorBoundary>
+          
+          <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
+            <p className="text-lg text-muted-foreground">Failed to load theme showcase</p>
+          </div>}>
+            <ComponentPreloader
+              importFn={() => import('@/components/sections/ThemeShowcase')}
+              componentName="ThemeShowcase"
+              trigger="scroll"
+              scrollThreshold={70}
+            >
+              <DynamicThemeShowcase />
+            </ComponentPreloader>
+          </ErrorBoundary>
           
           {/* Test content to verify scroll effects */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

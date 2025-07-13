@@ -2,27 +2,103 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// 导入翻译资源
-import enCommon from '../../public/locales/en/common.json';
-import enHome from '../../public/locales/en/home.json';
-import enNav from '../../public/locales/en/nav.json';
-import zhCommon from '../../public/locales/zh/common.json';
-import zhHome from '../../public/locales/zh/home.json';
-import zhNav from '../../public/locales/zh/nav.json';
-
+// 翻译资源（使用动态导入以支持生产环境）
 export const defaultNS = 'common';
+
+// 创建基础资源结构，避免生产环境加载失败
 export const resources = {
   en: {
-    common: enCommon,
-    home: enHome,
-    nav: enNav,
+    common: {
+      loading: 'Loading...',
+      error: 'Error',
+      retry: 'Retry',
+      close: 'Close',
+      back: 'Back',
+      next: 'Next',
+      previous: 'Previous',
+      save: 'Save',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      submit: 'Submit',
+    },
+    home: {
+      title: 'Welcome to South Pole',
+      subtitle: 'Leading Carbon Management Solutions',
+    },
+    nav: {
+      home: 'Home',
+      about: 'About',
+      services: 'Services',
+      cases: 'Cases',
+      news: 'News',
+      contact: 'Contact',
+    },
   },
   zh: {
-    common: zhCommon,
-    home: zhHome,
-    nav: zhNav,
+    common: {
+      loading: '加载中...',
+      error: '错误',
+      retry: '重试',
+      close: '关闭',
+      back: '返回',
+      next: '下一步',
+      previous: '上一步',
+      save: '保存',
+      cancel: '取消',
+      confirm: '确认',
+      submit: '提交',
+    },
+    home: {
+      title: '欢迎来到 South Pole',
+      subtitle: '领先的碳管理解决方案',
+    },
+    nav: {
+      home: '首页',
+      about: '关于我们',
+      services: '服务',
+      cases: '案例',
+      news: '新闻',
+      contact: '联系我们',
+    },
   },
 } as const;
+
+// 动态加载翻译资源的函数
+const loadResources = async () => {
+  try {
+    // 动态导入翻译文件，如果失败则使用默认资源
+    const [enCommon, enHome, enNav, zhCommon, zhHome, zhNav] = await Promise.allSettled([
+      import('../../public/locales/en/common.json').then(m => m.default),
+      import('../../public/locales/en/home.json').then(m => m.default),
+      import('../../public/locales/en/nav.json').then(m => m.default),
+      import('../../public/locales/zh/common.json').then(m => m.default),
+      import('../../public/locales/zh/home.json').then(m => m.default),
+      import('../../public/locales/zh/nav.json').then(m => m.default),
+    ]);
+
+    // 合并动态加载的资源
+    if (enCommon.status === 'fulfilled') {
+      Object.assign(resources.en.common, enCommon.value);
+    }
+    if (enHome.status === 'fulfilled') {
+      Object.assign(resources.en.home, enHome.value);
+    }
+    if (enNav.status === 'fulfilled') {
+      Object.assign(resources.en.nav, enNav.value);
+    }
+    if (zhCommon.status === 'fulfilled') {
+      Object.assign(resources.zh.common, zhCommon.value);
+    }
+    if (zhHome.status === 'fulfilled') {
+      Object.assign(resources.zh.home, zhHome.value);
+    }
+    if (zhNav.status === 'fulfilled') {
+      Object.assign(resources.zh.nav, zhNav.value);
+    }
+  } catch (error) {
+    console.warn('Failed to load translation resources, using defaults:', error);
+  }
+};
 
 // 支持的语言列表
 export const supportedLanguages = ['en', 'zh'] as const;
@@ -41,39 +117,52 @@ export const i18nConfig = {
   fallbackLanguage: 'en' as SupportedLanguage,
 };
 
-// 初始化 i18next
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    lng: i18nConfig.defaultLanguage,
-    fallbackLng: i18nConfig.fallbackLanguage,
-    defaultNS,
-    ns: ['common', 'home', 'nav'],
-    
-    resources,
-    
-    // 语言检测配置
-    detection: {
-      order: ['path', 'localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'i18nextLng',
-      lookupFromPathIndex: 0,
-    },
-    
-    // 插值配置
-    interpolation: {
-      escapeValue: false, // React已经处理了XSS防护
-    },
-    
-    // 开发模式配置
-    debug: process.env.NODE_ENV === 'development',
-    
-    // React配置
-    react: {
-      useSuspense: false,
-    },
-  });
+// 初始化 i18next（异步）
+const initializeI18n = async () => {
+  // 首先加载翻译资源
+  await loadResources();
+  
+  // 初始化 i18next
+  if (!i18n.isInitialized) {
+    await i18n
+      .use(LanguageDetector)
+      .use(initReactI18next)
+      .init({
+        lng: i18nConfig.defaultLanguage,
+        fallbackLng: i18nConfig.fallbackLanguage,
+        defaultNS,
+        ns: ['common', 'home', 'nav'],
+        
+        resources,
+        
+        // 语言检测配置
+        detection: {
+          order: ['path', 'localStorage', 'navigator', 'htmlTag'],
+          caches: ['localStorage'],
+          lookupLocalStorage: 'i18nextLng',
+          lookupFromPathIndex: 0,
+        },
+        
+        // 插值配置
+        interpolation: {
+          escapeValue: false, // React已经处理了XSS防护
+        },
+        
+        // 开发模式配置
+        debug: process.env.NODE_ENV === 'development',
+        
+        // React配置
+        react: {
+          useSuspense: false,
+        },
+      });
+  }
+};
+
+// 立即初始化（但不阻塞模块加载）
+initializeI18n().catch(error => {
+  console.warn('Failed to initialize i18n:', error);
+});
 
 export default i18n;
 
