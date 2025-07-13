@@ -1,5 +1,9 @@
 'use client';
 
+// 强制动态渲染，避免预渲染问题
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export default function AccessibilityDemoPage() {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
