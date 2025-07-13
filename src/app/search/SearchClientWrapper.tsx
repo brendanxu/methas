@@ -1,9 +1,9 @@
 'use client';
 
-import nextDynamic from 'next/dynamic';
+import dynamic from 'next/dynamic';
 
-// Dynamically import the client component with NO SSR
-const ButtonDemoClient = nextDynamic(() => import('./ButtonDemoClient'), {
+// Dynamic import to prevent prerendering issues
+const SearchPageClient = dynamic(() => import('./SearchPageClient'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -12,6 +12,6 @@ const ButtonDemoClient = nextDynamic(() => import('./ButtonDemoClient'), {
   ),
 });
 
-export default function ButtonDemoPage() {
-  return <ButtonDemoClient />;
+export default function SearchClientWrapper() {
+  return <SearchPageClient />;
 }

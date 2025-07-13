@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+
+// Force dynamic rendering for all routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 // import "@/lib/ssr-guard.js"; // Temporarily disabled
 import { Providers, GlobalStylesProvider } from "./providers";
 import { Header } from "@/components/layouts/Header";

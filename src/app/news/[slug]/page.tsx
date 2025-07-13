@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-// Temporarily using static import to avoid dynamic import issues
-import NewsArticlePage from './NewsArticlePage';
+// Import client wrapper that handles dynamic imports
+import NewsArticleClient from './NewsArticleClient';
 
 // 类型定义
 export interface NewsArticle {
@@ -249,12 +249,12 @@ export async function generateMetadata({
   };
 }
 
-// 生成静态参数
-export async function generateStaticParams() {
-  return mockArticles.map((article) => ({
-    slug: article.slug,
-  }));
-}
+// 注释掉静态参数生成以避免预渲染问题
+// export async function generateStaticParams() {
+//   return mockArticles.map((article) => ({
+//     slug: article.slug,
+//   }));
+// }
 
 // 页面组件
 export default async function ArticlePage({ 
@@ -313,7 +313,7 @@ export default async function ArticlePage({
       />
       
       {/* 文章页面组件 */}
-      <NewsArticlePage 
+      <NewsArticleClient 
         article={article} 
         relatedArticles={relatedArticles} 
       />

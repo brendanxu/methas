@@ -1,9 +1,5 @@
 'use client';
 
-// Force dynamic rendering to prevent prerendering of interactive components
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/app/providers';

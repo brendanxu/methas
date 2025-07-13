@@ -246,7 +246,7 @@ const nextConfig = {
   trailingSlash: false,
   generateEtags: false,
 
-  // 禁用有问题页面的静态生成
+  // 禁用有问题页面的静态生成 - 强制所有页面动态渲染
   output: 'standalone',
   
   // 移除了无效的generateStaticParams配置
@@ -271,6 +271,7 @@ const nextConfig = {
     optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
     // optimizeCss: true, // 禁用CSS优化，避免critters依赖问题
   },
+
 
   // Security headers
   async headers() {

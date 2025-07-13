@@ -1,4 +1,9 @@
-export default function FormsDemo() {
+'use client';
+
+import dynamic from 'next/dynamic';
+
+// Create a client component for the forms demo content
+const FormsDemoContent = dynamic(() => Promise.resolve(function FormsDemoContent() {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -56,4 +61,15 @@ export default function FormsDemo() {
       </div>
     </div>
   );
+}), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>
+  ),
+});
+
+export default function FormsDemo() {
+  return <FormsDemoContent />;
 }
