@@ -70,15 +70,18 @@ const nextConfig = {
           'typeof navigator': '"undefined"',
           'typeof location': '"undefined"',
           'typeof self': '"undefined"',
-          // 直接定义self为global
+          // 强制定义self为global，处理所有引用
           'self': 'global',
+          'globalThis': 'global',
+          'window': 'undefined',
         })
       );
 
-      // 添加强制polyfill
+      // 添加强制polyfill，确保所有self引用都被替换
       config.plugins.push(
         new webpack.ProvidePlugin({
-          'self': ['global'],
+          'self': require.resolve('./src/polyfills/force-global.js'),
+          'globalThis': require.resolve('./src/polyfills/force-global.js'),
         })
       );
 
@@ -98,10 +101,14 @@ const nextConfig = {
       config.optimization = config.optimization || {};
       config.optimization.splitChunks = false;
       config.optimization.runtimeChunk = false;
+      config.optimization.minimize = false; // 禁用压缩，可能导致问题
       
       // 禁用模块联邦和其他可能导致runtime问题的特性
       config.optimization.moduleIds = 'deterministic';
       config.optimization.chunkIds = 'deterministic';
+      
+      // 强制所有模块内联，不生成vendor chunks
+      config.optimization.concatenateModules = false;
       
       // 使用更简单的方法处理polyfills，避免entry操作的复杂性
     }

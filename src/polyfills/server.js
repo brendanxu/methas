@@ -3,9 +3,16 @@
  * This must be loaded before any other modules that might access browser globals
  */
 
-// Polyfill 'self' global variable for server-side rendering
-if (typeof global !== 'undefined' && typeof self === 'undefined') {
+// 强制polyfill所有可能的全局对象引用
+if (typeof global !== 'undefined') {
+  // 确保self总是指向global
   global.self = global;
+  global.globalThis = global;
+  
+  // 如果这些变量被意外访问，至少不会抛出错误
+  if (typeof window === 'undefined') {
+    global.window = global;
+  }
 }
 
 // Additional browser API polyfills
