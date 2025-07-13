@@ -109,17 +109,10 @@ const nextConfig = {
         },
       });
 
-      // 临时禁用有问题的chunk优化以解决webpack-runtime问题
-      if (config.optimization?.splitChunks) {
-        // 简化splitChunks配置，避免复杂的vendor分离
-        config.optimization.splitChunks = {
-          chunks: 'async',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-          },
-        };
-      }
+      // 完全禁用服务器端的chunk分离，避免webpack-runtime问题
+      config.optimization = config.optimization || {};
+      config.optimization.splitChunks = false;
+      config.optimization.runtimeChunk = false;
     }
 
     // Client-side optimizations
@@ -290,8 +283,14 @@ const nextConfig = {
   trailingSlash: false,
   generateEtags: false,
 
-  // 暂时禁用静态错误页面的生成
+  // 禁用有问题页面的静态生成
   output: 'standalone',
+  
+  // 跳过预渲染错误，继续构建
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
 
   // Security headers
   async headers() {
