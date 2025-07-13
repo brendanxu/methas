@@ -6,6 +6,7 @@ import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { useBackgroundDetection } from '@/hooks/useBackgroundDetection';
 import { useGlobalSearch } from '@/components/layout/GlobalSearch';
 import { LanguageSwitcherFull } from '@/components/ui/LanguageSwitcher';
 import { cn } from '@/lib/utils';
@@ -131,7 +132,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ className }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   
@@ -139,28 +139,10 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const colors = useThemeColors();
   const { settings } = useAccessibility();
   const { openSearch } = useGlobalSearch();
+  const { isDarkBackground, isScrolled } = useBackgroundDetection();
   
   // Get navigation data with translations
   const navigationData = getNavigationData(t);
-
-  // Handle scroll effect with throttling for performance
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrollPosition = window.scrollY;
-          setIsScrolled(scrollPosition > 10);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check initial scroll position
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Close mobile menu when window resizes
   useEffect(() => {
@@ -210,9 +192,14 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     <motion.header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-md border-b shadow-soft' 
-          : 'bg-transparent',
+        {
+          // 未滚动状态
+          'bg-transparent': !isScrolled,
+          
+          // 滚动后根据背景调整
+          'bg-white/95 backdrop-blur-md shadow-sm border-b': isScrolled && !isDarkBackground,
+          'bg-gray-900/90 backdrop-blur-md border-b': isScrolled && isDarkBackground,
+        },
         className
       )}
       style={{
@@ -243,17 +230,21 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               </div>
               <div className="hidden sm:block">
                 <div 
-                  className="text-xl font-bold"
-                  style={{ color: isScrolled ? colors.foreground : '#FFFFFF' }}
+                  className="text-xl font-bold transition-colors duration-300"
+                  style={{ 
+                    color: (!isScrolled || isDarkBackground) 
+                      ? '#FFFFFF' 
+                      : colors.foreground 
+                  }}
                 >
                   South Pole
                 </div>
                 <div 
-                  className="text-xs font-medium"
+                  className="text-xs font-medium transition-colors duration-300"
                   style={{ 
-                    color: isScrolled 
-                      ? colors.mutedForeground 
-                      : 'rgba(255, 255, 255, 0.8)' 
+                    color: (!isScrolled || isDarkBackground) 
+                      ? 'rgba(255, 255, 255, 0.8)' 
+                      : colors.mutedForeground 
                   }}
                 >
                   Climate Solutions
@@ -281,11 +272,17 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <button
               onClick={openSearch}
               className={cn(
-                'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+                'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300',
+                {
+                  'hover:bg-white/10': !isScrolled || isDarkBackground,
+                  'hover:bg-gray-100': isScrolled && !isDarkBackground,
+                },
+                'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
               )}
               style={{
-                color: isScrolled ? colors.foreground : '#FFFFFF',
+                color: (!isScrolled || isDarkBackground) 
+                  ? '#FFFFFF' 
+                  : colors.foreground,
               }}
               aria-label={t('common:search')}
             >
@@ -322,11 +319,17 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <button
               onClick={toggleMobileMenu}
               className={cn(
-                'lg:hidden p-2 rounded-lg transition-colors',
+                'lg:hidden p-2 rounded-lg transition-all duration-300',
+                {
+                  'hover:bg-white/10': !isScrolled || isDarkBackground,
+                  'hover:bg-gray-100': isScrolled && !isDarkBackground,
+                },
                 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
               )}
               style={{
-                color: isScrolled ? colors.foreground : '#FFFFFF',
+                color: (!isScrolled || isDarkBackground) 
+                  ? '#FFFFFF' 
+                  : colors.foreground,
               }}
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileMenuOpen}
@@ -378,6 +381,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
   onDropdownToggle,
 }) => {
   const colors = useThemeColors();
+  const { isDarkBackground } = useBackgroundDetection();
   const isActive = activeDropdown === item.label;
 
   if (item.children) {
@@ -386,11 +390,17 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
         <button
           onClick={(e) => onDropdownToggle(item.label, e)}
           className={cn(
-            'flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-            'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+            'flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300',
+            {
+              'hover:bg-white/10': !isScrolled || isDarkBackground,
+              'hover:bg-gray-100': isScrolled && !isDarkBackground,
+            },
+            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
           )}
           style={{
-            color: isScrolled ? colors.foreground : '#FFFFFF',
+            color: (!isScrolled || isDarkBackground) 
+              ? '#FFFFFF' 
+              : colors.foreground,
           }}
           aria-expanded={isActive}
           aria-haspopup="true"
@@ -424,11 +434,17 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
     <Link
       href={item.href || '#'}
       className={cn(
-        'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-        'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+        'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300',
+        {
+          'hover:bg-white/10': !isScrolled || isDarkBackground,
+          'hover:bg-gray-100': isScrolled && !isDarkBackground,
+        },
+        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
       )}
       style={{
-        color: isScrolled ? colors.foreground : '#FFFFFF',
+        color: (!isScrolled || isDarkBackground) 
+          ? '#FFFFFF' 
+          : colors.foreground,
       }}
     >
       {item.label}
