@@ -1,10 +1,10 @@
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
 // Force dynamic rendering to prevent ALL server-side rendering issues
 export const dynamic = 'force-dynamic';
 
 // Dynamically import the client component with NO SSR
-const ButtonDemoClient = dynamic(() => import('./ButtonDemoClient'), {
+const ButtonDemoClient = nextDynamic(() => import('./ButtonDemoClient'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-background flex items-center justify-center">
