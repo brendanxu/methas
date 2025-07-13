@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+// import "@/lib/ssr-guard.js"; // Temporarily disabled
 import { Providers, GlobalStylesProvider } from "./providers";
 import { Header } from "@/components/layouts/Header";
 import { Footer } from "@/components/layouts/Footer";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { DynamicHead } from "@/components/seo/DynamicHead";
-import { PreloadProvider, PreloadMonitor } from "@/components/optimization/PreloadProvider";
-import { PreloadStrategy, RoutePreloader } from "@/components/optimization/PreloadStrategy";
+import { ClientOnlyPreload } from "@/components/optimization/ClientOnlyPreload";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo-metadata";
 import { HOME_SEO } from "@/lib/seo-config";
 import { SEOChecker } from "@/components/seo/SEOChecker";
@@ -59,34 +59,30 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Providers defaultTheme="light">
-          <PreloadProvider>
-            <PreloadStrategy>
-              <GlobalStylesProvider>
-                <Suspense fallback={null}>
-                  <ProgressBar />
-                </Suspense>
-                <DynamicHead />
-                <Suspense fallback={null}>
-                  <PageTracker />
-                </Suspense>
-                <PreloadMonitor />
-                <RoutePreloader />
-                <GlobalSearch />
-                <SEOChecker />
-                <div className="min-h-screen flex flex-col bg-background text-foreground">
-                  <Header />
-                  <main className="flex-1">
-                    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-                    </div>}>
-                      {children}
-                    </Suspense>
-                  </main>
-                  <Footer />
-                </div>
-              </GlobalStylesProvider>
-            </PreloadStrategy>
-          </PreloadProvider>
+          <ClientOnlyPreload>
+            <GlobalStylesProvider>
+              <Suspense fallback={null}>
+                <ProgressBar />
+              </Suspense>
+              <DynamicHead />
+              <Suspense fallback={null}>
+                <PageTracker />
+              </Suspense>
+              <GlobalSearch />
+              <SEOChecker />
+              <div className="min-h-screen flex flex-col bg-background text-foreground">
+                <Header />
+                <main className="flex-1">
+                  <Suspense fallback={<div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                  </div>}>
+                    {children}
+                  </Suspense>
+                </main>
+                <Footer />
+              </div>
+            </GlobalStylesProvider>
+          </ClientOnlyPreload>
         </Providers>
       </body>
     </html>

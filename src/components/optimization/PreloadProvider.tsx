@@ -66,6 +66,9 @@ export const ComponentPreloader: React.FC<ComponentPreloaderProps> = ({
     }
 
     if (trigger === 'scroll') {
+      // Only run scroll tracking in browser environment
+      if (typeof window === 'undefined') return;
+      
       let hasTriggered = false;
       
       const handleScroll = () => {
@@ -137,17 +140,20 @@ export const PreloadLink: React.FC<PreloadLinkProps> = ({
  */
 export const PreloadMonitor: React.FC = () => {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return;
+    // Only run in browser environment
+    if (typeof window === 'undefined' || process.env.NODE_ENV !== 'development') return;
 
     const logPerformance = () => {
       // Log First Contentful Paint
-      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
-      if (fcpEntry) {
-        console.log(`FCP: ${Math.round(fcpEntry.startTime)}ms`);
+      if (typeof performance !== 'undefined' && performance.getEntriesByName) {
+        const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+        if (fcpEntry) {
+          console.log(`FCP: ${Math.round(fcpEntry.startTime)}ms`);
+        }
       }
 
       // Log Largest Contentful Paint
-      if ('PerformanceObserver' in window) {
+      if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
@@ -157,21 +163,25 @@ export const PreloadMonitor: React.FC = () => {
       }
 
       // Log bundle chunks loading
-      const navigationEntries = performance.getEntriesByType('navigation');
-      if (navigationEntries.length > 0) {
-        const nav = navigationEntries[0] as PerformanceNavigationTiming;
-        console.log(`DOM Content Loaded: ${Math.round(nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart)}ms`);
-        console.log(`Page Load Complete: ${Math.round(nav.loadEventEnd - nav.loadEventStart)}ms`);
+      if (typeof performance !== 'undefined' && performance.getEntriesByType) {
+        const navigationEntries = performance.getEntriesByType('navigation');
+        if (navigationEntries.length > 0) {
+          const nav = navigationEntries[0] as PerformanceNavigationTiming;
+          console.log(`DOM Content Loaded: ${Math.round(nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart)}ms`);
+          console.log(`Page Load Complete: ${Math.round(nav.loadEventEnd - nav.loadEventStart)}ms`);
+        }
       }
     };
 
     // Run after page load
-    if (document.readyState === 'complete') {
-      setTimeout(logPerformance, 100);
-    } else {
-      window.addEventListener('load', () => {
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'complete') {
         setTimeout(logPerformance, 100);
-      });
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(logPerformance, 100);
+        });
+      }
     }
   }, []);
 

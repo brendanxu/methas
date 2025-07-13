@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Button as AntButton, Result } from 'antd';
-import {  motion  } from '@/lib/mock-framer-motion';
-import { Button } from '@/components/ui/Button';
-import { SEOHead } from '@/components/seo/SEOHead';
-import { ERROR_SEO } from '@/lib/seo-config';
+import dynamic from 'next/dynamic';
+
+// 动态导入以避免SSR问题
+const Result = dynamic(() => import('antd').then(mod => ({ default: mod.Result })), { ssr: false });
+const AntButton = dynamic(() => import('antd').then(mod => ({ default: mod.Button })), { ssr: false });
+const Button = dynamic(() => import('@/components/ui/Button').then(mod => ({ default: mod.Button })), { ssr: false });
+const SEOHead = dynamic(() => import('@/components/seo/SEOHead').then(mod => ({ default: mod.SEOHead })), { ssr: false });
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -28,16 +30,21 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     }
   }, [error]);
 
-  return (
-    <>
-      <SEOHead config={ERROR_SEO} basePath="/error" />
+  if (typeof window === 'undefined') {
+    // 服务器端渲染时返回简单的HTML
+    return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <motion.div
-        className="max-w-2xl w-full text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+        <div className="max-w-2xl w-full text-center">
+          <h1 className="text-4xl font-bold text-red-600 mb-4">页面出现错误</h1>
+          <p className="text-lg text-gray-600 mb-8">抱歉，页面遇到了一些问题。请尝试刷新页面或稍后再试。</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="max-w-2xl w-full text-center">
         <Result
           status="error"
           title="页面出现错误"
@@ -61,12 +68,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         />
         
         {process.env.NODE_ENV === 'development' && (
-          <motion.div
-            className="mt-8 p-4 bg-red-50 border border-red-200 rounded-lg text-left"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div className="mt-8 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
             <h3 className="text-lg font-semibold text-red-800 mb-2">
               开发环境错误信息：
             </h3>
@@ -81,10 +83,9 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                 </pre>
               </details>
             )}
-          </motion.div>
+          </div>
         )}
-      </motion.div>
       </div>
-    </>
+    </div>
   );
 }

@@ -47,6 +47,9 @@ export function useIntersectionObserver(
 
   useEffect(() => {
     if (!enabled || (triggerOnce && hasTriggered)) return;
+    
+    // 仅在客户端执行
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
 
     const element = ref.current;
     if (!element) return;
@@ -79,7 +82,9 @@ export function useIntersectionObserver(
     observer.observe(element);
 
     return () => {
-      observer.unobserve(element);
+      if (element) {
+        observer.unobserve(element);
+      }
     };
   }, [onIntersect, threshold, rootMargin, triggerOnce, enabled, hasTriggered, hasIntersected]);
 

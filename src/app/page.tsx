@@ -8,7 +8,7 @@ import {
   DynamicServices,
   DynamicCaseStudies 
 } from '@/lib/dynamic-imports';
-import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
+import { ClientOnlyComponentPreloader } from '@/components/optimization/ClientOnlyComponentPreloader';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_SEO } from '@/lib/seo-config';
 import { getDefaultSchemas } from '@/lib/structured-data';
@@ -38,40 +38,40 @@ export default function Home() {
           <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
             <p className="text-lg text-muted-foreground">Failed to load services section</p>
           </div>}>
-            <ComponentPreloader
+            <ClientOnlyComponentPreloader
               importFn={() => import('@/components/sections/home/Services')}
               componentName="Services"
               trigger="scroll"
               scrollThreshold={30}
             >
               <DynamicServices />
-            </ComponentPreloader>
+            </ClientOnlyComponentPreloader>
           </ErrorBoundary>
           
           <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
             <p className="text-lg text-muted-foreground">Failed to load case studies section</p>
           </div>}>
-            <ComponentPreloader
+            <ClientOnlyComponentPreloader
               importFn={() => import('@/components/sections/home/CaseStudies')}
               componentName="CaseStudies"
               trigger="scroll"
               scrollThreshold={50}
             >
               <DynamicCaseStudies />
-            </ComponentPreloader>
+            </ClientOnlyComponentPreloader>
           </ErrorBoundary>
           
           <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
             <p className="text-lg text-muted-foreground">Failed to load theme showcase</p>
           </div>}>
-            <ComponentPreloader
+            <ClientOnlyComponentPreloader
               importFn={() => import('@/components/sections/ThemeShowcase')}
               componentName="ThemeShowcase"
               trigger="scroll"
               scrollThreshold={70}
             >
               <DynamicThemeShowcase />
-            </ComponentPreloader>
+            </ClientOnlyComponentPreloader>
           </ErrorBoundary>
           
           {/* Test content to verify scroll effects */}

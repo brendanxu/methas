@@ -10,8 +10,12 @@ interface PreloadStrategyProps {
 // 预加载关键资源
 export const PreloadStrategy: React.FC<PreloadStrategyProps> = ({ children }) => {
   useEffect(() => {
+    // 仅在客户端执行
+    if (typeof window === 'undefined') return;
+
     // 预加载关键字体
     const preloadFont = (href: string, type = 'font/woff2') => {
+      if (typeof document === 'undefined') return;
       const link = document.createElement('link');
       link.rel = 'preload';
       link.href = href;
@@ -23,6 +27,7 @@ export const PreloadStrategy: React.FC<PreloadStrategyProps> = ({ children }) =>
 
     // 预加载关键图片
     const preloadImage = (src: string) => {
+      if (typeof document === 'undefined') return;
       const link = document.createElement('link');
       link.rel = 'preload';
       link.href = src;
@@ -32,6 +37,7 @@ export const PreloadStrategy: React.FC<PreloadStrategyProps> = ({ children }) =>
 
     // 预加载关键 JS 模块
     const preloadModule = (src: string) => {
+      if (typeof document === 'undefined') return;
       const link = document.createElement('link');
       link.rel = 'modulepreload';
       link.href = src;
@@ -44,32 +50,29 @@ export const PreloadStrategy: React.FC<PreloadStrategyProps> = ({ children }) =>
       preloadImage('/og-default.jpg');
       preloadImage('/images/test-hero.png');
 
-      // 预加载下一页面的关键模块
-      if (typeof window !== 'undefined') {
-        // 检测用户意图并预加载
-        const preloadNextLikelyPage = () => {
-          const currentPath = window.location.pathname;
-          
-          // 根据当前页面预测下一个可能访问的页面
-          switch (currentPath) {
-            case '/':
-              // 首页用户可能访问服务页面
-              import('@/components/sections/home/Services');
-              break;
-            case '/services':
-              // 服务页面用户可能查看案例
-              import('@/components/sections/home/CaseStudies');
-              break;
-            case '/about':
-              // 关于页面用户可能联系我们
-              import('@/components/forms/ContactForm');
-              break;
-          }
-        };
+      // 检测用户意图并预加载
+      const preloadNextLikelyPage = () => {
+        const currentPath = window.location.pathname;
+        
+        // 根据当前页面预测下一个可能访问的页面
+        switch (currentPath) {
+          case '/':
+            // 首页用户可能访问服务页面
+            import('@/components/sections/home/Services').catch(() => {});
+            break;
+          case '/services':
+            // 服务页面用户可能查看案例
+            import('@/components/sections/home/CaseStudies').catch(() => {});
+            break;
+          case '/about':
+            // 关于页面用户可能联系我们
+            import('@/components/forms/ContactForm').catch(() => {});
+            break;
+        }
+      };
 
-        // 延迟预加载，避免阻塞主要内容
-        setTimeout(preloadNextLikelyPage, 2000);
-      }
+      // 延迟预加载，避免阻塞主要内容
+      setTimeout(preloadNextLikelyPage, 2000);
     } catch (error) {
       console.warn('Preload strategy error:', error);
     }
@@ -81,33 +84,40 @@ export const PreloadStrategy: React.FC<PreloadStrategyProps> = ({ children }) =>
 // 智能预加载 Hook
 export const useSmartPreload = () => {
   useEffect(() => {
+    // 仅在客户端执行
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     // 鼠标悬停预加载
     const handleMouseEnter = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const link = target.closest('a');
       
       if (link?.href && link.href !== window.location.href) {
-        // 预加载链接页面的关键资源
-        const url = new URL(link.href);
-        
-        // 根据路径预加载对应组件
-        switch (url.pathname) {
-          case '/services':
-            // 预加载服务相关组件
-            import('@/components/sections/home/Services');
-            break;
-          case '/about':
-            // 预加载案例研究组件
-            import('@/components/sections/home/CaseStudies');
-            break;
-          case '/contact':
-            // 预加载联系表单
-            import('@/components/forms/ContactForm');
-            break;
-          case '/news':
-            // 预加载新闻相关组件
-            import('@/components/sections/home/CaseStudies');
-            break;
+        try {
+          // 预加载链接页面的关键资源
+          const url = new URL(link.href);
+          
+          // 根据路径预加载对应组件
+          switch (url.pathname) {
+            case '/services':
+              // 预加载服务相关组件
+              import('@/components/sections/home/Services').catch(() => {});
+              break;
+            case '/about':
+              // 预加载案例研究组件
+              import('@/components/sections/home/CaseStudies').catch(() => {});
+              break;
+            case '/contact':
+              // 预加载联系表单
+              import('@/components/forms/ContactForm').catch(() => {});
+              break;
+            case '/news':
+              // 预加载新闻相关组件
+              import('@/components/sections/home/CaseStudies').catch(() => {});
+              break;
+          }
+        } catch (error) {
+          // 忽略URL解析错误
         }
       }
     };
@@ -140,6 +150,9 @@ export const ViewportPreloader: React.FC<{
 // 路由预加载组件
 export const RoutePreloader: React.FC = () => {
   useEffect(() => {
+    // 仅在客户端执行
+    if (typeof window === 'undefined') return;
+
     // 预加载重要路由组件
     const preloadRoutes = async () => {
       try {
@@ -156,8 +169,12 @@ export const RoutePreloader: React.FC = () => {
 
         // 逐个预加载，避免一次性加载太多
         for (const route of routes) {
-          await route();
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          try {
+            await route();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } catch (error) {
+            // 忽略单个路由预加载失败
+          }
         }
       } catch (error) {
         console.warn('Route preloader error:', error);
@@ -166,7 +183,7 @@ export const RoutePreloader: React.FC = () => {
 
     // 仅在空闲时预加载
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(preloadRoutes);
+      window.requestIdleCallback(preloadRoutes);
     } else {
       setTimeout(preloadRoutes, 5000);
     }
