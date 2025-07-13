@@ -252,7 +252,7 @@ const nextConfig = {
   // 完全禁用静态生成，使用动态渲染
   experimental: {
     optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
-    optimizeCss: true,
+    // optimizeCss: true, // 禁用CSS优化，避免critters依赖问题
   },
 
   // Security headers
