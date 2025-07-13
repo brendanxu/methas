@@ -4,10 +4,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
-    optimizeCss: true,
-  },
 
   // 外部化服务器包（Next.js 15的正确配置）
   serverExternalPackages: [
@@ -296,7 +292,8 @@ const nextConfig = {
   
   // 完全禁用静态生成，使用动态渲染
   experimental: {
-    ...nextConfig.experimental,
+    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
+    optimizeCss: true,
     staticWorkerRequestDeduping: false,
   },
 
