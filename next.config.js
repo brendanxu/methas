@@ -249,10 +249,7 @@ const nextConfig = {
   // 禁用有问题页面的静态生成
   output: 'standalone',
   
-  // 暂时跳过有问题的页面生成
-  async generateStaticParams() {
-    return [];
-  },
+  // 移除了无效的generateStaticParams配置
   
   // 排除有问题的路由
   async rewrites() {

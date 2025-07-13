@@ -1,3 +1,5 @@
+'use client';
+
 // 简化的重定向页面，避免预渲染问题
 export default function AccessibilityDemoPage() {
   return (
@@ -7,9 +9,12 @@ export default function AccessibilityDemoPage() {
         <p className="text-lg text-gray-600 mb-8">
           可访问性功能正在开发中，即将上线。
         </p>
-        <a href="/" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
           返回首页
-        </a>
+        </button>
       </div>
     </div>
   );
