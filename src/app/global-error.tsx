@@ -1,3 +1,5 @@
+'use client';
+
 // 极简化的全局错误页面，避免webpack-runtime问题
 export default function GlobalError({
   error,
