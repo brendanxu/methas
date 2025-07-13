@@ -2,6 +2,7 @@
 
 // Force dynamic rendering for interactive news page with filtering and search
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 import React, { useState, useMemo } from 'react';
 import {  motion  } from '@/lib/mock-framer-motion';
