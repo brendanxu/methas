@@ -431,3 +431,86 @@ body {
     max-width: 1536px;
   }
 }
+
+/* 额外的视觉优化 */
+/* 确保图片不会导致布局跳动 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 优化按钮和链接的悬停效果 */
+.btn-hover-scale {
+  transition: all var(--animation-duration) var(--animation-timing);
+}
+
+.btn-hover-scale:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-hover-scale:active {
+  transform: translateY(0);
+  transition-duration: var(--animation-duration-fast);
+}
+
+/* 移除按钮和链接的默认焦点轮廓 */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 统一的卡片样式 */
+.card-unified {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  transition: all var(--animation-duration) var(--animation-timing);
+}
+
+.card-unified:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+/* 优化文字选择 */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+::-moz-selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* 确保足够的页面间距 */
+.main-content {
+  padding-top: 80px; /* 为固定Header留出空间 */
+  min-height: calc(100vh - 80px);
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding-top: 80px;
+  }
+}
+
+/* 改进的loading状态 */
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--background) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
