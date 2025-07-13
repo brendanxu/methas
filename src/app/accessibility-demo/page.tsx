@@ -1,8 +1,7 @@
-'use client';
+import Link from 'next/link';
 
 // 强制动态渲染，避免预渲染问题
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
 // 简化的重定向页面，避免预渲染问题
 export default function AccessibilityDemoPage() {
@@ -13,12 +12,12 @@ export default function AccessibilityDemoPage() {
         <p className="text-lg text-gray-600 mb-8">
           可访问性功能正在开发中，即将上线。
         </p>
-        <button 
-          onClick={() => window.location.href = '/'}
+        <Link 
+          href="/"
           className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           返回首页
-        </button>
+        </Link>
       </div>
     </div>
   );
