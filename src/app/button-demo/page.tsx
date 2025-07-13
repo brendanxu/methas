@@ -35,7 +35,13 @@ const CheckIcon = () => (
 
 export default function ButtonDemoPage() {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [isClient, setIsClient] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+
+  // Ensure we only render interactive elements on the client
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const toggleLoading = (key: string) => {
     setLoadingStates(prev => ({
@@ -72,9 +78,11 @@ export default function ButtonDemoPage() {
             Unified Button component combining Tailwind styles with Ant Design functionality
           </p>
           <div className="flex gap-4">
-            <Button variant="ghost" onClick={toggleTheme}>
-              Toggle {isDark ? 'Light' : 'Dark'} Mode
-            </Button>
+            {isClient && (
+              <Button variant="ghost" onClick={toggleTheme}>
+                Toggle {isDark ? 'Light' : 'Dark'} Mode
+              </Button>
+            )}
           </div>
         </div>
 
@@ -147,32 +155,40 @@ export default function ButtonDemoPage() {
 
         {/* Loading States Demo */}
         <DemoSection title="Loading States">
-          <ButtonRow label="Loading">
-            <Button 
-              variant="primary" 
-              loading={loadingStates.loading1}
-              onClick={() => toggleLoading('loading1')}
-            >
-              {loadingStates.loading1 ? 'Loading...' : 'Click to Load'}
-            </Button>
-            <Button 
-              variant="secondary" 
-              loading={loadingStates.loading2}
-              onClick={() => toggleLoading('loading2')}
-              loadingText="Processing"
-            >
-              Process Data
-            </Button>
-            <Button 
-              variant="success" 
-              loading={loadingStates.loading3}
-              onClick={() => toggleLoading('loading3')}
-              icon={<CheckIcon />}
-              loadingText="Saving"
-            >
-              Save Changes
-            </Button>
-          </ButtonRow>
+          {isClient ? (
+            <ButtonRow label="Loading">
+              <Button 
+                variant="primary" 
+                loading={loadingStates.loading1}
+                onClick={() => toggleLoading('loading1')}
+              >
+                {loadingStates.loading1 ? 'Loading...' : 'Click to Load'}
+              </Button>
+              <Button 
+                variant="secondary" 
+                loading={loadingStates.loading2}
+                onClick={() => toggleLoading('loading2')}
+                loadingText="Processing"
+              >
+                Process Data
+              </Button>
+              <Button 
+                variant="success" 
+                loading={loadingStates.loading3}
+                onClick={() => toggleLoading('loading3')}
+                icon={<CheckIcon />}
+                loadingText="Saving"
+              >
+                Save Changes
+              </Button>
+            </ButtonRow>
+          ) : (
+            <ButtonRow label="Loading">
+              <Button variant="primary">Click to Load</Button>
+              <Button variant="secondary">Process Data</Button>
+              <Button variant="success" icon={<CheckIcon />}>Save Changes</Button>
+            </ButtonRow>
+          )}
         </DemoSection>
 
         {/* Disabled States Demo */}
@@ -194,15 +210,21 @@ export default function ButtonDemoPage() {
             <Button variant="secondary" fullWidth icon={<DownloadIcon />}>
               Full Width Secondary with Icon
             </Button>
-            <Button 
-              variant="success" 
-              fullWidth 
-              loading={loadingStates.fullWidth}
-              onClick={() => toggleLoading('fullWidth')}
-              loadingText="Processing your request"
-            >
-              Full Width Loading Button
-            </Button>
+            {isClient ? (
+              <Button 
+                variant="success" 
+                fullWidth 
+                loading={loadingStates.fullWidth}
+                onClick={() => toggleLoading('fullWidth')}
+                loadingText="Processing your request"
+              >
+                Full Width Loading Button
+              </Button>
+            ) : (
+              <Button variant="success" fullWidth>
+                Full Width Loading Button
+              </Button>
+            )}
           </div>
         </DemoSection>
 
@@ -242,24 +264,33 @@ export default function ButtonDemoPage() {
               <div className="border border-border rounded p-4">
                 <h4 className="text-lg font-medium mb-4 text-foreground">Async Actions</h4>
                 <div className="flex gap-3">
-                  <Button 
-                    variant="primary"
-                    loading={loadingStates.simulate}
-                    onClick={() => {
-                      toggleLoading('simulate');
-                      setTimeout(() => toggleLoading('simulate'), 3000);
-                    }}
-                    loadingText="Calculating carbon footprint"
-                  >
-                    Calculate Impact
-                  </Button>
-                  <Button 
-                    variant="success"
-                    icon={<DownloadIcon />}
-                    onClick={() => alert('Report downloaded!')}
-                  >
-                    Download Report
-                  </Button>
+                  {isClient ? (
+                    <>
+                      <Button 
+                        variant="primary"
+                        loading={loadingStates.simulate}
+                        onClick={() => {
+                          toggleLoading('simulate');
+                          setTimeout(() => toggleLoading('simulate'), 3000);
+                        }}
+                        loadingText="Calculating carbon footprint"
+                      >
+                        Calculate Impact
+                      </Button>
+                      <Button 
+                        variant="success"
+                        icon={<DownloadIcon />}
+                        onClick={() => alert('Report downloaded!')}
+                      >
+                        Download Report
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="primary">Calculate Impact</Button>
+                      <Button variant="success" icon={<DownloadIcon />}>Download Report</Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
