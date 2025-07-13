@@ -1,5 +1,9 @@
 'use client';
 
+// 强制动态渲染，避免预渲染问题
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // 简化的重定向页面，避免预渲染问题
 export default function AccessibilityDemoPage() {
   return (
