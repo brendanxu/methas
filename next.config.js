@@ -62,18 +62,19 @@ const nextConfig = {
         },
       ];
 
-      // Define environment-specific globals for compatibility
+      // Define environment-specific globals for compatibility - 使用更强的替换
       config.plugins.push(
         new webpack.DefinePlugin({
           'typeof window': '"undefined"',
           'typeof document': '"undefined"',
           'typeof navigator': '"undefined"',
           'typeof location': '"undefined"',
-          'typeof self': '"undefined"',
+          'typeof self': '"object"', // 改为object类型
           // 强制定义self为global，处理所有引用
           'self': 'global',
           'globalThis': 'global',
           'window': 'undefined',
+          '__NEXT_DATA__': '{}', // 防止Next.js相关的引用问题
         })
       );
 
@@ -104,11 +105,14 @@ const nextConfig = {
       config.optimization.minimize = false; // 禁用压缩，可能导致问题
       
       // 禁用模块联邦和其他可能导致runtime问题的特性
-      config.optimization.moduleIds = 'deterministic';
-      config.optimization.chunkIds = 'deterministic';
+      config.optimization.moduleIds = 'named'; // 使用named而不是deterministic
+      config.optimization.chunkIds = 'named';
       
       // 强制所有模块内联，不生成vendor chunks
       config.optimization.concatenateModules = false;
+      config.optimization.removeAvailableModules = false;
+      config.optimization.removeEmptyChunks = false;
+      config.optimization.mergeDuplicateChunks = false;
       
       // 使用更简单的方法处理polyfills，避免entry操作的复杂性
     }
@@ -127,57 +131,18 @@ const nextConfig = {
       );
     }
 
-    // Production optimizations
+    // Production optimizations - 禁用所有chunk分离，包括客户端
     if (!dev) {
       // Enable tree shaking
       config.optimization.usedExports = true;
       config.optimization.sideEffects = false;
       
-      // Split chunks for better caching
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: -10,
-            chunks: 'all',
-          },
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-            name: 'react',
-            priority: 20,
-            chunks: 'all',
-          },
-          antd: {
-            test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
-            name: 'antd',
-            priority: 15,
-            chunks: 'all',
-          },
-          framer: {
-            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-            name: 'framer-motion',
-            priority: 15,
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            priority: 5,
-            chunks: 'all',
-            enforce: true,
-          },
-        },
-      };
+      // 完全禁用chunk分离，所有代码打包到一个文件
+      config.optimization.splitChunks = false;
+      config.optimization.runtimeChunk = false;
 
-      // Module concatenation for smaller bundles
-      config.optimization.concatenateModules = true;
+      // 禁用模块连接，避免复杂的依赖关系
+      config.optimization.concatenateModules = false;
       
       // Remove unused code
       config.optimization.innerGraph = true;
