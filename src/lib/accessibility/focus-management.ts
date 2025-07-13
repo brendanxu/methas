@@ -6,7 +6,7 @@ interface FocusableElement extends HTMLElement {
 
 interface FocusTrapOptions {
   initialFocus?: HTMLElement | string;
-  returnFocus?: HTMLElement;
+  returnFocus?: boolean;
   allowClickOutside?: boolean;
   escapeDeactivates?: boolean;
 }

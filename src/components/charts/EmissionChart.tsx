@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Line, Column, Pie } from '@ant-design/charts';
+// Temporary placeholders for chart components
+const Line = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Line Chart Placeholder</div>;
+const Column = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Column Chart Placeholder</div>;
+const Pie = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Pie Chart Placeholder</div>;
 import { BaseChart } from './BaseChart';
 
 interface EmissionData {

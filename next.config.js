@@ -7,18 +7,29 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'react-icons'],
     optimizeCss: true,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
 
   // Webpack optimization
   webpack: (config, { dev, isServer }) => {
+    // Fallback for server-side node modules
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
+    }
+
     // Production optimizations
     if (!dev) {
       // Enable tree shaking

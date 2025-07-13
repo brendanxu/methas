@@ -211,6 +211,7 @@ export function useRenderPerformance(componentName: string) {
         console.log(`${componentName} render time: ${end - start}ms`);
       };
     }
+    return undefined;
   });
 }
 

@@ -692,8 +692,7 @@ class WCAGChecker {
     const walker = document.createTreeWalker(
       container,
       NodeFilter.SHOW_ELEMENT,
-      null,
-      false
+      null
     );
     
     const elements: Element[] = [];

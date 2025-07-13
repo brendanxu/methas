@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Column, Gauge } from '@ant-design/charts';
+// Temporary placeholders for chart components
+const Column = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Column Chart Placeholder</div>;
+const Gauge = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Gauge Chart Placeholder</div>;
 import { BaseChart } from './BaseChart';
 
 interface ProgressData {

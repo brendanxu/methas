@@ -81,7 +81,7 @@ class ScreenReaderManager {
     const announcement = {
       message: message.trim(),
       options: {
-        priority: 'polite',
+        priority: 'polite' as const,
         delay: 100,
         clear: false,
         ...options,

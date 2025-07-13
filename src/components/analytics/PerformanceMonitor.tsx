@@ -90,6 +90,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
         return () => observer.disconnect();
       }
+      return undefined;
     };
 
     // 监控First Input Delay (FID) / Interaction to Next Paint (INP)
@@ -133,17 +134,18 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
         return () => observer.disconnect();
       }
+      return undefined;
     };
 
     // 监控自定义指标
     const measureCustomMetrics = () => {
       // 测量首屏渲染时间
       const measureATF = () => {
-        const startTime = performance.mark ? performance.now() : Date.now();
+        const startTime = 'mark' in performance ? performance.now() : Date.now();
         
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            const endTime = performance.mark ? performance.now() : Date.now();
+            const endTime = 'mark' in performance ? performance.now() : Date.now();
             const aboveFoldTime = endTime - startTime;
             
             measureCustomMetric('above_the_fold_render', startTime, endTime);
@@ -285,7 +287,7 @@ export const PagePerformanceTracker: React.FC<{ pageName: string }> = ({ pageNam
           tcp_connection: navigation.connectEnd - navigation.connectStart,
           tls_handshake: navigation.connectEnd - navigation.secureConnectionStart,
           request_response: navigation.responseEnd - navigation.requestStart,
-          dom_processing: navigation.domComplete - navigation.domLoading,
+          dom_processing: navigation.domComplete - navigation.domContentLoadedEventStart,
           page_load: performance.now() - pageLoadStart,
         };
 

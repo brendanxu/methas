@@ -88,6 +88,9 @@ export const ComponentPreloader: React.FC<ComponentPreloaderProps> = ({
       window.addEventListener('scroll', handleScroll, { passive: true });
       return () => window.removeEventListener('scroll', handleScroll);
     }
+
+    // Return undefined for other triggers
+    return undefined;
   }, [trigger, importFn, componentName, preloadComponent, scrollThreshold, delay, isReady]);
 
   return <>{children}</>;

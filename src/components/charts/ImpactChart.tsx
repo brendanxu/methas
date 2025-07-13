@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Area, Column, Rose } from '@ant-design/charts';
+// Temporary placeholders for chart components
+const Area = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Area Chart Placeholder</div>;
+const Column = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Column Chart Placeholder</div>;
+const Rose = ({ ...props }) => <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded">Rose Chart Placeholder</div>;
 import { BaseChart } from './BaseChart';
 
 interface ImpactData {

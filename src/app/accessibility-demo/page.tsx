@@ -3,15 +3,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Card, Row, Col, Button, Alert, Badge, Tabs, Typography, Switch, Progress, Collapse } from 'antd';
 import { 
-  AccessibilityNewOutlined, 
   EyeOutlined, 
   SoundOutlined,
   CheckCircleOutlined,
-  ExclamationTriangleOutlined,
+  ExclamationCircleOutlined,
   InfoCircleOutlined,
   BugOutlined,
-  KeyboardOutlined,
-  FormOutlined
+  FormOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { screenReader } from '@/lib/accessibility/screen-reader';
 import { keyboardNavigation } from '@/lib/accessibility/keyboard-navigation';
@@ -259,7 +258,7 @@ export default function AccessibilityDemoPage() {
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto p-6">
           <Title level={1} id="main-title">
-            <AccessibilityNewOutlined className="mr-3" />
+            <SettingOutlined className="mr-3" />
             可访问性功能演示
           </Title>
           <Paragraph className="text-lg text-gray-600">
@@ -382,7 +381,7 @@ export default function AccessibilityDemoPage() {
                     <Button 
                       type="primary" 
                       block 
-                      icon={<KeyboardOutlined />}
+                      icon={<SettingOutlined />}
                       onClick={demoKeyboardNavigation}
                       data-demo-element
                     >
@@ -478,8 +477,8 @@ export default function AccessibilityDemoPage() {
                             header={
                               <div className="flex items-center justify-between w-full">
                                 <span className="flex items-center">
-                                  {issue.severity === 'error' && <ExclamationTriangleOutlined className="text-red-500 mr-2" />}
-                                  {issue.severity === 'warning' && <ExclamationTriangleOutlined className="text-orange-500 mr-2" />}
+                                  {issue.severity === 'error' && <ExclamationCircleOutlined className="text-red-500 mr-2" />}
+                                  {issue.severity === 'warning' && <ExclamationCircleOutlined className="text-orange-500 mr-2" />}
                                   {issue.severity === 'info' && <InfoCircleOutlined className="text-blue-500 mr-2" />}
                                   {issue.message}
                                 </span>

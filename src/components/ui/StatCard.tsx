@@ -164,6 +164,7 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({
     } else if (!animated || settings.reducedMotion) {
       setDisplayValue(value);
     }
+    return undefined;
   }, [animated, isInView, value, hasAnimated, settings.reducedMotion]);
 
   // Get trend color and icon

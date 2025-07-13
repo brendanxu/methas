@@ -10,9 +10,21 @@ import {
   RocketOutlined,
   SafetyOutlined
 } from '@ant-design/icons';
+import dynamic from 'next/dynamic';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
-import { PerformanceMonitor } from '@/components/analytics/PerformanceMonitor';
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+
+const PerformanceMonitor = dynamic(
+  () => import('@/components/analytics/PerformanceMonitor').then(mod => ({ default: mod.PerformanceMonitor })),
+  { ssr: false }
+);
+
+const AnalyticsDashboard = dynamic(
+  () => import('@/components/analytics/AnalyticsDashboard').then(mod => ({ default: mod.AnalyticsDashboard })),
+  { 
+    ssr: false,
+    loading: () => <div className="flex items-center justify-center p-8">加载中...</div>
+  }
+);
 import { useAnalytics, useScrollTracker, useTimeOnPageTracker } from '@/hooks/useAnalytics';
 import { monitoring, initMonitoring } from '@/lib/monitoring/alerts';
 
