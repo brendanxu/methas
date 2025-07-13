@@ -1,0 +1,321 @@
+name: 🔄 Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - development
+      rollback_to:
+        description: 'Tag or commit to rollback to'
+        required: true
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+jobs:
+  validate-rollback:
+    name: 🔍 Validate Rollback
+    runs-on: ubuntu-latest
+    
+    outputs:
+      is_valid: ${{ steps.validate.outputs.is_valid }}
+      commit_sha: ${{ steps.validate.outputs.commit_sha }}
+      
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Validate rollback target
+        id: validate
+        run: |
+          # 检查目标 commit/tag 是否存在
+          if git rev-parse --verify "${{ github.event.inputs.rollback_to }}" >/dev/null 2>&1; then
+            COMMIT_SHA=$(git rev-parse "${{ github.event.inputs.rollback_to }}")
+            echo "is_valid=true" >> $GITHUB_OUTPUT
+            echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "✅ Valid rollback target: $COMMIT_SHA"
+          else
+            echo "is_valid=false" >> $GITHUB_OUTPUT
+            echo "❌ Invalid rollback target: ${{ github.event.inputs.rollback_to }}"
+            exit 1
+          fi
+
+      - name: 📊 Show rollback info
+        run: |
+          echo "🔄 **Rollback Information**"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Rollback to: ${{ github.event.inputs.rollback_to }}"
+          echo "Commit SHA: ${{ steps.validate.outputs.commit_sha }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          echo "Initiated by: ${{ github.actor }}"
+
+  backup-current:
+    name: 💾 Backup Current Deployment
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    if: needs.validate-rollback.outputs.is_valid == 'true'
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏷️ Create backup tag
+        run: |
+          BACKUP_TAG="backup-$(date +'%Y%m%d-%H%M%S')-${{ github.event.inputs.environment }}"
+          git tag $BACKUP_TAG
+          git push origin $BACKUP_TAG
+          echo "Created backup tag: $BACKUP_TAG"
+
+      - name: 📝 Create backup record
+        run: |
+          mkdir -p .github/rollback-logs
+          cat > .github/rollback-logs/rollback-$(date +'%Y%m%d-%H%M%S').json << EOF
+          {
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "environment": "${{ github.event.inputs.environment }}",
+            "rollback_from": "${{ github.sha }}",
+            "rollback_to": "${{ needs.validate-rollback.outputs.commit_sha }}",
+            "rollback_target": "${{ github.event.inputs.rollback_to }}",
+            "reason": "${{ github.event.inputs.reason }}",
+            "initiated_by": "${{ github.actor }}",
+            "backup_tag": "$BACKUP_TAG"
+          }
+          EOF
+
+  execute-rollback:
+    name: 🚀 Execute Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, backup-current]
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: 📚 Checkout rollback target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-rollback.outputs.commit_sha }}
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: 🔧 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build rollback version
+        run: pnpm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+      - name: 🧪 Quick health check
+        run: |
+          echo "🏥 Running health checks on rollback build..."
+          # 检查构建产物
+          if [ ! -d ".next" ]; then
+            echo "❌ Build directory not found"
+            exit 1
+          fi
+          
+          # 检查关键文件
+          if [ ! -f ".next/BUILD_ID" ]; then
+            echo "❌ Build ID not found"
+            exit 1
+          fi
+          
+          echo "✅ Health checks passed"
+
+      - name: 🚀 Deploy rollback
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          alias-domains: |
+            ${{ github.event.inputs.environment == 'production' && 'southpole.com' || 'dev.southpole.com' }}
+
+  verify-rollback:
+    name: ✅ Verify Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, execute-rollback]
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verify deployment
+        run: |
+          # 等待部署完成
+          sleep 30
+          
+          # 检查网站可访问性
+          URL="${{ github.event.inputs.environment == 'production' && 'https://southpole.com' || 'https://dev.southpole.com' }}"
+          
+          echo "🔍 Checking $URL..."
+          
+          # 健康检查
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Website is accessible (HTTP $HTTP_CODE)"
+          else
+            echo "❌ Website check failed (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+          
+          # 检查页面内容
+          if curl -s "$URL" | grep -q "South Pole"; then
+            echo "✅ Page content verification passed"
+          else
+            echo "❌ Page content verification failed"
+            exit 1
+          fi
+
+      - name: 📊 Performance check
+        run: |
+          # 简单的性能检查
+          URL="${{ github.event.inputs.environment == 'production' && 'https://southpole.com' || 'https://dev.southpole.com' }}"
+          
+          RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "$URL")
+          echo "⏱️ Response time: ${RESPONSE_TIME}s"
+          
+          # 检查响应时间是否合理 (< 5秒)
+          if (( $(echo "$RESPONSE_TIME < 5.0" | bc -l) )); then
+            echo "✅ Response time is acceptable"
+          else
+            echo "⚠️ Response time is slow but acceptable for rollback"
+          fi
+
+  notify-rollback:
+    name: 📢 Notify Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, execute-rollback, verify-rollback]
+    if: always()
+    
+    steps:
+      - name: 📢 Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              attachments: [{
+                color: '${{ needs.verify-rollback.result }}' === 'success' ? 'good' : 'danger',
+                title: '🔄 Rollback Deployment',
+                text: `
+                  *Environment*: ${{ github.event.inputs.environment }}
+                  *Rollback Target*: ${{ github.event.inputs.rollback_to }}
+                  *Commit SHA*: ${{ needs.validate-rollback.outputs.commit_sha }}
+                  *Reason*: ${{ github.event.inputs.reason }}
+                  *Initiated by*: ${{ github.actor }}
+                  *Status*: ${{ needs.verify-rollback.result == 'success' && '✅ Successful' || '❌ Failed' }}
+                  *Duration*: ${process.env.AS_TOOK}
+                `,
+                footer: 'South Pole CI/CD',
+                ts: Math.floor(Date.now() / 1000)
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: 📧 Email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 🔄 South Pole Rollback ${{ needs.verify-rollback.result == 'success' && 'Completed' || 'Failed' }}
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: South Pole CI/CD <noreply@southpole.com>
+          body: |
+            Rollback deployment has been ${{ needs.verify-rollback.result == 'success' && 'completed successfully' || 'failed' }}.
+            
+            Environment: ${{ github.event.inputs.environment }}
+            Rollback Target: ${{ github.event.inputs.rollback_to }}
+            Commit SHA: ${{ needs.validate-rollback.outputs.commit_sha }}
+            Reason: ${{ github.event.inputs.reason }}
+            Initiated by: ${{ github.actor }}
+            
+            ${{ needs.verify-rollback.result == 'success' && 'The rollback has been verified and is now live.' || 'Please check the GitHub Actions logs for error details.' }}
+
+  create-incident-report:
+    name: 📝 Create Incident Report
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, execute-rollback, verify-rollback]
+    if: always()
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📝 Generate incident report
+        run: |
+          mkdir -p docs/incidents
+          
+          INCIDENT_ID="incident-$(date +'%Y%m%d-%H%M%S')"
+          
+          cat > docs/incidents/${INCIDENT_ID}.md << EOF
+          # Incident Report: ${INCIDENT_ID}
+          
+          ## Summary
+          Rollback deployment executed for ${{ github.event.inputs.environment }} environment.
+          
+          ## Details
+          - **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Environment**: ${{ github.event.inputs.environment }}
+          - **Rollback From**: ${{ github.sha }}
+          - **Rollback To**: ${{ github.event.inputs.rollback_to }} (${{ needs.validate-rollback.outputs.commit_sha }})
+          - **Initiated By**: ${{ github.actor }}
+          - **Reason**: ${{ github.event.inputs.reason }}
+          
+          ## Status
+          - **Rollback Execution**: ${{ needs.execute-rollback.result }}
+          - **Verification**: ${{ needs.verify-rollback.result }}
+          - **Overall Status**: ${{ needs.verify-rollback.result == 'success' && 'Success' || 'Failed' }}
+          
+          ## Timeline
+          - Rollback initiated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - Validation completed: ${{ needs.validate-rollback.result }}
+          - Backup created: ${{ needs.backup-current.result }}
+          - Deployment executed: ${{ needs.execute-rollback.result }}
+          - Verification completed: ${{ needs.verify-rollback.result }}
+          
+          ## Actions Taken
+          1. Validated rollback target
+          2. Created backup of current deployment
+          3. Executed rollback deployment
+          4. Verified rollback success
+          5. Sent notifications
+          
+          ## Follow-up Actions
+          ${{ needs.verify-rollback.result == 'success' && '- Monitor application metrics
+          - Verify user experience
+          - Plan for proper fix and redeployment' || '- Investigate rollback failure
+          - Consider alternative recovery methods
+          - Escalate to senior team members' }}
+          
+          ---
+          *This report was generated automatically by GitHub Actions.*
+          EOF
+          
+          echo "📝 Incident report created: docs/incidents/${INCIDENT_ID}.md"

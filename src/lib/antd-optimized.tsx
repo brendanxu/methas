@@ -131,6 +131,8 @@ export const antdThemeConfig = {
   }
 };
 
-export default {
+const antdOptimizedConfig = {
   antdThemeConfig
 };
+
+export default antdOptimizedConfig;

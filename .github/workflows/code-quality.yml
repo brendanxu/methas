@@ -1,0 +1,227 @@
+name: 📊 Code Quality & Security
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 每周一运行安全扫描
+    - cron: '0 0 * * 1'
+
+jobs:
+  # 依赖安全检查
+  security-audit:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: 🔧 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔒 Run security audit
+        run: pnpm audit
+        continue-on-error: true
+
+      - name: 🔍 Run npm audit fix
+        run: pnpm audit --fix
+        continue-on-error: true
+
+      - name: 📊 Upload audit results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-audit-results
+          path: audit-results.json
+
+  # CodeQL 安全分析
+  codeql-analysis:
+    name: 🔍 CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript']
+
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: 🏗️ Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
+
+  # Bundle 分析
+  bundle-analysis:
+    name: 📦 Bundle Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: 🔧 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build with bundle analysis
+        run: pnpm run build
+        env:
+          ANALYZE: true
+
+      - name: 📊 Upload bundle analysis
+        uses: actions/upload-artifact@v3
+        with:
+          name: bundle-analysis
+          path: .next/analyze/
+
+      - name: 💬 Comment bundle size
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // 读取构建统计信息
+            let bundleInfo = "📦 **Bundle Analysis**\n\n";
+            
+            // 检查 .next 目录大小
+            const { execSync } = require('child_process');
+            try {
+              const nextSize = execSync('du -sh .next/', { encoding: 'utf-8' });
+              bundleInfo += `📁 **Total Build Size**: ${nextSize.split('\t')[0]}\n`;
+              
+              const jsFiles = execSync('find .next -name "*.js" -type f | wc -l', { encoding: 'utf-8' });
+              bundleInfo += `📄 **JS Files Count**: ${jsFiles.trim()}\n`;
+              
+              const cssFiles = execSync('find .next -name "*.css" -type f | wc -l', { encoding: 'utf-8' });
+              bundleInfo += `🎨 **CSS Files Count**: ${cssFiles.trim()}\n\n`;
+              
+              bundleInfo += "🔍 **Largest Files**:\n";
+              const largestFiles = execSync('find .next -name "*.js" -type f -exec wc -c {} + | sort -nr | head -5', { encoding: 'utf-8' });
+              bundleInfo += "```\n" + largestFiles + "```\n";
+              
+            } catch (error) {
+              bundleInfo += "❌ Could not analyze bundle size\n";
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: bundleInfo
+            });
+
+  # 代码覆盖率报告
+  coverage-report:
+    name: 📊 Coverage Report
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: 🔧 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Run tests with coverage
+        run: pnpm run test:coverage
+        continue-on-error: true
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: 💬 Coverage comment
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let coverageComment = "📊 **Test Coverage Report**\n\n";
+            
+            try {
+              // 检查是否存在覆盖率报告
+              if (fs.existsSync('./coverage/coverage-summary.json')) {
+                const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+                const total = coverage.total;
+                
+                coverageComment += `📈 **Overall Coverage**: ${total.lines.pct}%\n`;
+                coverageComment += `📄 **Lines**: ${total.lines.covered}/${total.lines.total} (${total.lines.pct}%)\n`;
+                coverageComment += `🔀 **Branches**: ${total.branches.covered}/${total.branches.total} (${total.branches.pct}%)\n`;
+                coverageComment += `⚡ **Functions**: ${total.functions.covered}/${total.functions.total} (${total.functions.pct}%)\n`;
+                coverageComment += `📝 **Statements**: ${total.statements.covered}/${total.statements.total} (${total.statements.pct}%)\n\n`;
+                
+                if (total.lines.pct >= 80) {
+                  coverageComment += "✅ **Status**: Good coverage level!\n";
+                } else if (total.lines.pct >= 60) {
+                  coverageComment += "⚠️ **Status**: Coverage could be improved\n";
+                } else {
+                  coverageComment += "❌ **Status**: Low coverage - please add more tests\n";
+                }
+              } else {
+                coverageComment += "❌ No coverage report generated\n";
+              }
+            } catch (error) {
+              coverageComment += "❌ Could not read coverage report\n";
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: coverageComment
+            });

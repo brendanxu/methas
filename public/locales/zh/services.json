@@ -1,0 +1,31 @@
+{
+  "title": "全方位的气候解决方案",
+  "subtitle": "我们的解决方案",
+  "viewAllServices": "查看所有服务",
+  "items": {
+    "carbonFootprint": {
+      "title": "碳足迹测算",
+      "description": "精确计算企业碳排放量，提供详细的碳足迹报告和分析，帮助企业了解自身环境影响。"
+    },
+    "carbonReduction": {
+      "title": "减排项目投资",
+      "description": "投资高质量的碳减排项目，包括可再生能源、森林保护和技术创新等领域。"
+    },
+    "strategyConsulting": {
+      "title": "战略咨询",
+      "description": "制定全面的可持续发展战略，协助企业实现长期环境目标和商业价值的平衡。"
+    },
+    "carbonNeutral": {
+      "title": "碳中和认证",
+      "description": "提供权威的碳中和认证服务，帮助企业获得国际认可的环保资质。"
+    },
+    "supplyChain": {
+      "title": "可持续供应链",
+      "description": "优化供应链管理，减少整体碳足迹，提升供应链透明度和可持续性。"
+    },
+    "esgReporting": {
+      "title": "ESG报告",
+      "description": "编制专业的ESG报告，展示企业在环境、社会和治理方面的卓越表现。"
+    }
+  }
+}

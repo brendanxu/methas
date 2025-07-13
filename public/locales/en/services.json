@@ -1,0 +1,31 @@
+{
+  "title": "Comprehensive Climate Solutions",
+  "subtitle": "Our Solutions",
+  "viewAllServices": "View All Services",
+  "items": {
+    "carbonFootprint": {
+      "title": "Carbon Footprint Assessment",
+      "description": "Accurately calculate corporate carbon emissions with detailed carbon footprint reports and analysis to help businesses understand their environmental impact."
+    },
+    "carbonReduction": {
+      "title": "Carbon Reduction Investments",
+      "description": "Invest in high-quality carbon reduction projects including renewable energy, forest protection, and technological innovation."
+    },
+    "strategyConsulting": {
+      "title": "Strategy Consulting",
+      "description": "Develop comprehensive sustainability strategies to help businesses balance long-term environmental goals with commercial value."
+    },
+    "carbonNeutral": {
+      "title": "Carbon Neutral Certification",
+      "description": "Provide authoritative carbon neutral certification services to help businesses obtain internationally recognized environmental credentials."
+    },
+    "supplyChain": {
+      "title": "Sustainable Supply Chain",
+      "description": "Optimize supply chain management, reduce overall carbon footprint, and enhance supply chain transparency and sustainability."
+    },
+    "esgReporting": {
+      "title": "ESG Reporting",
+      "description": "Prepare professional ESG reports showcasing corporate excellence in environmental, social, and governance performance."
+    }
+  }
+}

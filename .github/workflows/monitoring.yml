@@ -1,0 +1,343 @@
+name: 📊 Monitoring & Health Checks
+
+on:
+  schedule:
+    # 每15分钟运行一次健康检查
+    - cron: '*/15 * * * *'
+    # 每天凌晨2点运行完整监控报告
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: 'Type of monitoring check'
+        required: true
+        default: 'health'
+        type: choice
+        options:
+          - health
+          - performance
+          - security
+          - full
+
+env:
+  PRODUCTION_URL: https://southpole.com
+  DEV_URL: https://dev.southpole.com
+
+jobs:
+  health-check:
+    name: 🏥 Health Check
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '*/15 * * * *' || github.event.inputs.check_type == 'health' || github.event.inputs.check_type == 'full'
+    
+    strategy:
+      matrix:
+        environment: [production, development]
+        include:
+          - environment: production
+            url: https://southpole.com
+          - environment: development
+            url: https://dev.southpole.com
+    
+    steps:
+      - name: 🔍 Check website availability
+        id: health
+        run: |
+          echo "Checking ${{ matrix.url }}..."
+          
+          # 基础可访问性检查
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${{ matrix.url }}" || echo "000")
+          RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "${{ matrix.url }}" || echo "999")
+          
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response_time=$RESPONSE_TIME" >> $GITHUB_OUTPUT
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+            echo "✅ ${{ matrix.environment }}: HTTP $HTTP_CODE, ${RESPONSE_TIME}s"
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+            echo "❌ ${{ matrix.environment }}: HTTP $HTTP_CODE, ${RESPONSE_TIME}s"
+          fi
+
+      - name: 🔍 Check critical pages
+        if: steps.health.outputs.status == 'healthy'
+        run: |
+          declare -a pages=("/" "/services" "/about" "/contact" "/news")
+          
+          for page in "${pages[@]}"; do
+            URL="${{ matrix.url }}$page"
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ $page: HTTP $HTTP_CODE"
+            else
+              echo "❌ $page: HTTP $HTTP_CODE"
+            fi
+          done
+
+      - name: 📊 Content verification
+        if: steps.health.outputs.status == 'healthy'
+        run: |
+          # 检查主页是否包含关键内容
+          CONTENT=$(curl -s "${{ matrix.url }}")
+          
+          if echo "$CONTENT" | grep -q "South Pole"; then
+            echo "✅ Content verification passed"
+          else
+            echo "❌ Content verification failed"
+            exit 1
+          fi
+
+      - name: 🚨 Alert on failure
+        if: steps.health.outputs.status == 'unhealthy' && matrix.environment == 'production'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              attachments: [{
+                color: 'danger',
+                title: '🚨 PRODUCTION SITE DOWN',
+                text: `
+                  *Environment*: ${{ matrix.environment }}
+                  *URL*: ${{ matrix.url }}
+                  *HTTP Code*: ${{ steps.health.outputs.http_code }}
+                  *Response Time*: ${{ steps.health.outputs.response_time }}s
+                  *Time*: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+                `,
+                footer: 'Immediate attention required!',
+                ts: Math.floor(Date.now() / 1000)
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  performance-monitoring:
+    name: ⚡ Performance Monitoring
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * *' || github.event.inputs.check_type == 'performance' || github.event.inputs.check_type == 'full'
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: 🔧 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🚨 Run Lighthouse on Production
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://southpole.com
+            https://southpole.com/services
+            https://southpole.com/about
+          configPath: './lighthouse.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: 📊 Performance metrics
+        run: |
+          echo "📊 **Performance Report**" > performance-report.md
+          echo "" >> performance-report.md
+          echo "Generated on: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          # 基本性能指标
+          for url in "https://southpole.com" "https://southpole.com/services" "https://southpole.com/about"; do
+            echo "### $url" >> performance-report.md
+            
+            RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "$url")
+            SIZE=$(curl -s "$url" | wc -c)
+            
+            echo "- Response Time: ${RESPONSE_TIME}s" >> performance-report.md
+            echo "- Page Size: ${SIZE} bytes" >> performance-report.md
+            echo "" >> performance-report.md
+          done
+
+      - name: 📊 Upload performance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: performance-report.md
+
+  security-monitoring:
+    name: 🔒 Security Monitoring
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * *' || github.event.inputs.check_type == 'security' || github.event.inputs.check_type == 'full'
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔒 Security headers check
+        run: |
+          echo "🔒 **Security Headers Report**" > security-report.md
+          echo "" >> security-report.md
+          
+          # 检查生产环境安全头
+          URL="https://southpole.com"
+          
+          echo "### Security Headers for $URL" >> security-report.md
+          echo "" >> security-report.md
+          
+          # 获取响应头
+          HEADERS=$(curl -s -I "$URL")
+          
+          # 检查关键安全头
+          declare -a security_headers=(
+            "X-Frame-Options"
+            "X-Content-Type-Options"
+            "X-XSS-Protection"
+            "Strict-Transport-Security"
+            "Content-Security-Policy"
+            "Referrer-Policy"
+            "Permissions-Policy"
+          )
+          
+          for header in "${security_headers[@]}"; do
+            if echo "$HEADERS" | grep -i "$header" > /dev/null; then
+              VALUE=$(echo "$HEADERS" | grep -i "$header" | cut -d' ' -f2-)
+              echo "✅ $header: $VALUE" >> security-report.md
+            else
+              echo "❌ $header: Missing" >> security-report.md
+            fi
+          done
+
+      - name: 🔍 SSL/TLS check
+        run: |
+          echo "" >> security-report.md
+          echo "### SSL/TLS Configuration" >> security-report.md
+          echo "" >> security-report.md
+          
+          # 检查 SSL 证书
+          SSL_INFO=$(openssl s_client -connect southpole.com:443 -servername southpole.com </dev/null 2>/dev/null | openssl x509 -noout -dates)
+          
+          echo "```" >> security-report.md
+          echo "$SSL_INFO" >> security-report.md
+          echo "```" >> security-report.md
+
+      - name: 📊 Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: security-report.md
+
+  uptime-tracking:
+    name: ⏰ Uptime Tracking
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '*/15 * * * *' || github.event.inputs.check_type == 'health' || github.event.inputs.check_type == 'full'
+    
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📊 Record uptime data
+        run: |
+          mkdir -p monitoring/uptime
+          
+          # 检查生产环境
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://southpole.com" || echo "000")
+          RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "https://southpole.com" || echo "999")
+          
+          # 记录数据
+          echo "$TIMESTAMP,$HTTP_CODE,$RESPONSE_TIME" >> monitoring/uptime/production-$(date +%Y%m).csv
+          
+          # 检查开发环境
+          DEV_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://dev.southpole.com" || echo "000")
+          DEV_RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "https://dev.southpole.com" || echo "999")
+          
+          echo "$TIMESTAMP,$DEV_HTTP_CODE,$DEV_RESPONSE_TIME" >> monitoring/uptime/development-$(date +%Y%m).csv
+
+      - name: 📊 Generate uptime summary
+        if: github.event.schedule == '0 2 * * *'
+        run: |
+          # 生成每日正常运行时间报告
+          YESTERDAY=$(date -d "yesterday" +%Y-%m-%d)
+          
+          echo "📊 **Daily Uptime Report - $YESTERDAY**" > uptime-summary.md
+          echo "" >> uptime-summary.md
+          
+          # 分析昨天的数据
+          if [ -f "monitoring/uptime/production-$(date +%Y%m).csv" ]; then
+            TOTAL_CHECKS=$(grep "$YESTERDAY" monitoring/uptime/production-$(date +%Y%m).csv | wc -l)
+            SUCCESSFUL_CHECKS=$(grep "$YESTERDAY" monitoring/uptime/production-$(date +%Y%m).csv | grep ",200," | wc -l)
+            
+            if [ $TOTAL_CHECKS -gt 0 ]; then
+              UPTIME_PERCENTAGE=$(echo "scale=2; $SUCCESSFUL_CHECKS * 100 / $TOTAL_CHECKS" | bc)
+              echo "### Production Environment" >> uptime-summary.md
+              echo "- Total Checks: $TOTAL_CHECKS" >> uptime-summary.md
+              echo "- Successful Checks: $SUCCESSFUL_CHECKS" >> uptime-summary.md
+              echo "- Uptime: $UPTIME_PERCENTAGE%" >> uptime-summary.md
+            fi
+          fi
+
+      - name: 📊 Upload uptime data
+        uses: actions/upload-artifact@v3
+        with:
+          name: uptime-data
+          path: monitoring/
+
+  daily-report:
+    name: 📊 Daily Monitoring Report
+    runs-on: ubuntu-latest
+    needs: [health-check, performance-monitoring, security-monitoring, uptime-tracking]
+    if: github.event.schedule == '0 2 * * *' || github.event.inputs.check_type == 'full'
+    
+    steps:
+      - name: 📥 Download reports
+        uses: actions/download-artifact@v3
+
+      - name: 📊 Generate comprehensive report
+        run: |
+          echo "# 📊 Daily Monitoring Report - $(date +%Y-%m-%d)" > daily-report.md
+          echo "" >> daily-report.md
+          echo "Generated at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> daily-report.md
+          echo "" >> daily-report.md
+          
+          # 合并所有报告
+          if [ -f "performance-report/performance-report.md" ]; then
+            echo "## Performance Report" >> daily-report.md
+            cat performance-report/performance-report.md >> daily-report.md
+            echo "" >> daily-report.md
+          fi
+          
+          if [ -f "security-report/security-report.md" ]; then
+            echo "## Security Report" >> daily-report.md
+            cat security-report/security-report.md >> daily-report.md
+            echo "" >> daily-report.md
+          fi
+          
+          if [ -f "uptime-summary.md" ]; then
+            echo "## Uptime Report" >> daily-report.md
+            cat uptime-summary.md >> daily-report.md
+          fi
+
+      - name: 📧 Send daily report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 📊 South Pole Daily Monitoring Report - $(date +%Y-%m-%d)
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: South Pole Monitoring <noreply@southpole.com>
+          body: file://daily-report.md
+
+      - name: 📊 Archive reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: daily-monitoring-report-$(date +%Y%m%d)
+          path: daily-report.md
+          retention-days: 30
