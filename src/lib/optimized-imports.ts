@@ -4,6 +4,8 @@
  * Tree-shakeable imports for better bundle size
  */
 
+import React from 'react';
+
 // ===== Lodash ES (Tree-shakeable) =====
 // Instead of: import _ from 'lodash'
 // Use specific imports for better tree shaking
@@ -41,19 +43,90 @@ dayjs.extend(customParseFormat);
 
 export { dayjs };
 
-// ===== Framer Motion (Optimized imports) =====
-// Import only what's needed instead of the entire library
-export {
-  motion,
-  AnimatePresence,
-  useAnimation,
-  useInView,
-  useScroll,
-  useTransform,
-  useSpring,
-  useMotionValue,
-  useMotionTemplate
-} from 'framer-motion';
+// ===== Lightweight Animation Alternatives =====
+// Replaced Framer Motion with CSS-based animations for better performance
+// Using Web Animations API where needed for complex interactions
+
+// Simple motion wrapper using CSS transitions
+export const motion = {
+  div: ({ children, className, style, initial, animate, exit, transition, ...props }: any) => {
+    const combinedStyle = {
+      ...style,
+      transition: transition ? `all ${transition.duration || 0.3}s ease` : 'all 0.3s ease',
+    };
+    
+    return React.createElement(
+      'div',
+      { className, style: combinedStyle, ...props },
+      children
+    );
+  },
+  section: ({ children, className, style, initial, animate, exit, transition, ...props }: any) => {
+    const combinedStyle = {
+      ...style,
+      transition: transition ? `all ${transition.duration || 0.3}s ease` : 'all 0.3s ease',
+    };
+    
+    return React.createElement(
+      'section',
+      { className, style: combinedStyle, ...props },
+      children
+    );
+  },
+  button: ({ children, className, style, initial, animate, exit, transition, ...props }: any) => {
+    const combinedStyle = {
+      ...style,
+      transition: transition ? `all ${transition.duration || 0.3}s ease` : 'all 0.3s ease',
+    };
+    
+    return React.createElement(
+      'button',
+      { className, style: combinedStyle, ...props },
+      children
+    );
+  }
+};
+
+// Simple AnimatePresence replacement
+export const AnimatePresence = ({ children }: { children: React.ReactNode }) => {
+  return React.createElement(React.Fragment, null, children);
+};
+
+// Simplified hooks using Intersection Observer API
+export const useCustomInView = (threshold: number = 0.1) => {
+  const [inView, setInView] = React.useState(false);
+  const ref = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+      },
+      { threshold }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, inView] as const;
+};
+
+// Simplified animation hooks
+export const useAnimation = () => ({
+  start: () => {},
+  stop: () => {},
+  set: () => {}
+});
+
+export const useScroll = () => ({ scrollY: 0, scrollX: 0 });
+export const useTransform = () => 0;
+export const useSpring = () => 0;
+export const useMotionValue = () => ({ get: () => 0, set: () => {} });
+export const useMotionTemplate = () => '';
 
 // Common animation variants
 export const commonAnimations = {

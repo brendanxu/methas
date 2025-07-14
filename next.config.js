@@ -7,7 +7,6 @@ const nextConfig = {
 
   // 外部化服务器包（Next.js 15的正确配置）
   serverExternalPackages: [
-    'framer-motion',
     'web-vitals',
     '@ant-design/charts',
     'react-intersection-observer',
@@ -43,7 +42,6 @@ const nextConfig = {
 
       // External packages that should not be bundled on server
       const serverExternals = [
-        'framer-motion',
         'web-vitals',
         '@ant-design/charts',
         'react-intersection-observer',
@@ -186,10 +184,6 @@ const nextConfig = {
       transform: 'react-icons/{{member}}',
       preventFullImport: true,
     },
-    'framer-motion': {
-      transform: 'framer-motion',
-      preventFullImport: false, // Allow full import for motion
-    }
   },
 
   // Image optimization

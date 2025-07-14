@@ -15,8 +15,9 @@ import { getDefaultSchemas } from '@/lib/structured-data';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function HomeContent() {
-  // 暂时移除useTranslation以避免500错误
-  // const { t } = useTranslation(['home']);
+  const { t } = useTranslation(['home'], { 
+    useSuspense: false
+  });
 
   return (
     <>

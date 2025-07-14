@@ -86,14 +86,15 @@ export const i18nConfig = {
   fallbackLanguage: 'en' as SupportedLanguage,
 };
 
-// 简化的 i18next 初始化
+// 优化的 i18next 初始化
 const initializeI18n = async () => {
   if (i18n.isInitialized) {
-    return;
+    return i18n;
   }
   
   try {
     await i18n
+      .use(LanguageDetector)
       .use(initReactI18next)
       .init({
         lng: i18nConfig.defaultLanguage,
@@ -103,30 +104,55 @@ const initializeI18n = async () => {
         
         resources,
         
+        // 语言检测配置
+        detection: {
+          order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
+          lookupLocalStorage: 'i18nextLng',
+          lookupCookie: 'i18nextLng',
+          caches: ['localStorage', 'cookie'],
+          excludeCacheFor: ['cimode'],
+        },
+        
         // 插值配置
         interpolation: {
           escapeValue: false,
         },
         
         // 开发模式配置
-        debug: false, // 禁用调试以避免生产环境问题
+        debug: process.env.NODE_ENV === 'development',
         
         // React配置
         react: {
           useSuspense: false,
+          bindI18n: 'languageChanged',
+          bindI18nStore: '',
+          transEmptyNodeValue: '',
+          transSupportBasicHtmlNodes: true,
+          transKeepBasicHtmlNodesFor: ['br', 'strong', 'i'],
+        },
+        
+        // 性能优化
+        cleanCode: true,
+        parseMissingKeyHandler: (missing: string) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Missing translation: ${missing}`);
+          }
+          return missing;
         },
       });
+    
+    console.log('i18n initialized successfully');
+    return i18n;
   } catch (error) {
     console.warn('Failed to initialize i18n:', error);
+    return i18n;
   }
 };
 
-// 延迟初始化以避免SSR问题
-if (typeof window !== 'undefined') {
-  initializeI18n().catch(error => {
-    console.warn('Failed to initialize i18n:', error);
-  });
-}
+// 立即初始化，但处理错误
+initializeI18n().catch(error => {
+  console.warn('Failed to initialize i18n:', error);
+});
 
 export default i18n;
 
