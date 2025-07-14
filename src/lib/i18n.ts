@@ -63,41 +63,10 @@ export const resources = {
   },
 } as const;
 
-// 动态加载翻译资源的函数
+// 暂时禁用动态加载以避免部署问题
 const loadResources = async () => {
-  try {
-    // 动态导入翻译文件，如果失败则使用默认资源
-    const [enCommon, enHome, enNav, zhCommon, zhHome, zhNav] = await Promise.allSettled([
-      import('../../public/locales/en/common.json').then(m => m.default),
-      import('../../public/locales/en/home.json').then(m => m.default),
-      import('../../public/locales/en/nav.json').then(m => m.default),
-      import('../../public/locales/zh/common.json').then(m => m.default),
-      import('../../public/locales/zh/home.json').then(m => m.default),
-      import('../../public/locales/zh/nav.json').then(m => m.default),
-    ]);
-
-    // 合并动态加载的资源
-    if (enCommon.status === 'fulfilled') {
-      Object.assign(resources.en.common, enCommon.value);
-    }
-    if (enHome.status === 'fulfilled') {
-      Object.assign(resources.en.home, enHome.value);
-    }
-    if (enNav.status === 'fulfilled') {
-      Object.assign(resources.en.nav, enNav.value);
-    }
-    if (zhCommon.status === 'fulfilled') {
-      Object.assign(resources.zh.common, zhCommon.value);
-    }
-    if (zhHome.status === 'fulfilled') {
-      Object.assign(resources.zh.home, zhHome.value);
-    }
-    if (zhNav.status === 'fulfilled') {
-      Object.assign(resources.zh.nav, zhNav.value);
-    }
-  } catch (error) {
-    console.warn('Failed to load translation resources, using defaults:', error);
-  }
+  // 使用静态资源，避免动态导入在生产环境的问题
+  console.log('Using static i18n resources');
 };
 
 // 支持的语言列表
@@ -117,15 +86,14 @@ export const i18nConfig = {
   fallbackLanguage: 'en' as SupportedLanguage,
 };
 
-// 初始化 i18next（异步）
+// 简化的 i18next 初始化
 const initializeI18n = async () => {
-  // 首先加载翻译资源
-  await loadResources();
+  if (i18n.isInitialized) {
+    return;
+  }
   
-  // 初始化 i18next
-  if (!i18n.isInitialized) {
+  try {
     await i18n
-      .use(LanguageDetector)
       .use(initReactI18next)
       .init({
         lng: i18nConfig.defaultLanguage,
@@ -135,34 +103,30 @@ const initializeI18n = async () => {
         
         resources,
         
-        // 语言检测配置
-        detection: {
-          order: ['path', 'localStorage', 'navigator', 'htmlTag'],
-          caches: ['localStorage'],
-          lookupLocalStorage: 'i18nextLng',
-          lookupFromPathIndex: 0,
-        },
-        
         // 插值配置
         interpolation: {
-          escapeValue: false, // React已经处理了XSS防护
+          escapeValue: false,
         },
         
         // 开发模式配置
-        debug: process.env.NODE_ENV === 'development',
+        debug: false, // 禁用调试以避免生产环境问题
         
         // React配置
         react: {
           useSuspense: false,
         },
       });
+  } catch (error) {
+    console.warn('Failed to initialize i18n:', error);
   }
 };
 
-// 立即初始化（但不阻塞模块加载）
-initializeI18n().catch(error => {
-  console.warn('Failed to initialize i18n:', error);
-});
+// 延迟初始化以避免SSR问题
+if (typeof window !== 'undefined') {
+  initializeI18n().catch(error => {
+    console.warn('Failed to initialize i18n:', error);
+  });
+}
 
 export default i18n;
 

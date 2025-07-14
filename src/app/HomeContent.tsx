@@ -15,7 +15,8 @@ import { getDefaultSchemas } from '@/lib/structured-data';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function HomeContent() {
-  const { t } = useTranslation(['home']);
+  // 暂时移除useTranslation以避免500错误
+  // const { t } = useTranslation(['home']);
 
   return (
     <>
@@ -76,13 +77,13 @@ export default function HomeContent() {
           
           {/* Test content to verify scroll effects */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <h2 className="text-3xl font-bold mb-8">{t('home:sections.climateSolutions')}</h2>
+            <h2 className="text-3xl font-bold mb-8">Climate Solutions</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-card rounded-lg p-6 shadow-soft border border-border">
-                  <h3 className="text-xl font-semibold mb-4">{t('home:sections.solution')} {i}</h3>
+                  <h3 className="text-xl font-semibold mb-4">Solution {i}</h3>
                   <p className="text-muted-foreground">
-                    {t('home:content.solutionDescription')}
+                    Comprehensive climate solutions for your business
                   </p>
                 </div>
               ))}
@@ -92,13 +93,13 @@ export default function HomeContent() {
           {/* Additional content for scroll testing */}
           <div className="bg-muted py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-3xl font-bold mb-8">{t('home:sections.ourImpact')}</h2>
+              <h2 className="text-3xl font-bold mb-8">Our Impact</h2>
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="bg-background rounded-lg p-6 shadow-soft">
-                    <h3 className="text-lg font-semibold mb-2">{t('home:sections.impactStory')} {i}</h3>
+                    <h3 className="text-lg font-semibold mb-2">Impact Story {i}</h3>
                     <p className="text-muted-foreground">
-                      {t('home:content.impactDescription')}
+                      Real-world impact through innovative climate solutions
                     </p>
                   </div>
                 ))}
