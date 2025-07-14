@@ -15,9 +15,10 @@ import { getDefaultSchemas } from '@/lib/structured-data';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function HomeContent() {
-  const { t } = useTranslation(['home'], { 
-    useSuspense: false
-  });
+  // 暂时禁用i18n以修复部署问题
+  // const { t } = useTranslation(['home'], { 
+  //   useSuspense: false
+  // });
 
   return (
     <>

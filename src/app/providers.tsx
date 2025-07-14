@@ -137,13 +137,11 @@ export const Providers: React.FC<ProvidersProps> = ({
 }) => {
   return (
     <ErrorBoundary>
-      <I18nProvider>
-        <ThemeProvider defaultTheme={defaultTheme}>
-          <AntdProvider>
-            {children}
-          </AntdProvider>
-        </ThemeProvider>
-      </I18nProvider>
+      <ThemeProvider defaultTheme={defaultTheme}>
+        <AntdProvider>
+          {children}
+        </AntdProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };

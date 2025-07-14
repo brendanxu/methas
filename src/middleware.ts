@@ -1,79 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-// Define supported locales
-const locales = ['en', 'zh'] as const;
-const defaultLocale = 'en' as const;
-
-type Locale = typeof locales[number];
-
-function getLocale(request: NextRequest): Locale {
-  // Check if there is any supported locale in the pathname
-  const { pathname } = request.nextUrl;
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  if (pathnameHasLocale) {
-    return pathname.split('/')[1] as Locale;
-  }
-
-  // Check accept-language header
-  const acceptLanguage = request.headers.get('accept-language');
-  if (acceptLanguage) {
-    const preferredLocale = acceptLanguage
-      .split(',')
-      .map((lang) => lang.split(';')[0].trim())
-      .find((lang) => {
-        const locale = lang.toLowerCase().split('-')[0];
-        return locales.includes(locale as Locale);
-      });
-
-    if (preferredLocale) {
-      const locale = preferredLocale.toLowerCase().split('-')[0];
-      return locale as Locale;
-    }
-  }
-
-  // Check cookies
-  const localeCookie = request.cookies.get('locale')?.value as Locale;
-  if (localeCookie && locales.includes(localeCookie)) {
-    return localeCookie;
-  }
-
-  return defaultLocale;
-}
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // 简化的中间件，只处理基础路由
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for API routes, static files, and _next
+  // 跳过所有静态资源和API路由
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon') ||
     pathname.includes('.') ||
-    pathname.startsWith('/favicon')
+    pathname.startsWith('/robots') ||
+    pathname.startsWith('/sitemap')
   ) {
     return NextResponse.next();
   }
 
-  // For now, disable locale redirects to fix deployment issues
-  // TODO: Implement proper i18n routing later
-  
-  // Just set locale cookie based on preference without redirecting
-  const locale = getLocale(request);
-  const response = NextResponse.next();
-  response.cookies.set('locale', locale, {
-    maxAge: 365 * 24 * 60 * 60, // 1 year
-    path: '/',
-    sameSite: 'lax',
-  });
-  
-  return response;
+  // 直接返回，不做任何复杂处理
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next)
-    '/((?!_next/static|_next/image|favicon.ico|api/).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
