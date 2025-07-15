@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
+// 强制动态渲染，避免静态生成时的onClick函数序列化问题
+export const dynamic = 'force-dynamic';
+
 // Production logging utilities
 const logError = (message: string, error?: any) => {
   console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
