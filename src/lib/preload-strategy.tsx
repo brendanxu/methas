@@ -146,7 +146,7 @@ class EnhancedPreloadManager {
     // Temporary implementation - only preload existing routes
     const routeMap: Record<string, () => Promise<any>> = {
       '/services': () => import('../components/sections/home/Services'),
-      '/search': () => import('../app/search/SearchPageClient'),
+      // '/search': () => import('../app/search/SearchPageClient'), // Temporarily disabled
       '/news': () => import('../app/news/page'),
       // Add more routes as they are implemented
     };

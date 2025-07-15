@@ -30,15 +30,15 @@ const nextConfig: NextConfig = {
   
   // 实验性功能
   experimental: {
-    // 优化包导入 - 减少bundle大小
-    optimizePackageImports: [
-      'antd', 
-      '@ant-design/icons',
-      'framer-motion', 
-      'lodash-es',
-      'react-i18next',
-      'dayjs'
-    ],
+    // 优化包导入 - 减少bundle大小（暂时禁用以解决模块解析问题）
+    // optimizePackageImports: [
+    //   'antd', 
+    //   '@ant-design/icons',
+    //   'framer-motion', 
+    //   'lodash-es',
+    //   'react-i18next',
+    //   'dayjs'
+    // ],
     // 启用优化CSS导入
     optimizeCss: true,
     // 启用 turbo 模式

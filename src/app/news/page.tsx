@@ -6,26 +6,18 @@ export const runtime = 'nodejs';
 
 import React, { useState, useMemo } from 'react';
 import {  motion  } from '@/lib/mock-framer-motion';
-import { 
-  Select, 
-  DatePicker, 
-  Input, 
-  Radio, 
-  Pagination, 
-  Tag, 
-  Form, 
-  Button as AntButton, 
-  Skeleton, 
-  Empty,
-  Card
-} from 'antd';
+// Optimized Ant Design imports
+import Select from 'antd/lib/select';
+import DatePicker from 'antd/lib/date-picker';
+import Card from 'antd/lib/card';
+import { Input, Radio, Pagination, Tag, Form, Skeleton, Button as AntButton, Empty } from '@/lib/antd-optimized';
 import { 
   SearchOutlined, 
   CalendarOutlined, 
-  FilterOutlined,
   DownloadOutlined,
-  MailOutlined
-} from '@ant-design/icons';
+  MailOutlined,
+  FilterOutlined
+} from '@/lib/antd-optimized';
 import dayjs, { Dayjs } from 'dayjs';
 import { NewsCard } from '@/components/ui/NewsCard';
 import { Button } from '@/components/ui/Button';
