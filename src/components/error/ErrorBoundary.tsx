@@ -57,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // 记录到控制台（开发环境）
     if (process.env.NODE_ENV === 'development') {
-      logError('Error caught by boundary:', error, errorInfo);
+      logError('Error caught by boundary:', { error, errorInfo });
     }
 
     // 发送到外部错误追踪服务

@@ -1,4 +1,6 @@
 
+'use client'
+
 // Production logging utilities
 const logInfo = (message: string, data?: any) => {
   if (process.env.NODE_ENV === 'production') {
@@ -9,7 +11,6 @@ const logInfo = (message: string, data?: any) => {
 const logError = (message: string, error?: any) => {
   console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
 };
-'use client'
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { Form, Input, Select, Button, Card, Space, Row, Col } from 'antd'

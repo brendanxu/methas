@@ -1,5 +1,10 @@
 'use client';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 import React, { useState, useCallback } from 'react';
 import {
   Form,
