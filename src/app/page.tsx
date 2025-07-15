@@ -17,6 +17,10 @@ const DynamicInteractiveCaseStudies = dynamic(() => import('@/components/section
   loading: () => <div className="min-h-[40vh] animate-pulse bg-muted" />
 });
 
+const DynamicInteractiveNewsletterForm = dynamic(() => import('@/components/forms/InteractiveNewsletterForm'), {
+  loading: () => <div className="min-h-[200px] animate-pulse bg-muted rounded-lg" />
+});
+
 // 静态内容组件（服务端渲染）
 function StaticClimateSection() {
   return (
@@ -110,6 +114,52 @@ export default function Home() {
         </div>}>
           <DynamicInteractiveCaseStudies />
         </ErrorBoundary>
+        
+        {/* Newsletter订阅区块 - 静态+动态混合 */}
+        <div className="bg-primary text-primary-foreground py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* 静态介绍内容 - 服务端渲染 */}
+              <div>
+                <h2 className="text-3xl font-bold mb-4">Stay Informed</h2>
+                <p className="text-xl text-primary-foreground/80 mb-6">
+                  Get the latest climate insights, industry trends, and actionable sustainability strategies delivered to your inbox.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <div className="bg-primary-foreground/20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-primary-foreground text-sm">✓</span>
+                    </div>
+                    <span className="text-primary-foreground/90">Weekly climate insights and market updates</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-primary-foreground/20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-primary-foreground text-sm">✓</span>
+                    </div>
+                    <span className="text-primary-foreground/90">Exclusive access to research and case studies</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-primary-foreground/20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-primary-foreground text-sm">✓</span>
+                    </div>
+                    <span className="text-primary-foreground/90">Early invitations to webinars and events</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 动态Newsletter表单 */}
+              <ErrorBoundary fallback={<div className="min-h-[200px] flex items-center justify-center bg-background/10 rounded-lg">
+                <p className="text-primary-foreground/60">Failed to load newsletter form</p>
+              </div>}>
+                <DynamicInteractiveNewsletterForm 
+                  variant="card" 
+                  showInterests={true}
+                  className="bg-background text-foreground"
+                />
+              </ErrorBoundary>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
