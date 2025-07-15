@@ -1,20 +1,16 @@
-
-// Production logging utilities
-const logInfo = (message: string, data?: any) => {
-  if (process.env.NODE_ENV === 'production') {
-    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
-  }
-};
-
-const logError = (message: string, error?: any) => {
-  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
-};
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { 
+  ApiWrappers, 
+  createSuccessResponse, 
+  APIError, 
+  ErrorCode,
+  validateRequestBody
+} from '@/lib/api-error-handler'
 
 const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,32 +19,35 @@ const createUserSchema = z.object({
   role: z.enum(['USER', 'ADMIN', 'SUPER_ADMIN']).default('USER'),
 })
 
-export async function GET(request: NextRequest) {
+// GET /api/users - 获取用户列表
+const handleGetUsers = async (request: NextRequest, context: any) => {
+  const { session } = context
+  
+  // 权限检查
+  if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+    throw new APIError(ErrorCode.FORBIDDEN, 'Admin access required')
+  }
+
+  const { searchParams } = new URL(request.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100) // 限制最大100
+  const role = searchParams.get('role')
+  const search = searchParams.get('search')
+  const skip = (page - 1) * limit
+
+  // 构建查询条件
+  const where: any = {}
+  if (role && ['USER', 'ADMIN', 'SUPER_ADMIN'].includes(role)) {
+    where.role = role
+  }
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } }
+    ]
+  }
+
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const role = searchParams.get('role')
-    const search = searchParams.get('search')
-    const skip = (page - 1) * limit
-
-    const where: any = {}
-    if (role) where.role = role
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-
     const [users, total] = await Promise.all([
       prisma.user.findMany({
         where,
@@ -74,7 +73,7 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where })
     ])
 
-    return NextResponse.json({
+    return createSuccessResponse({
       users,
       pagination: {
         page,
@@ -84,47 +83,64 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    logError('Users fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
+    throw new APIError(
+      ErrorCode.INTERNAL_SERVER_ERROR,
+      'Failed to fetch users',
+      error
     )
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions)
-    // Only SUPER_ADMIN can create new users
-    if (!session?.user || session.user.role !== 'SUPER_ADMIN') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+// POST /api/users - 创建新用户
+const handleCreateUser = async (request: NextRequest, context: any) => {
+  const { session } = context
+  
+  // 权限检查 - 只有 SUPER_ADMIN 可以创建用户
+  if (!session?.user || session.user.role !== 'SUPER_ADMIN') {
+    throw new APIError(ErrorCode.FORBIDDEN, 'Super admin access required')
+  }
+
+  // 验证请求体
+  const data = await validateRequestBody<z.infer<typeof createUserSchema>>(
+    request,
+    {
+      required: ['name', 'email', 'password'],
+      validate: (body) => {
+        try {
+          createUserSchema.parse(body)
+          return { isValid: true }
+        } catch (error) {
+          return { 
+            isValid: false, 
+            errors: error instanceof z.ZodError ? error.errors.map(e => e.message) : ['Invalid input'] 
+          }
+        }
+      }
     }
+  )
 
-    const body = await request.json()
-    const data = createUserSchema.parse(body)
+  const parsedData = createUserSchema.parse(data)
 
-    // Check if user already exists
+  try {
+    // 检查用户是否已存在
     const existingUser = await prisma.user.findUnique({
-      where: { email: data.email }
+      where: { email: parsedData.email }
     })
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 400 }
+      throw new APIError(
+        ErrorCode.CONFLICT,
+        'User with this email already exists'
       )
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(data.password, 12)
+    // 哈希密码
+    const hashedPassword = await bcrypt.hash(parsedData.password, 12)
 
-    // Create user
+    // 创建用户
     const user = await prisma.user.create({
       data: {
-        ...data,
+        ...parsedData,
         password: hashedPassword,
       },
       select: {
@@ -136,29 +152,35 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Log the action
+    // 记录审计日志
     await prisma.auditLog.create({
       data: {
         userId: session.user.id,
         action: 'CREATE_USER',
         resource: 'user',
-        details: { createdUserId: user.id, email: user.email, role: user.role }
+        details: { 
+          createdUserId: user.id, 
+          email: user.email, 
+          role: user.role 
+        }
       }
     })
 
-    return NextResponse.json(user, { status: 201 })
+    return createSuccessResponse(user, { created: true })
+    
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
-      )
+    if (error instanceof APIError) {
+      throw error
     }
-
-    logError('User creation error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+    
+    throw new APIError(
+      ErrorCode.INTERNAL_SERVER_ERROR,
+      'Failed to create user',
+      error
     )
   }
 }
+
+// 导出包装的处理器
+export const GET = ApiWrappers.admin(handleGetUsers)
+export const POST = ApiWrappers.admin(handleCreateUser)
