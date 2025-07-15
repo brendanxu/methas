@@ -25,6 +25,21 @@ const { Title, Text } = Typography
 
 type ConfirmationStatus = 'loading' | 'success' | 'error' | 'already-confirmed'
 
+// 单独的重试按钮组件避免静态渲染问题
+function RetryButton() {
+  const handleRetry = () => {
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
+  }
+
+  return (
+    <Button size="large" onClick={handleRetry}>
+      重试
+    </Button>
+  )
+}
+
 export default function NewsletterConfirmPage() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<ConfirmationStatus>('loading')
@@ -154,13 +169,7 @@ export default function NewsletterConfirmPage() {
                 返回首页
               </Button>
             </Link>,
-            <Button 
-              key="retry" 
-              size="large"
-              onClick={() => window.location.reload()}
-            >
-              重试
-            </Button>
+            <RetryButton key="retry" />
           ]
         }
 
