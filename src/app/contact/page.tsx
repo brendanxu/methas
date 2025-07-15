@@ -15,7 +15,7 @@ function ContactHero() {
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
           <p className="text-xl text-primary-foreground/80 max-w-3xl mx-auto">
-            Ready to start your climate journey? Let's discuss how South Pole can help 
+            Ready to start your climate journey? Let&apos;s discuss how South Pole can help 
             your organization achieve its sustainability goals.
           </p>
         </div>
@@ -81,7 +81,7 @@ function WhyChooseUs() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Why Choose South Pole?</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We're the trusted partner for organizations worldwide looking to create positive climate impact.
+            We&apos;re the trusted partner for organizations worldwide looking to create positive climate impact.
           </p>
         </div>
 
@@ -144,9 +144,9 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* 静态内容区块 */}
             <div>
-              <h2 className="text-3xl font-bold mb-6">Let's Start the Conversation</h2>
+              <h2 className="text-3xl font-bold mb-6">Let&apos;s Start the Conversation</h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Whether you're looking to offset your carbon footprint, develop a comprehensive 
+                Whether you&apos;re looking to offset your carbon footprint, develop a comprehensive 
                 climate strategy, or explore renewable energy solutions, our team of experts 
                 is here to help you achieve your sustainability goals.
               </p>
@@ -158,7 +158,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Initial Consultation</h4>
-                    <p className="text-muted-foreground text-sm">We'll discuss your current situation and sustainability goals</p>
+                    <p className="text-muted-foreground text-sm">We&apos;ll discuss your current situation and sustainability goals</p>
                   </div>
                 </div>
                 
@@ -168,7 +168,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Custom Strategy</h4>
-                    <p className="text-muted-foreground text-sm">We'll develop a tailored climate strategy for your organization</p>
+                    <p className="text-muted-foreground text-sm">We&apos;ll develop a tailored climate strategy for your organization</p>
                   </div>
                 </div>
                 
@@ -178,7 +178,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Implementation Support</h4>
-                    <p className="text-muted-foreground text-sm">We'll guide you through every step of the implementation process</p>
+                    <p className="text-muted-foreground text-sm">We&apos;ll guide you through every step of the implementation process</p>
                   </div>
                 </div>
               </div>

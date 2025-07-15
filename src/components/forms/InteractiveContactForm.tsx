@@ -369,7 +369,7 @@ export default function InteractiveContactForm() {
         <CheckCircleOutlined className="text-green-600 text-6xl mb-4" />
         <h3 className="text-2xl font-bold mb-2">Thank You!</h3>
         <p className="text-muted-foreground mb-4">
-          Your message has been sent successfully. We'll get back to you within 24 hours.
+          Your message has been sent successfully. We&apos;ll get back to you within 24 hours.
         </p>
         <button
           onClick={() => setIsSubmitted(false)}

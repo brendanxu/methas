@@ -325,7 +325,7 @@ export default function InteractiveNewsletterForm({
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground text-center">
-                  Select topics you're interested in (optional)
+                  Select topics you&apos;re interested in (optional)
                 </p>
               </div>
             )}
