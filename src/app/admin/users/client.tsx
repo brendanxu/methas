@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Table, Button, Tag, Space, Modal, message, Input, Typography, Tooltip, Form, Select, Avatar } from 'antd'
 import { 
   PlusOutlined, 
@@ -49,7 +49,7 @@ export default function UserManagementClient() {
     search: ''
   })
 
-  const fetchUsers = async (page = 1) => {
+  const fetchUsers = useCallback(async (page = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -77,11 +77,11 @@ export default function UserManagementClient() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.pageSize, filters.role, filters.search])
 
   useEffect(() => {
     fetchUsers()
-  }, [filters.role])
+  }, [fetchUsers])
 
   const handleSearch = (value: string) => {
     setFilters(prev => ({ ...prev, search: value }))

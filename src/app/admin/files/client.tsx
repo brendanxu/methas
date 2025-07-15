@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Table, Button, Tag, Space, Modal, message, Input, Typography, Image, Select } from 'antd'
 import { 
   DeleteOutlined, 
@@ -40,7 +40,7 @@ export default function FileManagementClient() {
     search: ''
   })
 
-  const fetchFiles = async (page = 1) => {
+  const fetchFiles = useCallback(async (page = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -68,11 +68,11 @@ export default function FileManagementClient() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.pageSize, filters.category, filters.type])
 
   useEffect(() => {
     fetchFiles()
-  }, [filters.category, filters.type])
+  }, [fetchFiles])
 
   const handleDelete = (file: FileRecord) => {
     Modal.confirm({

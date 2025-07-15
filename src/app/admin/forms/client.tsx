@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Table, Tag, Space, Button, Modal, message, Select, Typography, Card } from 'antd'
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
@@ -31,7 +31,7 @@ export default function FormManagementClient() {
     status: undefined as string | undefined
   })
 
-  const fetchSubmissions = async (page = 1) => {
+  const fetchSubmissions = useCallback(async (page = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -59,11 +59,11 @@ export default function FormManagementClient() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.pageSize, filters.type, filters.status])
 
   useEffect(() => {
     fetchSubmissions()
-  }, [filters.type, filters.status])
+  }, [fetchSubmissions])
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {

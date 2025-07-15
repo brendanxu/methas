@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Button, Table, Tag, Space, Modal, message, Select, Input, Typography } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
@@ -40,7 +40,7 @@ export default function ContentManagementClient() {
   })
   const router = useRouter()
 
-  const fetchContents = async (page = 1) => {
+  const fetchContents = useCallback(async (page = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -68,11 +68,11 @@ export default function ContentManagementClient() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.pageSize, filters.type, filters.status])
 
   useEffect(() => {
     fetchContents()
-  }, [filters.type, filters.status])
+  }, [fetchContents])
 
   const handleDelete = (id: string, title: string) => {
     Modal.confirm({

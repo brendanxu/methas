@@ -168,7 +168,7 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       feedback.setError(errorMessage);
       onSubmitError?.(errorMessage);
     }
-  }, [form, onSubmitSuccess, onSubmitError, variant]);
+  }, [form, onSubmitSuccess, onSubmitError, variant, feedback]);
 
   // 内联表单
   const renderInlineForm = () => (
