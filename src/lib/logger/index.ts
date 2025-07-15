@@ -211,7 +211,7 @@ class Logger {
         console.warn(`%c${formattedMessage}`, style);
         break;
       case LogLevel.ERROR:
-        logError(`%c${formattedMessage}`, style, entry.error);
+        console.error(`%c${formattedMessage}`, style, entry.error);
         break;
     }
   }
