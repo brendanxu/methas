@@ -1,17 +1,38 @@
-import dynamicImport from 'next/dynamic'
+'use client'
 
-// 强制动态渲染，避免静态生成时的事件处理器序列化问题
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+import { useEffect, useState } from 'react'
 
-// 动态导入客户端组件
-const AdminDashboardClient = dynamicImport(() => import('./client'), {
-  loading: () => <div>Loading...</div>
-})
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+import { Card, Row, Col, Statistic, Table, Typography, Space, Tag } from 'antd'
+import { 
+  FileTextOutlined, 
+  FormOutlined, 
+  UserOutlined,
+  EyeOutlined
+} from '@ant-design/icons'
 
-export default function AdminDashboardPage() {
-  return <AdminDashboardClient />
+const { Title } = Typography
+
+interface DashboardStats {
+  totalContent: number
+  publishedContent: number
+  totalSubmissions: number
+  newSubmissions: number
+  totalUsers: number
 }
+
+interface RecentActivity {
+  id: string
+  type: 'content' | 'form' | 'user'
+  action: string
+  details: string
+  timestamp: string
+}
+
+export default function AdminDashboardClient() {
   const [stats, setStats] = useState<DashboardStats>({
     totalContent: 0,
     publishedContent: 0,
