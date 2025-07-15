@@ -13,8 +13,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    
-    // 严格类型检查选项
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -26,21 +24,15 @@
     "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": false,
-    
-    // 模块解析增强
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": false,
-    
-    // 代码生成选项
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
     "removeComments": true,
     "importHelpers": true,
     "downlevelIteration": true,
-    
-    // 实验性功能
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,

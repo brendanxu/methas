@@ -241,7 +241,7 @@ export function useSearchInsights() {
       }
       return await response.json();
     } catch (error) {
-      console.error('Failed to get analytics report:', error);
+      logError('Failed to get analytics report:', error);
       return null;
     }
   }, []);
@@ -251,7 +251,7 @@ export function useSearchInsights() {
       const report = await getAnalyticsReport('7d');
       return report?.topQueries?.slice(0, limit) || [];
     } catch (error) {
-      console.error('Failed to get popular queries:', error);
+      logError('Failed to get popular queries:', error);
       return [];
     }
   }, [getAnalyticsReport]);

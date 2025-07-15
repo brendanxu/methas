@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // 记录到控制台（开发环境）
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error caught by boundary:', error, errorInfo);
+      logError('Error caught by boundary:', error, errorInfo);
     }
 
     // 发送到外部错误追踪服务
@@ -93,7 +93,7 @@ export class ErrorBoundary extends Component<Props, State> {
         }),
       });
     } catch (reportingError) {
-      console.error('Failed to report error:', reportingError);
+      logError('Failed to report error:', reportingError);
     }
   };
 
@@ -201,7 +201,7 @@ export class ErrorBoundary extends Component<Props, State> {
 // 可重置的错误边界Hook
 export const useErrorHandler = () => {
   return (error: Error, errorInfo?: ErrorInfo) => {
-    console.error('Error handled:', error);
+    logError('Error handled:', error);
     
     // 发送到监控系统
     monitoring.logError(error, {

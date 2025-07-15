@@ -1,6 +1,11 @@
 'use client';
 
 import React from 'react';
+
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 import dynamic from 'next/dynamic';
 
 // 动态导入以避免SSR问题
@@ -19,7 +24,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       // 这里可以集成如 Sentry、LogRocket 等错误监控服务
-      console.error('Application Error:', {
+      logError('Application Error:', {
         message: error.message,
         digest: error.digest,
         stack: error.stack,

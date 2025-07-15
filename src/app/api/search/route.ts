@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { localSearchAPI } from '@/lib/search-api';
 import { SearchFilters } from '@/hooks/useSearch';
 import { validateSearchQuery, searchRateLimiter, isSuspiciousQuery } from '@/lib/search-validation';
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 
 // GET /api/search - 搜索接口
 export async function GET(request: NextRequest) {
@@ -79,7 +89,7 @@ export async function GET(request: NextRequest) {
     return response;
     
   } catch (error) {
-    console.error('Search API error:', error);
+    logError('Search API error:', error);
     return NextResponse.json(
       { error: '搜索服务暂时不可用' },
       { status: 500 }
@@ -95,19 +105,12 @@ export async function POST(request: NextRequest) {
     
     // 这里可以记录搜索行为到数据库或分析服务
     // 例如：记录热门搜索词、点击率等
-    console.log('Search analytics:', {
-      query,
-      action,
-      metadata,
-      timestamp: new Date().toISOString(),
-      userAgent: request.headers.get('user-agent'),
-      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-    });
+    // Debug log removed for production
     
     return NextResponse.json({ success: true });
     
   } catch (error) {
-    console.error('Search analytics error:', error);
+    logError('Search analytics error:', error);
     return NextResponse.json(
       { error: '分析数据记录失败' },
       { status: 500 }

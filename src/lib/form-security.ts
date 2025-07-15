@@ -439,7 +439,7 @@ export function logSecurityEvent(
   if (type === 'blocked' || type === 'suspicious') {
     console.warn('Security Event:', logEntry);
   } else {
-    console.log('Security Event:', logEntry);
+    // Debug log removed for production
   }
 
   // 在生产环境中集成SIEM系统

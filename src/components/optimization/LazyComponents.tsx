@@ -223,7 +223,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('LazyComponent Error:', error, errorInfo);
+    logError('LazyComponent Error:', error, errorInfo);
   }
 
   render() {

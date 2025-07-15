@@ -1,4 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 
 // 热门搜索建议数据
 const popularSuggestions = [
@@ -57,7 +67,7 @@ export async function GET(request: NextRequest) {
     return response;
     
   } catch (error) {
-    console.error('Search suggestions API error:', error);
+    logError('Search suggestions API error:', error);
     return NextResponse.json(
       { error: '搜索建议服务暂时不可用' },
       { status: 500 }

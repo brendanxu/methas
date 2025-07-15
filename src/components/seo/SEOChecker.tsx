@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Collapse, Alert, Badge, Divider, Typography, Space, Button } from 'antd';
+import { Card, Collapse, Badge, Divider, Typography, Space, Button } from 'antd';
+import Alert from 'antd/es/alert';
 import { 
   CheckCircleOutlined, 
   WarningOutlined, 

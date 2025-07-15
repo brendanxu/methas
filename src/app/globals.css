@@ -1,9 +1,9 @@
+/* Import custom styles must come first */
+@import '../styles/mobile.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import custom styles */
-@import '../styles/mobile.css';
 
 /* CSS Reset and Base Styles */
 *,

@@ -288,7 +288,7 @@ export function useSearch() {
       });
 
     } catch (error) {
-      console.error('Search failed:', error);
+      logError('Search failed:', error);
       setState(prev => ({
         ...prev,
         results: [],

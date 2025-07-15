@@ -1,4 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 
 interface WebVitalData {
   dsn?: string;
@@ -46,13 +56,7 @@ export async function POST(request: NextRequest) {
 
     // 记录到控制台（开发环境）
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Web Vitals]', {
-        metric: data.event_name,
-        value: data.value,
-        rating: data.rating,
-        page: data.page,
-        connection: data.connection?.effectiveType,
-      });
+      // Debug log removed for production
     }
 
     // 这里可以将数据保存到数据库
@@ -79,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Web Vitals API error:', error);
+    logError('Web Vitals API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -124,7 +128,7 @@ async function sendToGoogleAnalytics(data: WebVitalData) {
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    console.error('Failed to send to Google Analytics:', error);
+    logError('Failed to send to Google Analytics:', error);
   }
 }
 
@@ -180,7 +184,7 @@ async function sendPerformanceAlert(alertData: any) {
       }),
     });
   } catch (error) {
-    console.error('Failed to send performance alert:', error);
+    logError('Failed to send performance alert:', error);
   }
 }
 

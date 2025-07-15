@@ -411,7 +411,7 @@ export const logFormError = (formType: string, error: unknown, formData?: unknow
     formData: formData ? JSON.stringify(formData, null, 2) : 'not provided',
   };
 
-  console.error('Form Error:', errorLog);
+  logError('Form Error:', errorLog);
 
   // 在生产环境中，这里应该发送到错误跟踪服务
   if (process.env.NODE_ENV === 'production') {

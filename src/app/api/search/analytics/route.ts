@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { ApiWrappers, createSuccessResponse, APIError, ErrorCode } from '@/lib/api-error-handler'
 
 // 搜索分析事件类型
 interface SearchAnalyticsEvent {
@@ -20,8 +21,8 @@ interface SearchAnalyticsEvent {
 const analyticsData: SearchAnalyticsEvent[] = [];
 const MAX_EVENTS = 10000; // 限制内存使用
 
-// POST /api/search/analytics - 记录搜索分析事件
-export async function POST(request: NextRequest) {
+// POST /api/search/analytics - 记录搜索分析事件（公开）
+export const POST = ApiWrappers.public(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
@@ -55,26 +56,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 记录到控制台用于调试
-    console.log('Search analytics event:', {
-      type: event.eventType,
-      query: event.query,
-      results: event.resultCount,
-      timestamp: event.timestamp,
-    });
+    // Debug log removed for production
 
-    return NextResponse.json({ success: true });
+    return createSuccessResponse({ message: 'Analytics event recorded' })
 
   } catch (error) {
-    console.error('Search analytics error:', error);
-    return NextResponse.json(
-      { error: '分析数据记录失败' },
-      { status: 500 }
-    );
+    throw new APIError(ErrorCode.INTERNAL_SERVER_ERROR, 'Failed to record analytics event')
   }
-}
+})
 
-// GET /api/search/analytics - 获取搜索分析报告
-export async function GET(request: NextRequest) {
+// GET /api/search/analytics - 获取搜索分析报告（需要管理员权限）
+export const GET = ApiWrappers.admin(async (request: NextRequest, { session }: any) => {
   try {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '7d'; // 默认7天
@@ -97,25 +89,19 @@ export async function GET(request: NextRequest) {
     );
 
     if (format === 'raw') {
-      return NextResponse.json({ events });
+      return createSuccessResponse({ events })
     }
 
     // 生成汇总报告
-    const report = generateAnalyticsReport(events);
+    const report = generateAnalyticsReport(events)
+    report.generatedAt = new Date().toISOString()
 
-    const response = NextResponse.json(report);
-    response.headers.set('Cache-Control', 'public, max-age=300'); // 5分钟缓存
-    
-    return response;
+    return createSuccessResponse(report)
 
   } catch (error) {
-    console.error('Analytics report error:', error);
-    return NextResponse.json(
-      { error: '分析报告生成失败' },
-      { status: 500 }
-    );
+    throw new APIError(ErrorCode.INTERNAL_SERVER_ERROR, 'Failed to generate analytics report')
   }
-}
+})
 
 // 生成分析报告
 function generateAnalyticsReport(events: SearchAnalyticsEvent[]) {

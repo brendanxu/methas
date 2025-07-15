@@ -31,7 +31,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         const domContentLoadedTime = nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart;
         
         if (enableDetailedLogging) {
-          console.log('DOM Content Loaded Time:', domContentLoadedTime);
+          // Debug log removed for production
         }
         
         trackEvent({
@@ -59,11 +59,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
                 resourceEntry.initiatorType === 'css') {
               
               if (enableDetailedLogging) {
-                console.log('Critical Resource Loaded:', {
-                  name: resourceEntry.name,
-                  duration: resourceEntry.duration,
-                  size: resourceEntry.transferSize,
-                });
+                // Debug log removed for production
               }
               
               trackEvent({
@@ -85,7 +81,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         try {
           observer.observe({ entryTypes: ['resource'] });
         } catch (e) {
-          console.error('Resource performance observer error:', e);
+          logError('Resource performance observer error:', e);
         }
 
         return () => observer.disconnect();
@@ -129,7 +125,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         try {
           observer.observe({ entryTypes: ['event'] });
         } catch (e) {
-          console.error('Event timing observer error:', e);
+          logError('Event timing observer error:', e);
         }
 
         return () => observer.disconnect();
@@ -260,7 +256,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             observer.disconnect();
           }, 30000); // 30秒后停止监控
         } catch (e) {
-          console.error('Performance budget observer error:', e);
+          logError('Performance budget observer error:', e);
         }
       }
     };

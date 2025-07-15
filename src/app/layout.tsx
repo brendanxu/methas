@@ -10,7 +10,7 @@ import { DynamicHead } from "@/components/seo/DynamicHead";
 import { ClientOnlyPreload } from "@/components/optimization/ClientOnlyPreload";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo-metadata";
 import { HOME_SEO } from "@/lib/seo-config";
-import { SEOChecker } from "@/components/seo/SEOChecker";
+// import { SEOChecker } from "@/components/seo/SEOChecker";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import "./globals.css";
 import "../styles/nprogress.css";
@@ -69,7 +69,7 @@ export default function RootLayout({
                 <PageTracker />
               </Suspense>
               <GlobalSearch />
-              <SEOChecker />
+              {/* <SEOChecker /> */}
               <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <Header />
                 <main className="flex-1">

@@ -48,7 +48,7 @@ class Analytics {
       this.processEventQueue();
       
       if (this.debug) {
-        console.log('📊 Analytics initialized');
+        // Debug log removed for production
       }
     } catch (error) {
       console.warn('Analytics initialization failed:', error);
@@ -111,7 +111,7 @@ class Analytics {
     };
 
     if (this.debug) {
-      console.log('📊 Page View:', pageData);
+      // Debug log removed for production
     }
 
     // 如果尚未初始化，添加到队列
@@ -135,7 +135,7 @@ class Analytics {
     };
 
     if (this.debug) {
-      console.log('📊 Event:', enrichedData);
+      // Debug log removed for production
     }
 
     // 如果尚未初始化，添加到队列

@@ -13,7 +13,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('生成robots.txt时发生错误:', error);
+    logError('生成robots.txt时发生错误:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

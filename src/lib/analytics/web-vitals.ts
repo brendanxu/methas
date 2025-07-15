@@ -78,7 +78,7 @@ function sendToAnalytics(metric: Metric) {
         'Content-Type': 'application/json',
       },
     }).catch(err => {
-      console.error('Failed to send Web Vitals:', err);
+      logError('Failed to send Web Vitals:', err);
     });
   }
 
@@ -159,7 +159,7 @@ export function reportWebVitals() {
     onLCP(sendToAnalytics);
     onTTFB(sendToAnalytics);
   } catch (err) {
-    console.error('[Web Vitals Error]', err);
+    logError('[Web Vitals Error]', err);
     
     // 报告初始化错误
     event({
@@ -225,7 +225,7 @@ export function monitorResourceLoading() {
     try {
       observer.observe({ entryTypes: ['resource'] });
     } catch (e) {
-      console.error('Resource monitoring failed:', e);
+      logError('Resource monitoring failed:', e);
     }
   }
 }
@@ -257,7 +257,7 @@ export function monitorLongTasks() {
     try {
       observer.observe({ entryTypes: ['longtask'] });
     } catch (e) {
-      console.error('Long task observer error:', e);
+      logError('Long task observer error:', e);
     }
   }
 }

@@ -156,7 +156,7 @@ export const DownloadForm: React.FC<DownloadFormProps> = ({
       }, 5000);
 
     } catch (error) {
-      console.error('Download form submission error:', error);
+      logError('Download form submission error:', error);
       logFormError('download', error, values);
       
       const errorMessage = error instanceof Error 
@@ -172,7 +172,7 @@ export const DownloadForm: React.FC<DownloadFormProps> = ({
 
   // 表单验证失败处理
   const handleSubmitFailed = useCallback((errorInfo: unknown) => {
-    console.log('Form validation failed:', errorInfo);
+    // Debug log removed for production
     message.error('请检查并完善表单信息');
   }, []);
 

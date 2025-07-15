@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Authentication
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(USER)
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  contents Content[]
+  auditLogs AuditLog[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Content Management
+model Content {
+  id        String        @id @default(cuid())
+  type      ContentType
+  title     String
+  slug      String        @unique
+  content   String
+  excerpt   String?
+  status    ContentStatus @default(DRAFT)
+  authorId  String
+  imageUrl  String?
+  tags      String? // JSON string for SQLite compatibility
+  metadata  Json?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+}
+
+enum ContentType {
+  NEWS
+  CASE_STUDY
+  SERVICE
+  PAGE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Form Submissions
+model FormSubmission {
+  id        String             @id @default(cuid())
+  type      FormSubmissionType
+  data      Json
+  status    SubmissionStatus   @default(NEW)
+  notes     String?            // For storing error messages or additional info
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+enum FormSubmissionType {
+  CONTACT
+  CONSULTATION
+  NEWSLETTER
+}
+
+enum SubmissionStatus {
+  NEW
+  PROCESSED
+  REPLIED
+  ARCHIVED
+  EMAIL_FAILED
+}
+
+// File Management
+model File {
+  id        String   @id @default(cuid())
+  filename  String
+  originalName String
+  url       String
+  size      Int
+  mimeType  String
+  uploadedBy String?
+  createdAt DateTime @default(now())
+}
+
+// Audit Logs
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  resource  String
+  details   Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

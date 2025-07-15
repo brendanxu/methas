@@ -36,11 +36,7 @@ export const PerformanceMonitor: React.FC = () => {
       
       // 开发环境下的控制台输出
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Web Vitals] ${metric.name}:`, {
-          value: metric.value,
-          rating: metric.rating,
-          delta: metric.delta,
-        });
+        // Debug log removed for production
       }
     };
 

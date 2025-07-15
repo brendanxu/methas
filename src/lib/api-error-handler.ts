@@ -1,5 +1,5 @@
 // API错误处理和响应标准化
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // 错误代码枚举
 export enum ErrorCode {
@@ -205,11 +205,11 @@ export function handleValidationErrors(
   return createErrorResponse(error);
 }
 
-// 错误日志记录
-export function logAPIError(
+// 错误日志记录（增强版）
+export async function logAPIError(
   error: APIError | Error,
   context?: Record<string, unknown>
-): void {
+): Promise<void> {
   const logEntry = {
     timestamp: new Date().toISOString(),
     error: {
@@ -218,17 +218,75 @@ export function logAPIError(
       code: error instanceof APIError ? error.code : 'UNKNOWN',
       stack: error.stack,
     },
-    context,
+    context: context ? sanitizeLogContext(context) : undefined,
     environment: process.env.NODE_ENV,
   };
 
-  // 在生产环境中，这里应该发送到日志服务
+  // 控制台输出
   if (process.env.NODE_ENV === 'production') {
-    // 发送到日志服务 (如 CloudWatch, LogRocket, Datadog 等)
-    console.error('[API Error]', JSON.stringify(logEntry));
+    logError('[API Error]', JSON.stringify(logEntry));
   } else {
-    console.error('[API Error]', logEntry);
+    logError('[API Error]', logEntry);
   }
+
+  // TODO: 存储严重错误到数据库（需要先创建ErrorLog模型）
+  if (shouldPersistError(error)) {
+    try {
+      // 暂时注释掉，直到创建ErrorLog表
+      // const { prisma } = await import('@/lib/prisma');
+      // await prisma.errorLog.create({
+      //   data: {
+      //     level: getErrorLevel(error),
+      //     message: error.message,
+      //     stack: error.stack,
+      //     context: logEntry.context || {},
+      //     timestamp: new Date()
+      //   }
+      // });
+      // Debug log removed for production
+    } catch (dbError) {
+      logError('Failed to persist error to database:', dbError);
+    }
+  }
+}
+
+// 清理日志上下文中的敏感信息
+function sanitizeLogContext(context: Record<string, unknown>): Record<string, unknown> {
+  const sensitiveKeys = ['password', 'token', 'secret', 'key', 'authorization', 'cookie'];
+  const sanitized = { ...context };
+
+  Object.keys(sanitized).forEach(key => {
+    if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+      sanitized[key] = '[REDACTED]';
+    } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
+      sanitized[key] = sanitizeLogContext(sanitized[key] as Record<string, unknown>);
+    }
+  });
+
+  return sanitized;
+}
+
+// 判断是否应该持久化错误
+function shouldPersistError(error: APIError | Error): boolean {
+  if (error instanceof APIError) {
+    // 只持久化服务器错误和严重的客户端错误
+    return error.statusCode >= 500 || [
+      ErrorCode.SECURITY_VIOLATION,
+      ErrorCode.SPAM_DETECTED,
+      ErrorCode.RATE_LIMIT_EXCEEDED
+    ].includes(error.code);
+  }
+  return true; // 所有非APIError都应该持久化
+}
+
+// 获取错误级别
+function getErrorLevel(error: APIError | Error): string {
+  if (error instanceof APIError) {
+    if (error.statusCode >= 500) return 'error';
+    if (error.statusCode >= 400) return 'warn';
+    return 'info';
+  }
+  return 'error';
 }
 
 // 错误恢复装饰器
@@ -357,4 +415,327 @@ export async function validateRequestBody<T>(
   }
 
   return body as T;
+}
+
+// =============== 增强功能扩展 ===============
+
+// 速率限制错误处理
+export async function handleRateLimit(
+  request: NextRequest,
+  options: {
+    requests: number;
+    windowMs: number;
+    keyGenerator?: (req: NextRequest) => string;
+  }
+): Promise<void> {
+  try {
+    const { rateLimit } = await import('@/lib/rate-limit');
+    const limiter = rateLimit({
+      interval: options.windowMs,
+      uniqueTokenPerInterval: 500,
+    });
+
+    const key = options.keyGenerator 
+      ? options.keyGenerator(request)
+      : getClientIP(request);
+
+    await limiter.check(options.requests, key);
+  } catch {
+    throw new APIError(
+      ErrorCode.RATE_LIMIT_EXCEEDED,
+      'Rate limit exceeded',
+      { 
+        retryAfter: Math.ceil(options.windowMs / 1000),
+        limit: options.requests,
+        window: options.windowMs 
+      }
+    );
+  }
+}
+
+// 获取客户端IP
+function getClientIP(request: NextRequest): string {
+  const headers = request.headers;
+  return headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+         headers.get('x-real-ip') ||
+         headers.get('x-client-ip') ||
+         'unknown';
+}
+
+// Prisma错误处理
+export function handlePrismaError(error: any): APIError {
+  if (error.code) {
+    switch (error.code) {
+      case 'P2002':
+        return new APIError(
+          ErrorCode.CONFLICT,
+          'Resource already exists',
+          { field: error.meta?.target }
+        );
+      case 'P2025':
+        return new APIError(
+          ErrorCode.NOT_FOUND,
+          'Record not found'
+        );
+      case 'P2003':
+        return new APIError(
+          ErrorCode.BAD_REQUEST,
+          'Foreign key constraint failed',
+          { field: error.meta?.field_name }
+        );
+      case 'P2014':
+        return new APIError(
+          ErrorCode.BAD_REQUEST,
+          'Invalid relation',
+          { relation: error.meta?.relation_name }
+        );
+      default:
+        return new APIError(
+          ErrorCode.INTERNAL_SERVER_ERROR,
+          'Database operation failed',
+          process.env.NODE_ENV === 'development' ? { code: error.code, meta: error.meta } : undefined
+        );
+    }
+  }
+  
+  return new APIError(
+    ErrorCode.INTERNAL_SERVER_ERROR,
+    'Database error',
+    process.env.NODE_ENV === 'development' ? error.message : undefined
+  );
+}
+
+// Zod验证错误处理
+export function handleZodError(error: any): APIError {
+  const issues = error.issues || [];
+  const validationErrors = issues.map((issue: any) => ({
+    path: issue.path.join('.'),
+    message: issue.message,
+    code: issue.code
+  }));
+
+  return new APIError(
+    ErrorCode.VALIDATION_FAILED,
+    'Input validation failed',
+    { errors: validationErrors }
+  );
+}
+
+// API包装器接口
+interface ApiWrapperOptions {
+  rateLimiting?: {
+    requests: number;
+    windowMs: number;
+  };
+  requireAuth?: boolean;
+  validateInput?: boolean;
+  logRequests?: boolean;
+}
+
+// 通用API包装器
+export function createApiHandler(
+  handler: (request: NextRequest, context: any) => Promise<NextResponse>,
+  options: ApiWrapperOptions = {}
+) {
+  return async (request: NextRequest, context?: any) => {
+    const requestId = generateRequestId();
+    const startTime = Date.now();
+    
+    try {
+      // 请求日志
+      if (options.logRequests) {
+        // Debug log removed for production
+      }
+
+      // 速率限制
+      if (options.rateLimiting) {
+        await handleRateLimit(request, options.rateLimiting);
+      }
+
+      // 身份验证检查
+      if (options.requireAuth) {
+        const { getServerSession } = await import('next-auth');
+        const { authOptions } = await import('@/lib/auth');
+        const session = await getServerSession(authOptions);
+        
+        if (!session?.user) {
+          throw new APIError(ErrorCode.UNAUTHORIZED, 'Authentication required');
+        }
+        
+        context = { ...context, session };
+      }
+
+      // 调用处理器
+      const result = await handler(request, context);
+      
+      // 成功日志
+      if (options.logRequests) {
+        const duration = Date.now() - startTime;
+        // Debug log removed for production
+      }
+
+      return result;
+
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      // 错误上下文
+      const errorContext = {
+        requestId,
+        method: request.method,
+        url: request.url,
+        userAgent: request.headers.get('user-agent'),
+        ip: getClientIP(request),
+        duration
+      };
+
+      // 处理不同类型的错误
+      let apiError: APIError;
+      
+      if (error instanceof APIError) {
+        apiError = error;
+      } else if (error && typeof error === 'object' && 'code' in error && 
+                 typeof error.code === 'string' && error.code.startsWith('P')) {
+        // Prisma错误
+        apiError = handlePrismaError(error);
+      } else if (error && typeof error === 'object' && 'issues' in error) {
+        // Zod验证错误
+        apiError = handleZodError(error);
+      } else if (error instanceof Error) {
+        apiError = new APIError(
+          ErrorCode.INTERNAL_SERVER_ERROR,
+          error.message,
+          process.env.NODE_ENV === 'development' ? error.stack : undefined
+        );
+      } else {
+        apiError = new APIError(
+          ErrorCode.INTERNAL_SERVER_ERROR,
+          'An unexpected error occurred'
+        );
+      }
+
+      // 异步记录错误日志
+      logAPIError(apiError, errorContext).catch(console.error);
+
+      return createErrorResponse(apiError);
+    }
+  };
+}
+
+// 预配置的API包装器
+export const ApiWrappers = {
+  // 公开端点，基本速率限制
+  public: (handler: (request: NextRequest, context: any) => Promise<NextResponse>) =>
+    createApiHandler(handler, {
+      rateLimiting: { requests: 100, windowMs: 15 * 60 * 1000 }, // 15分钟100次
+      logRequests: true
+    }),
+
+  // 表单提交，严格速率限制
+  form: (handler: (request: NextRequest, context: any) => Promise<NextResponse>) =>
+    createApiHandler(handler, {
+      rateLimiting: { requests: 10, windowMs: 60 * 60 * 1000 }, // 1小时10次
+      validateInput: true,
+      logRequests: true
+    }),
+
+  // 管理员端点
+  admin: (handler: (request: NextRequest, context: any) => Promise<NextResponse>) =>
+    createApiHandler(handler, {
+      requireAuth: true,
+      rateLimiting: { requests: 1000, windowMs: 15 * 60 * 1000 }, // 15分钟1000次
+      logRequests: true
+    }),
+
+  // 无限制的内部端点
+  internal: (handler: (request: NextRequest, context: any) => Promise<NextResponse>) =>
+    createApiHandler(handler, {
+      logRequests: false
+    })
+};
+
+// 健康检查助手
+export function createHealthCheck(dependencies: {
+  database?: () => Promise<boolean>;
+  cache?: () => Promise<boolean>;
+  external?: () => Promise<boolean>;
+} = {}) {
+  return async () => {
+    const checks: Record<string, boolean> = {};
+    let allHealthy = true;
+
+    // 数据库检查
+    if (dependencies.database) {
+      try {
+        checks.database = await dependencies.database();
+      } catch {
+        checks.database = false;
+      }
+      if (!checks.database) allHealthy = false;
+    }
+
+    // 缓存检查
+    if (dependencies.cache) {
+      try {
+        checks.cache = await dependencies.cache();
+      } catch {
+        checks.cache = false;
+      }
+      if (!checks.cache) allHealthy = false;
+    }
+
+    // 外部服务检查
+    if (dependencies.external) {
+      try {
+        checks.external = await dependencies.external();
+      } catch {
+        checks.external = false;
+      }
+      if (!checks.external) allHealthy = false;
+    }
+
+    const response = {
+      status: allHealthy ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      checks
+    };
+
+    return NextResponse.json(response, {
+      status: allHealthy ? 200 : 503
+    });
+  };
+}
+
+// 监控指标助手
+export class ApiMetrics {
+  private static metrics = new Map<string, {
+    requests: number;
+    errors: number;
+    avgResponseTime: number;
+    lastReset: number;
+  }>();
+
+  static recordRequest(endpoint: string, responseTime: number, isError: boolean = false) {
+    const key = endpoint;
+    const current = this.metrics.get(key) || {
+      requests: 0,
+      errors: 0,
+      avgResponseTime: 0,
+      lastReset: Date.now()
+    };
+
+    current.requests++;
+    if (isError) current.errors++;
+    current.avgResponseTime = (current.avgResponseTime + responseTime) / 2;
+
+    this.metrics.set(key, current);
+  }
+
+  static getMetrics() {
+    return Object.fromEntries(this.metrics.entries());
+  }
+
+  static reset() {
+    this.metrics.clear();
+  }
 }

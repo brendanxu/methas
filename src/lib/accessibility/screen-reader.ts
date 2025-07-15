@@ -134,7 +134,7 @@ class ScreenReaderManager {
 
     // 记录到控制台（开发环境）
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Screen Reader] ${options.priority?.toUpperCase()}: ${message}`);
+      // Debug log removed for production
     }
   }
 

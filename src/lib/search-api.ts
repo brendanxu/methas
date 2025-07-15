@@ -86,7 +86,7 @@ export class SearchAPI {
         return data;
       } catch (error) {
         performanceMonitor.recordError();
-        console.error('Search API request failed:', error);
+        logError('Search API request failed:', error);
         throw new Error('搜索服务暂时不可用，请稍后重试');
       }
     });
@@ -114,7 +114,7 @@ export class SearchAPI {
       const data = await response.json();
       return data.suggestions || [];
     } catch (error) {
-      console.error('Search suggestions request failed:', error);
+      logError('Search suggestions request failed:', error);
       return [];
     }
   }

@@ -148,7 +148,7 @@ export const PreloadMonitor: React.FC = () => {
       if (typeof performance !== 'undefined' && performance.getEntriesByName) {
         const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
         if (fcpEntry) {
-          console.log(`FCP: ${Math.round(fcpEntry.startTime)}ms`);
+          // Debug log removed for production
         }
       }
 
@@ -157,7 +157,7 @@ export const PreloadMonitor: React.FC = () => {
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
-          console.log(`LCP: ${Math.round(lastEntry.startTime)}ms`);
+          // Debug log removed for production
         });
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
       }
@@ -167,8 +167,7 @@ export const PreloadMonitor: React.FC = () => {
         const navigationEntries = performance.getEntriesByType('navigation');
         if (navigationEntries.length > 0) {
           const nav = navigationEntries[0] as PerformanceNavigationTiming;
-          console.log(`DOM Content Loaded: ${Math.round(nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart)}ms`);
-          console.log(`Page Load Complete: ${Math.round(nav.loadEventEnd - nav.loadEventStart)}ms`);
+          // Debug log removed for production
         }
       }
     };

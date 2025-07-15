@@ -2,10 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ConfigProvider } from 'antd';
+import { SessionProvider } from 'next-auth/react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { I18nProvider } from '@/components/providers/I18nProvider';
 import { antThemeConfig, antDarkThemeConfig, southPoleColors } from '@/styles/ant-theme';
 import { cssOptimizer, debounce, memoryMonitor } from '@/lib/performance';
+import { Session } from 'next-auth';
 
 // Theme context types
 interface ThemeContextType {
@@ -129,19 +131,23 @@ export const AntdProvider: React.FC<AntdProviderProps> = ({ children }) => {
 interface ProvidersProps {
   children: ReactNode;
   defaultTheme?: 'light' | 'dark';
+  session?: Session | null;
 }
 
 export const Providers: React.FC<ProvidersProps> = ({ 
   children, 
-  defaultTheme = 'light' 
+  defaultTheme = 'light',
+  session
 }) => {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme={defaultTheme}>
-        <AntdProvider>
-          {children}
-        </AntdProvider>
-      </ThemeProvider>
+      <SessionProvider session={session}>
+        <ThemeProvider defaultTheme={defaultTheme}>
+          <AntdProvider>
+            {children}
+          </AntdProvider>
+        </ThemeProvider>
+      </SessionProvider>
     </ErrorBoundary>
   );
 };

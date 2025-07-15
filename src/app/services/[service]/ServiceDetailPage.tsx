@@ -476,7 +476,7 @@ const CTASection: React.FC<{ ctaForm: Service['ctaForm'] }> = ({ ctaForm }) => {
   
   const handleSubmit = async (values: Record<string, string>) => {
     setLoading(true);
-    console.log('提交的表单数据:', values);
+    // Debug log removed for production
     // 模拟表单提交
     setTimeout(() => {
       setLoading(false);

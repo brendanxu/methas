@@ -1,4 +1,16 @@
+
 'use client';
+
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 
 interface Alert {
   id: string;
@@ -105,7 +117,7 @@ class MonitoringService {
       try {
         callback(alert);
       } catch (error) {
-        console.error('Alert callback error:', error);
+        logError('Alert callback error:', error);
       }
     });
     
@@ -136,7 +148,7 @@ class MonitoringService {
         }),
       });
     } catch (error) {
-      console.error('Failed to send alert to backend:', error);
+      logError('Failed to send alert to backend:', error);
     }
   }
 
@@ -165,7 +177,7 @@ class MonitoringService {
           });
         }
       } catch (error) {
-        console.error('Failed to send alert to third party:', error);
+        logError('Failed to send alert to third party:', error);
       }
     }
   }

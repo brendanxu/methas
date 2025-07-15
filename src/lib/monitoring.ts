@@ -38,7 +38,9 @@ export function initializeErrorMonitoring() {
   // Note: @sentry/nextjs not installed, monitoring disabled
   Promise.resolve().then(() => {
     const Sentry = {
-      init: (config: any) => console.log('Sentry mock init'),
+      init: (config: any) => {
+        // Debug log removed for production
+      },
       Replay: function(options: any) { return {}; },
     };
       Sentry.init({
@@ -65,7 +67,7 @@ export function initializeErrorMonitoring() {
         },
       });
 
-      console.log('✅ Sentry error monitoring initialized');
+      // Debug log removed for production
     })
     .catch((error) => {
       console.warn('Failed to initialize Sentry:', error);
@@ -78,7 +80,7 @@ export function initializeErrorMonitoring() {
 export function logError(error: Error, context?: ErrorContext) {
   // Console logging for development
   if (process.env.NODE_ENV === 'development') {
-    console.error('Error logged:', {
+    logError('Error logged:', {
       message: error.message,
       stack: error.stack,
       context,
@@ -92,7 +94,7 @@ export function logError(error: Error, context?: ErrorContext) {
     Promise.resolve().then(() => {
       const Sentry = {
         withScope: (fn: any) => fn({ setTag: () => {} }),
-        captureException: (error: Error) => console.error('Sentry fallback:', error),
+        captureException: (error: Error) => logError('Sentry fallback:', error),
       };
         Sentry.withScope((scope: any) => {
           if (context) {
@@ -105,7 +107,7 @@ export function logError(error: Error, context?: ErrorContext) {
       })
       .catch(() => {
         // Fallback logging
-        console.error('Monitoring service unavailable:', error);
+        logError('Monitoring service unavailable:', error);
       });
   }
 }
@@ -115,7 +117,7 @@ export function logError(error: Error, context?: ErrorContext) {
  */
 export function logPerformanceMetric(metric: PerformanceMetric) {
   if (process.env.NODE_ENV === 'development') {
-    console.log('Performance metric:', metric);
+    // Debug log removed for production
   }
 
   // Send to analytics service
@@ -137,7 +139,7 @@ export function logPerformanceMetric(metric: PerformanceMetric) {
  */
 export function logUserInteraction(action: string, details?: Record<string, any>) {
   if (process.env.NODE_ENV === 'development') {
-    console.log('User interaction:', { action, details });
+    // Debug log removed for production
   }
 
   // Send to analytics
@@ -182,7 +184,7 @@ export function initializeAnalytics() {
       page_location: window.location.href,
     });
 
-    console.log('✅ Google Analytics initialized');
+    // Debug log removed for production
   };
 }
 
@@ -194,7 +196,7 @@ export function initializeWebVitals() {
 
   // Note: web-vitals not installed, monitoring disabled
   Promise.resolve().then(() => {
-    console.log('⚠️ Web Vitals monitoring disabled (package not installed)');
+    // Debug log removed for production
   });
 }
 

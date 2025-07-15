@@ -57,9 +57,34 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       if (onSubmit) {
         await onSubmit(data);
       } else {
-        // 默认处理逻辑
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log('联系表单数据:', data);
+        // 提交到后端API
+        const response = await fetch('/api/forms/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'CONTACT',
+            data: {
+              name: data.name,
+              email: data.email,
+              company: data.company,
+              phone: data.phone,
+              subject: data.subject,
+              message: data.message,
+              industry: data.industry,
+              budget: data.budget,
+              timeline: data.timeline,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('提交失败');
+        }
+
+        const result = await response.json();
+        // Debug log removed for production
       }
       
       if (onSubmitSuccess) {
@@ -68,7 +93,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         alert('提交成功！我们将尽快与您联系。');
       }
     } catch (error) {
-      console.error('提交失败:', error);
+      logError('提交失败:', error);
       if (onSubmitError) {
         onSubmitError(error);
       } else {

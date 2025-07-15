@@ -331,8 +331,8 @@ export class PreloadQueue {
   public debugQueue(): void {
     const requests = Array.from(this.queue.values());
     console.group('Preload Queue Debug');
-    console.log('Queue status:', this.getQueueStatus());
-    console.log('Stats:', this.getStats());
+    // Debug log removed for production
+    // Debug log removed for production
     console.table(requests.map(r => ({
       id: r.id.substring(0, 16) + '...',
       status: r.status,

@@ -228,12 +228,7 @@ class EnhancedPreloadManager {
   // Debug utilities
   public debug(): void {
     console.group('Preload Manager Debug');
-    console.log('Config:', this.config);
-    console.log('Behavior:', this.getBehavior());
-    console.log('Predictions:', this.getPredictions());
-    console.log('Queue Status:', this.getQueueStatus());
-    console.log('Navigation Stats:', this.getNavigationStats());
-    console.log('Metrics:', this.getMetrics());
+    // Debug log removed for production
     this.preloadQueue.debugQueue();
     console.groupEnd();
   }

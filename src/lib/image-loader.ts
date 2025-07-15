@@ -220,7 +220,7 @@ export const trackImagePerformance = (src: string, startTime: number): void => {
   
   // Log performance data in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(`Image loaded: ${src} (${Math.round(loadTime)}ms)`);
+    // Debug log removed for production
   }
 };
 

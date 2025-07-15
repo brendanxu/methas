@@ -25,6 +25,8 @@ import {
 } from '@ant-design/icons';
 import {  motion, AnimatePresence  } from '@/lib/mock-framer-motion';
 import { useThemeColors } from '@/app/providers';
+import { useFormFeedback } from '@/hooks/useFormFeedback';
+import FormSuccessModal, { FormSuccessConfig } from './FormSuccessModal';
 import {
   NewsletterFormData,
   formRules,
@@ -61,10 +63,17 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
   description = '获取最新的气候解决方案和行业洞察',
 }) => {
   const [form] = Form.useForm<NewsletterFormData>();
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submissionData, setSubmissionData] = useState<NewsletterFormData | null>(null);
   const colors = useThemeColors();
+  
+  // 使用新的表单反馈系统
+  const feedback = useFormFeedback({
+    successMessageType: 'newsletter',
+    showGlobalMessage: variant !== 'modal',
+    autoResetSuccessDelay: 3000
+  });
 
   // 表单提交处理
   const handleSubmit = useCallback(async (values: NewsletterFormData) => {
@@ -77,7 +86,7 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       return;
     }
 
-    setLoading(true);
+    feedback.setSubmitting(10);
 
     try {
       // 数据清理
@@ -91,31 +100,44 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       const validation = validateNewsletterForm(sanitizedData);
       if (!validation.isValid) {
         message.error(validation.errors[0]);
-        setLoading(false);
+        feedback.setError(validation.errors[0]);
         return;
       }
 
-      // 提交到服务器
-      const response = await fetch('/api/forms/newsletter', {
+      // 提交到服务器 - 使用新的API端点
+      const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(sanitizedData),
+        body: JSON.stringify({
+          ...sanitizedData,
+          source: 'website' // 标识来源
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error(`订阅失败: ${response.status} ${response.statusText}`);
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || '订阅失败');
       }
-
-      await response.json(); // 结果在生产环境中使用
 
       // 记录提交
       formSubmissionManager.recordSubmission(formId);
 
       // 成功处理
-      setSubmitted(true);
-      message.success('订阅成功！感谢您的关注。');
+      const successMessage = result.isUpdate ? '订阅偏好更新成功！' : (result.isResend ? '确认邮件已重新发送，请检查您的邮箱。' : '订阅成功！请检查您的邮箱并确认订阅。');
+      feedback.setSuccess(successMessage);
+      setSubmissionData(sanitizedData);
+      
+      // 根据响应类型显示不同消息
+      if (result.isUpdate) {
+        message.success('订阅偏好更新成功！');
+      } else if (result.isResend) {
+        message.success('确认邮件已重新发送，请检查您的邮箱。');
+      } else {
+        message.success('订阅成功！请检查您的邮箱并确认订阅。');
+      }
       
       // 重置表单
       form.resetFields();
@@ -128,13 +150,9 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       // 回调
       onSubmitSuccess?.(sanitizedData);
 
-      // 3秒后重置状态
-      setTimeout(() => {
-        setSubmitted(false);
-      }, 3000);
 
     } catch (error) {
-      console.error('Newsletter subscription error:', error);
+      logError('Newsletter subscription error:', error);
       logFormError('newsletter', error, values);
       
       const errorMessage = error instanceof Error 
@@ -142,9 +160,8 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
         : '订阅失败，请稍后重试';
       
       message.error(errorMessage);
+      feedback.setError(errorMessage);
       onSubmitError?.(errorMessage);
-    } finally {
-      setLoading(false);
     }
   }, [form, onSubmitSuccess, onSubmitError, variant]);
 
@@ -175,15 +192,15 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
           type="primary"
           htmlType="submit"
           size="large"
-          loading={loading}
-          icon={submitted ? <CheckCircleOutlined /> : (loading ? <LoadingOutlined /> : <SendOutlined />)}
+          loading={feedback.isLoading}
+          icon={feedback.isSuccess ? <CheckCircleOutlined /> : (feedback.isLoading ? <LoadingOutlined /> : <SendOutlined />)}
           className="rounded-r-lg px-6"
           style={{
-            backgroundColor: submitted ? '#52c41a' : colors.primary,
-            borderColor: submitted ? '#52c41a' : colors.primary,
+            backgroundColor: feedback.isSuccess ? '#52c41a' : colors.primary,
+            borderColor: feedback.isSuccess ? '#52c41a' : colors.primary,
           }}
         >
-          {submitted ? '已订阅' : (loading ? '订阅中...' : buttonText)}
+          {feedback.isSuccess ? '已订阅' : (feedback.isLoading ? feedback.getStatusText() : buttonText)}
         </Button>
       </Form.Item>
     </Form>
@@ -261,15 +278,15 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
             type="primary"
             htmlType="submit"
             size="large"
-            loading={loading}
-            icon={submitted ? <CheckCircleOutlined /> : (loading ? <LoadingOutlined /> : <SendOutlined />)}
+            loading={feedback.isLoading}
+            icon={feedback.isSuccess ? <CheckCircleOutlined /> : (feedback.isLoading ? <LoadingOutlined /> : <SendOutlined />)}
             className="w-full"
             style={{
-              backgroundColor: submitted ? '#52c41a' : colors.primary,
-              borderColor: submitted ? '#52c41a' : colors.primary,
+              backgroundColor: feedback.isSuccess ? '#52c41a' : colors.primary,
+              borderColor: feedback.isSuccess ? '#52c41a' : colors.primary,
             }}
           >
-            {submitted ? '订阅成功！' : (loading ? '订阅中...' : buttonText)}
+            {feedback.isSuccess ? '订阅成功！' : (feedback.isLoading ? feedback.getStatusText() : buttonText)}
           </Button>
         </Form.Item>
       </Form>
@@ -319,15 +336,15 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
               type="primary"
               htmlType="submit"
               size="large"
-              loading={loading}
-              icon={submitted ? <CheckCircleOutlined /> : (loading ? <LoadingOutlined /> : <SendOutlined />)}
+              loading={feedback.isLoading}
+              icon={feedback.isSuccess ? <CheckCircleOutlined /> : (feedback.isLoading ? <LoadingOutlined /> : <SendOutlined />)}
               className="rounded-r-lg"
               style={{
-                backgroundColor: submitted ? '#52c41a' : colors.primary,
-                borderColor: submitted ? '#52c41a' : colors.primary,
+                backgroundColor: feedback.isSuccess ? '#52c41a' : colors.primary,
+                borderColor: feedback.isSuccess ? '#52c41a' : colors.primary,
               }}
             >
-              {submitted ? '已订阅' : (loading ? '订阅中...' : buttonText)}
+              {feedback.isSuccess ? '已订阅' : (feedback.isLoading ? feedback.getStatusText() : buttonText)}
             </Button>
           </Form.Item>
         </Space.Compact>
@@ -434,14 +451,14 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={loading}
-                icon={submitted ? <CheckCircleOutlined /> : (loading ? <LoadingOutlined /> : <SendOutlined />)}
+                loading={feedback.isLoading}
+                icon={feedback.isSuccess ? <CheckCircleOutlined /> : (feedback.isLoading ? <LoadingOutlined /> : <SendOutlined />)}
                 style={{
-                  backgroundColor: submitted ? '#52c41a' : colors.primary,
-                  borderColor: submitted ? '#52c41a' : colors.primary,
+                  backgroundColor: feedback.isSuccess ? '#52c41a' : colors.primary,
+                  borderColor: feedback.isSuccess ? '#52c41a' : colors.primary,
                 }}
               >
-                {submitted ? '订阅成功！' : (loading ? '订阅中...' : buttonText)}
+                {feedback.isSuccess ? '订阅成功！' : (feedback.isLoading ? feedback.getStatusText() : buttonText)}
               </Button>
             </Space>
           </Form.Item>
@@ -473,6 +490,26 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       <AnimatePresence mode="wait">
         {renderForm()}
       </AnimatePresence>
+      
+      {/* 成功提交模态框 */}
+      {showSuccess && submissionData && (
+        <FormSuccessModal
+          visible={showSuccess}
+          config={{
+            type: 'newsletter',
+            userEmail: submissionData.email,
+            showShareOptions: true
+          }}
+          onClose={() => setShowSuccess(false)}
+          onNewSubmission={() => {
+            setShowSuccess(false);
+            feedback.reset();
+            if (variant === 'modal') {
+              setModalVisible(true);
+            }
+          }}
+        />
+      )}
     </motion.div>
   );
 };

@@ -281,7 +281,7 @@ export function useRenderPerformance(componentName: string) {
       
       return () => {
         const end = globalThis.performance.now();
-        console.log(`${componentName} render time: ${end - start}ms`);
+        // Debug log removed for production
       };
     }
     return undefined;
@@ -293,7 +293,7 @@ export function useRenderPerformance(componentName: string) {
  */
 export function logChunkLoad(chunkName: string) {
   if (process.env.NODE_ENV === 'development') {
-    console.log(`Loading chunk: ${chunkName}`);
+    // Debug log removed for production
   }
 }
 

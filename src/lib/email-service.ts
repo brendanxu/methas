@@ -52,13 +52,7 @@ export async function sendEmail(emailData: EmailData): Promise<boolean> {
   
   // If no API key is configured, log to console (development mode)
   if (!config.apiKey) {
-    console.log('📧 Email would be sent (SendGrid not configured):');
-    console.log({
-      to: emailData.to,
-      subject: emailData.subject,
-      from: emailData.from || { email: config.fromEmail, name: config.fromName },
-      html: emailData.html.substring(0, 200) + '...',
-    });
+    // Debug log removed for production
     return true;
   }
 
@@ -78,10 +72,10 @@ export async function sendEmail(emailData: EmailData): Promise<boolean> {
     };
 
     await sgMail.default.send(message);
-    console.log('✅ Email sent successfully');
+    // Debug log removed for production
     return true;
   } catch (error) {
-    console.error('❌ Failed to send email:', error);
+    logError('❌ Failed to send email:', error);
     return false;
   }
 }
@@ -96,13 +90,7 @@ export async function sendTemplateEmail(
   const config = getEmailConfig();
   
   if (!config.apiKey) {
-    console.log('📧 Template email would be sent (SendGrid not configured):');
-    console.log({
-      to,
-      templateId: templateData.templateId,
-      subject: templateData.subject,
-      data: templateData.dynamicTemplateData,
-    });
+    // Debug log removed for production
     return true;
   }
 
@@ -119,10 +107,10 @@ export async function sendTemplateEmail(
     };
 
     await sgMail.default.send(message);
-    console.log('✅ Template email sent successfully');
+    // Debug log removed for production
     return true;
   } catch (error) {
-    console.error('❌ Failed to send template email:', error);
+    logError('❌ Failed to send template email:', error);
     return false;
   }
 }
@@ -379,12 +367,101 @@ export async function sendNewsletterWelcome(data: {
   });
 }
 
+/**
+ * Send newsletter confirmation email
+ */
+export async function sendConfirmationEmail(data: { email: string; firstName?: string; preferences?: string[] }, confirmationToken: string): Promise<boolean> {
+  const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/newsletter/confirm?token=${confirmationToken}`;
+  
+  const html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>确认您的Newsletter订阅</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo { color: #002145; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+    .title { color: #002145; font-size: 28px; margin: 0 0 10px 0; }
+    .subtitle { color: #666; font-size: 16px; margin: 0; }
+    .content { margin: 30px 0; }
+    .button { display: inline-block; background: #002145; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+    .button:hover { background: #003366; }
+    .preferences { background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 20px 0; }
+    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #666; }
+    .link { color: #002145; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🌍 South Pole</div>
+      <h1 class="title">确认您的Newsletter订阅</h1>
+      <p class="subtitle">感谢您订阅South Pole Newsletter！</p>
+    </div>
+    
+    <div class="content">
+      ${data.firstName ? `<p>您好 ${data.firstName}，</p>` : '<p>您好，</p>'}
+      
+      <p>感谢您订阅我们的Newsletter。为了确保您能收到我们的最新资讯，请点击下面的按钮确认您的订阅：</p>
+      
+      <div style="text-align: center;">
+        <a href="${confirmationUrl}" class="button">确认订阅</a>
+      </div>
+      
+      <p>或者，您也可以复制以下链接到浏览器中打开：</p>
+      <p class="link">${confirmationUrl}</p>
+      
+      ${data.preferences && data.preferences.length > 0 ? `
+        <div class="preferences">
+          <strong>您选择的订阅内容：</strong>
+          <ul>
+            ${data.preferences.map(pref => {
+              const labels: Record<string, string> = {
+                'climate-news': '气候新闻',
+                'industry-insights': '行业洞察',
+                'product-updates': '产品更新',
+                'events': '活动邀请',
+                'research': '研究报告'
+              };
+              return `<li>${labels[pref] || pref}</li>`;
+            }).join('')}
+          </ul>
+        </div>
+      ` : ''}
+      
+      <p>确认订阅后，您将开始收到我们精选的气候解决方案和行业洞察资讯。</p>
+    </div>
+    
+    <div class="footer">
+      <p>如果您没有订阅我们的Newsletter，请忽略此邮件。</p>
+      <p>
+        <strong>South Pole</strong> - 专业的碳中和解决方案提供商<br>
+        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email=${encodeURIComponent(data.email)}" style="color: #666;">取消订阅</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  return sendEmail({
+    to: data.email,
+    subject: '确认您的Newsletter订阅 - South Pole',
+    html,
+  });
+}
+
 const emailService = {
   sendEmail,
   sendTemplateEmail,
   sendContactNotification,
   sendContactConfirmation,
   sendNewsletterWelcome,
+  sendConfirmationEmail,
 };
 
 export default emailService;

@@ -66,7 +66,7 @@ export const resources = {
 // 暂时禁用动态加载以避免部署问题
 const loadResources = async () => {
   // 使用静态资源，避免动态导入在生产环境的问题
-  console.log('Using static i18n resources');
+  // Debug log removed for production
 };
 
 // 支持的语言列表
@@ -141,7 +141,7 @@ const initializeI18n = async () => {
         },
       });
     
-    console.log('i18n initialized successfully');
+    // Debug log removed for production
     return i18n;
   } catch (error) {
     console.warn('Failed to initialize i18n:', error);

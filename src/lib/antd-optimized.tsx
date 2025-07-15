@@ -10,26 +10,24 @@ import React from 'react';
 
 // ===== Core Components (Direct exports) =====
 // Import from main antd package for better compatibility
-import {
-  Button,
-  Input, 
-  Space, 
-  Divider,
-  Typography,
-  Row,
-  Col,
-  Layout,
-  Tag,
-  Badge,
-  Avatar,
-  Statistic,
-  Radio,
-  Checkbox,
-  Skeleton,
-  Spin,
-  message,
-  notification
-} from 'antd';
+import Button from 'antd/lib/button';
+import Input from 'antd/lib/input';
+import Space from 'antd/lib/space';
+import Divider from 'antd/lib/divider';
+import Typography from 'antd/lib/typography';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Layout from 'antd/lib/layout';
+import Tag from 'antd/lib/tag';
+import Badge from 'antd/lib/badge';
+import Avatar from 'antd/lib/avatar';
+import Statistic from 'antd/lib/statistic';
+import Radio from 'antd/lib/radio';
+import Checkbox from 'antd/lib/checkbox';
+import Skeleton from 'antd/lib/skeleton';
+import Spin from 'antd/lib/spin';
+import message from 'antd/lib/message';
+import notification from 'antd/lib/notification';
 
 // Re-export components
 export {

@@ -403,7 +403,7 @@ export class AnimationPerformanceManager {
    */
   private trackAnimationPerformance(name: string, duration: number) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Animation ${name} took ${duration.toFixed(2)}ms`);
+      // Debug log removed for production
     }
   }
 

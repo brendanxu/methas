@@ -179,7 +179,7 @@ class Logger {
           const { monitoring } = require('@/lib/monitoring/alerts');
           monitoring.logError(error, context);
         } catch (err) {
-          console.error('Failed to send to monitoring:', err);
+          logError('Failed to send to monitoring:', err);
         }
       }, 0);
     }
@@ -191,7 +191,7 @@ class Logger {
     
     switch (entry.level) {
       case LogLevel.DEBUG:
-        console.log(`%c${formattedMessage}`, style);
+        // Debug log removed for production
         break;
       case LogLevel.INFO:
         console.info(`%c${formattedMessage}`, style);
@@ -200,7 +200,7 @@ class Logger {
         console.warn(`%c${formattedMessage}`, style);
         break;
       case LogLevel.ERROR:
-        console.error(`%c${formattedMessage}`, style, entry.error);
+        logError(`%c${formattedMessage}`, style, entry.error);
         break;
     }
   }
@@ -237,7 +237,7 @@ class Logger {
         }),
       });
     } catch (err) {
-      console.error('Failed to send log to remote:', err);
+      logError('Failed to send log to remote:', err);
     }
   }
 

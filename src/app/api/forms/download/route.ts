@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateDownloadForm, sanitizeFormData, type DownloadFormData } from '@/lib/form-validation';
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 
 // 速率限制配置 - 每个IP每小时最多20次下载
 const limiter = rateLimit({
@@ -139,11 +149,7 @@ async function recordDownloadActivity(data: DownloadFormData, resourceInfo: { id
 // 发送下载通知邮件
 async function sendDownloadNotification(data: DownloadFormData, resourceName: string, downloadUrl: string): Promise<boolean> {
   try {
-    console.log('Sending download notification:', {
-      to: data.email,
-      resource: resourceName,
-      timestamp: new Date().toISOString(),
-    });
+    // Debug log removed for production
 
 //     // const emailContent = { // 在生产环境中启用
 //       to: data.email,
@@ -190,7 +196,7 @@ async function sendDownloadNotification(data: DownloadFormData, resourceName: st
 
     return true;
   } catch (error) {
-    console.error('Failed to send download notification:', error);
+    logError('Failed to send download notification:', error);
     return false;
   }
 }
@@ -301,7 +307,7 @@ export async function POST(request: NextRequest) {
     const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(textToCheck));
 
     if (isSuspicious) {
-      console.log('Suspicious download request detected:', { ip, data: sanitizedData });
+      // Debug log removed for production
       return NextResponse.json(
         { 
           success: false, 
@@ -342,22 +348,13 @@ export async function POST(request: NextRequest) {
           }),
         });
       } catch (error) {
-        console.error('Failed to add to marketing list:', error);
+        logError('Failed to add to marketing list:', error);
         // 不影响主要流程
       }
     }
 
     // 记录分析数据
-    console.log('Download request analytics:', {
-      downloadId: downloadRecord.id,
-      resourceId: resourceId || 'custom',
-      resourceType: sanitizedData.resourceType,
-      company: sanitizedData.company,
-      agreeToMarketing: sanitizedData.agreeToMarketing,
-      isRepeatDownload: downloadRecord.downloadCount > 1,
-      timestamp: new Date().toISOString(),
-      ip,
-    });
+    // Debug log removed for production
 
     return NextResponse.json({
       success: true,
@@ -372,7 +369,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Download form API error:', error);
+    logError('Download form API error:', error);
     
     return NextResponse.json(
       { 
@@ -457,12 +454,7 @@ export async function GET(request: NextRequest) {
     // 3. 流式传输文件内容
 
     // 模拟文件下载
-    console.log('File download:', {
-      resourceId,
-      fileName: resourceConfig.name,
-      fileSize: resourceConfig.fileSize,
-      timestamp: new Date().toISOString(),
-    });
+    // Debug log removed for production
 
     // 返回重定向到实际文件或者文件内容
     return NextResponse.redirect(
@@ -470,7 +462,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('File download error:', error);
+    logError('File download error:', error);
     
     return NextResponse.json(
       { 
@@ -514,7 +506,7 @@ export async function PUT(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Download stats error:', error);
+    logError('Download stats error:', error);
     
     return NextResponse.json(
       { 
