@@ -1,6 +1,11 @@
 // API错误处理和响应标准化
 import { NextRequest, NextResponse } from 'next/server';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 // 错误代码枚举
 export enum ErrorCode {
   // 客户端错误 (4xx)

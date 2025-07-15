@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 import { useRouter } from 'next/navigation';
 import { searchAPI, SearchResponse } from '@/lib/search-api';
 

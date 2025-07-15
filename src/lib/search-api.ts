@@ -1,5 +1,10 @@
 // 搜索API接口定义和实现
 import { SearchResultItem, SearchFilters } from '@/hooks/useSearch';
+
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 import { searchResultsCache, debounceCache, performanceMonitor } from './search-cache';
 
 // 搜索响应类型

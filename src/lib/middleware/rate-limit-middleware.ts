@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 import { 
   checkRateLimit, 
   createRateLimitHeaders,

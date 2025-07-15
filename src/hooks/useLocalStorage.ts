@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 export function useLocalStorage<T>(
   key: string,
   initialValue: T

@@ -1,6 +1,11 @@
 // 表单验证规则库
 import { Rule } from 'antd/es/form';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 // 验证结果类型
 export interface ValidationResult {
   isValid: boolean;
