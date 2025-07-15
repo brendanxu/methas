@@ -22,7 +22,7 @@ async function main() {
     ])
 
     counts.forEach(({ table, count }) => {
-      console.log(`  ${table}: ${chalk.green(count)}`)
+      console.log(`  ${table}: ${chalk.green(count.toString())}`)
     })
 
     // 2. Recent activity check
