@@ -1,3 +1,14 @@
+
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logErrorLocal = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
 /**
  * Monitoring and Error Tracking
  * 
@@ -80,7 +91,7 @@ export function initializeErrorMonitoring() {
 export function logError(error: Error, context?: ErrorContext) {
   // Console logging for development
   if (process.env.NODE_ENV === 'development') {
-    logError('Error logged:', {
+    logErrorLocal('Error logged:', {
       message: error.message,
       stack: error.stack,
       context,
@@ -94,7 +105,7 @@ export function logError(error: Error, context?: ErrorContext) {
     Promise.resolve().then(() => {
       const Sentry = {
         withScope: (fn: any) => fn({ setTag: () => {} }),
-        captureException: (error: Error) => logError('Sentry fallback:', error),
+        captureException: (error: Error) => logErrorLocal('Sentry fallback:', error),
       };
         Sentry.withScope((scope: any) => {
           if (context) {
@@ -107,7 +118,7 @@ export function logError(error: Error, context?: ErrorContext) {
       })
       .catch(() => {
         // Fallback logging
-        logError('Monitoring service unavailable:', error);
+        logErrorLocal('Monitoring service unavailable:', error);
       });
   }
 }

@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { generateRobotsTxt } from '@/lib/seo/sitemap';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 export async function GET() {
   try {
     const robotsTxt = generateRobotsTxt();

@@ -3,6 +3,17 @@
 import { useCallback } from 'react';
 import { SearchResultItem } from './useSearch';
 
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 // 分析事件类型
 interface AnalyticsEvent {
   eventType: 'search' | 'click' | 'view' | 'exit';

@@ -6,6 +6,17 @@ import { contactFormSchema, ContactFormData } from './schemas';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { motion } from '@/lib/mock-framer-motion';
 
+// Production logging utilities
+const logInfo = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data ? JSON.stringify(data) : '');
+  }
+};
+
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 interface ContactFormProps {
   onSubmit?: (data: ContactFormData) => Promise<void>;
   onSubmitSuccess?: (data: ContactFormData) => void;

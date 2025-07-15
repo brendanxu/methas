@@ -7,7 +7,9 @@ const logError = (message: string, error?: any) => {
   console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
 };
 import { useSearchParams } from 'next/navigation'
-import { Card, Result, Button, Spin, Typography } from 'antd'
+import { Button, Spin, Typography } from '@/lib/antd-optimized'
+import Card from 'antd/lib/card'
+import Result from 'antd/lib/result'
 import { 
   CheckCircleOutlined, 
   CloseCircleOutlined, 

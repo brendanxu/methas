@@ -9,8 +9,8 @@ const logError = (message: string, error?: any) => {
 import dynamic from 'next/dynamic';
 
 // 动态导入以避免SSR问题
-const Result = dynamic(() => import('antd').then(mod => ({ default: mod.Result })), { ssr: false });
-const AntButton = dynamic(() => import('antd').then(mod => ({ default: mod.Button })), { ssr: false });
+const Result = dynamic(() => import('antd/lib/result'), { ssr: false });
+const AntButton = dynamic(() => import('antd/lib/button'), { ssr: false });
 const Button = dynamic(() => import('@/components/ui/Button').then(mod => ({ default: mod.Button })), { ssr: false });
 const SEOHead = dynamic(() => import('@/components/seo/SEOHead').then(mod => ({ default: mod.SEOHead })), { ssr: false });
 

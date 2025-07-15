@@ -1,6 +1,13 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+// Conditional bundle analyzer import to avoid deployment errors
+let withBundleAnalyzer;
+try {
+  withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+  });
+} catch (error) {
+  // Bundle analyzer not installed, use identity function
+  withBundleAnalyzer = (config) => config;
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -152,15 +159,19 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     });
 
-    // Bundle analysis in development
+    // Bundle analysis in development (conditional)
     if (dev && process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server',
-          openAnalyzer: true,
-        })
-      );
+      try {
+        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+        config.plugins.push(
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'server',
+            openAnalyzer: true,
+          })
+        );
+      } catch (error) {
+        console.warn('webpack-bundle-analyzer not installed, skipping bundle analysis');
+      }
     }
 
     return config;
