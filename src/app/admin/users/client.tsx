@@ -1,28 +1,25 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { Table, Button, Tag, Space, Modal, message, Input, Typography, Tooltip, Form, Select, Avatar } from 'antd'
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
-  KeyOutlined,
-  SearchOutlined,
-  UserOutlined,
-  MailOutlined
-} from '@ant-design/icons'
+import { useState } from 'react'
+import { Button, Typography, Modal, Form, Input, Select, message } from 'antd'
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
+import { useRouter } from 'next/navigation'
 import type { ColumnsType } from 'antd/es/table'
-import FileUpload from '@/components/ui/FileUpload'
+
+// 导入公共组件和工具
+import { AdminTable, ActionColumnUtils } from '@/components/admin/common/AdminTable'
+import { AdminFilters, FilterConfigs } from '@/components/admin/common/AdminFilters'
+import { useAdminTable, AdminTableConfigs, FilterUtils } from '@/hooks/admin/useAdminTable'
+import { TagRenderers, ColumnUtils, formatRelativeTime } from '@/lib/admin/admin-utils'
 
 const { Title } = Typography
-const { Search } = Input
 
 interface User {
   id: string
-  name: string | null
+  name: string
   email: string
   role: 'USER' | 'ADMIN' | 'SUPER_ADMIN'
-  emailVerified: Date | null
+  emailVerified: string | null
   image: string | null
   createdAt: string
   updatedAt: string
@@ -31,321 +28,223 @@ interface User {
   }
 }
 
-export default function UserManagementClient() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+export default function UsersManagementClient() {
+  const router = useRouter()
   const [createModalVisible, setCreateModalVisible] = useState(false)
   const [editModalVisible, setEditModalVisible] = useState(false)
+  const [viewModalVisible, setViewModalVisible] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [form] = Form.useForm()
-  const [editForm] = Form.useForm()
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 20,
-    total: 0
-  })
-  const [filters, setFilters] = useState({
-    role: undefined as string | undefined,
-    search: ''
-  })
 
-  const fetchUsers = useCallback(async (page = 1) => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.pageSize.toString(),
-        ...(filters.role && { role: filters.role }),
-        ...(filters.search && { search: filters.search })
-      })
+  // 使用统一的admin table hook
+  const {
+    data: users,
+    loading,
+    pagination,
+    filters,
+    fetchData,
+    setFilters,
+    updatePagination,
+    refresh,
+    handleDelete
+  } = useAdminTable<User>(AdminTableConfigs.users)
 
-      const response = await fetch(`/api/users?${params}`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users)
-        setPagination(prev => ({
-          ...prev,
-          current: page,
-          total: data.pagination.total
-        }))
-      } else {
-        message.error('获取用户列表失败')
-      }
-    } catch (error) {
-      message.error('网络错误，请稍后重试')
-    } finally {
-      setLoading(false)
-    }
-  }, [pagination.pageSize, filters.role, filters.search])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
-
-  const handleSearch = (value: string) => {
-    setFilters(prev => ({ ...prev, search: value }))
-    fetchUsers(1)
+  // 处理分页变化
+  const handlePageChange = (page: number, pageSize: number) => {
+    updatePagination({ current: page, pageSize })
+    fetchData(page)
   }
 
-  const handleCreateUser = async (values: any) => {
+  // 处理过滤器变化
+  const handleFiltersChange = (newFilters: Record<string, any>) => {
+    setFilters(newFilters)
+    fetchData(1) // 重置到第一页
+  }
+
+  // 查看用户详情
+  const handleView = (user: User) => {
+    setSelectedUser(user)
+    setViewModalVisible(true)
+  }
+
+  // 编辑用户
+  const handleEdit = (user: User) => {
+    setSelectedUser(user)
+    form.setFieldsValue({
+      name: user.name,
+      email: user.email,
+      role: user.role
+    })
+    setEditModalVisible(true)
+  }
+
+  // 删除用户
+  const handleDeleteUser = (user: User) => {
+    handleDelete(user.id, user.name, () => {
+      // 删除成功后的回调
+      message.success('用户删除成功')
+    })
+  }
+
+  // 创建用户
+  const handleCreate = () => {
+    form.resetFields()
+    setCreateModalVisible(true)
+  }
+
+  // 提交创建用户
+  const handleCreateSubmit = async (values: any) => {
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values)
       })
 
       if (response.ok) {
         message.success('用户创建成功')
         setCreateModalVisible(false)
         form.resetFields()
-        fetchUsers(pagination.current)
+        refresh()
       } else {
-        const error = await response.json()
-        message.error(error.error || '创建失败')
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || '创建失败')
       }
-    } catch (error) {
-      message.error('网络错误，请稍后重试')
+    } catch (error: any) {
+      message.error(error.message || '创建用户失败')
     }
   }
 
-  const handleUpdateUser = async (values: any) => {
+  // 提交编辑用户
+  const handleEditSubmit = async (values: any) => {
     if (!selectedUser) return
 
     try {
       const response = await fetch(`/api/users/${selectedUser.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values)
       })
 
       if (response.ok) {
         message.success('用户更新成功')
         setEditModalVisible(false)
-        editForm.resetFields()
-        fetchUsers(pagination.current)
+        setSelectedUser(null)
+        refresh()
       } else {
-        const error = await response.json()
-        message.error(error.error || '更新失败')
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || '更新失败')
       }
-    } catch (error) {
-      message.error('网络错误，请稍后重试')
+    } catch (error: any) {
+      message.error(error.message || '更新用户失败')
     }
   }
 
-  const handleDeleteUser = (user: User) => {
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定要删除用户 "${user.name || user.email}" 吗？此操作不可恢复。`,
-      okText: '删除',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: async () => {
-        try {
-          const response = await fetch(`/api/users/${user.id}`, {
-            method: 'DELETE'
-          })
-
-          if (response.ok) {
-            message.success('删除成功')
-            fetchUsers(pagination.current)
-          } else {
-            const error = await response.json()
-            message.error(error.error || '删除失败')
-          }
-        } catch (error) {
-          message.error('网络错误，请稍后重试')
-        }
-      }
-    })
-  }
-
-  const getRoleTag = (role: string) => {
-    const config = {
-      USER: { color: 'default', text: '普通用户' },
-      ADMIN: { color: 'blue', text: '管理员' },
-      SUPER_ADMIN: { color: 'purple', text: '超级管理员' }
-    }
-    const { color, text } = config[role as keyof typeof config] || { color: 'default', text: role }
-    return <Tag color={color}>{text}</Tag>
-  }
-
+  // 表格列配置
   const columns: ColumnsType<User> = [
-    {
-      title: '用户信息',
-      key: 'userInfo',
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <Avatar 
-            size={48}
-            src={record.image}
-            icon={<UserOutlined />}
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{record.name || '未设置姓名'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
-              <MailOutlined />
-              <span>{record.email}</span>
-              {record.emailVerified && (
-                <Tag color="green" className="ml-2">已验证</Tag>
-              )}
-            </div>
-          </div>
-        </div>
-      ),
-    },
+    ColumnUtils.idColumn,
+    ColumnUtils.nameColumn(),
+    ColumnUtils.emailColumn,
     {
       title: '角色',
       dataIndex: 'role',
       key: 'role',
       width: 120,
-      render: (role) => getRoleTag(role),
+      render: TagRenderers.userRole
+    },
+    {
+      title: '邮箱验证',
+      dataIndex: 'emailVerified',
+      key: 'emailVerified',
+      width: 100,
+      render: (verified: string | null) => verified ? '已验证' : '未验证'
     },
     {
       title: '内容数量',
+      dataIndex: ['_count', 'contents'],
       key: 'contentCount',
       width: 100,
-      render: (_, record) => (
-        <Tooltip title="该用户创建的内容数量">
-          <span>{record._count.contents}</span>
-        </Tooltip>
-      ),
+      sorter: (a, b) => a._count.contents - b._count.contents
     },
     {
-      title: '注册时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 180,
-      render: (date) => new Date(date).toLocaleString('zh-CN'),
+      title: '最后活动',
+      dataIndex: 'updatedAt',
+      key: 'lastActivity',
+      width: 120,
+      render: formatRelativeTime,
+      sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
     },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 180,
-      render: (_, record) => (
-        <Space>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setSelectedUser(record)
-              editForm.setFieldsValue({
-                name: record.name,
-                email: record.email,
-                role: record.role,
-                image: record.image,
-              })
-              setEditModalVisible(true)
-            }}
-          >
-            编辑
-          </Button>
-          <Button
-            type="link"
-            icon={<KeyOutlined />}
-            onClick={() => {
-              setSelectedUser(record)
-              editForm.resetFields()
-              editForm.setFieldsValue({ password: '' })
-              setEditModalVisible(true)
-            }}
-          >
-            重置密码
-          </Button>
-          <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteUser(record)}
-          >
-            删除
-          </Button>
-        </Space>
-      ),
-    },
-  ]
-
-  const roleOptions = [
-    { label: '全部角色', value: undefined },
-    { label: '普通用户', value: 'USER' },
-    { label: '管理员', value: 'ADMIN' },
-    { label: '超级管理员', value: 'SUPER_ADMIN' }
+    ColumnUtils.createdAtColumn,
+    ActionColumnUtils.buildActionColumn([
+      {
+        key: 'view',
+        label: '查看',
+        icon: <EyeOutlined />,
+        onClick: handleView
+      },
+      {
+        key: 'edit',
+        label: '编辑',
+        icon: <EditOutlined />,
+        onClick: handleEdit
+      },
+      {
+        key: 'delete',
+        label: '删除',
+        icon: <DeleteOutlined />,
+        danger: true,
+        onClick: handleDeleteUser
+      }
+    ])
   ]
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <Title level={2}>用户管理</Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setCreateModalVisible(true)}
-        >
-          新建用户
-        </Button>
-      </div>
-
-      <div className="mb-4 flex gap-4">
-        <Select
-          style={{ width: 150 }}
-          placeholder="选择角色"
-          value={filters.role}
-          onChange={(value) => setFilters(prev => ({ ...prev, role: value }))}
-          options={roleOptions}
-        />
-        <Search
-          placeholder="搜索用户名或邮箱..."
-          style={{ width: 300 }}
-          onSearch={handleSearch}
-          enterButton={<SearchOutlined />}
-        />
-      </div>
-
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="id"
-        loading={loading}
-        pagination={{
-          ...pagination,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-          onChange: (page, pageSize) => {
-            setPagination(prev => ({ ...prev, pageSize }))
-            fetchUsers(page)
-          },
+    <div className="p-6">
+      <Title level={2}>用户管理</Title>
+      
+      {/* 过滤器 */}
+      <AdminFilters
+        fields={FilterConfigs.users}
+        values={filters}
+        onChange={handleFiltersChange}
+        onReset={() => {
+          setFilters({})
+          fetchData(1)
         }}
       />
 
-      {/* 创建用户弹窗 */}
+      {/* 数据表格 */}
+      <AdminTable
+        data={users}
+        loading={loading}
+        pagination={pagination}
+        columns={columns}
+        onPageChange={handlePageChange}
+        onRefresh={refresh}
+        onAdd={handleCreate}
+        addButtonText="新建用户"
+        rowKey="id"
+      />
+
+      {/* 创建用户模态框 */}
       <Modal
-        title="新建用户"
+        title="创建用户"
         open={createModalVisible}
-        onCancel={() => {
-          setCreateModalVisible(false)
-          form.resetFields()
-        }}
+        onCancel={() => setCreateModalVisible(false)}
         footer={null}
+        width={600}
       >
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleCreateUser}
+          onFinish={handleCreateSubmit}
         >
           <Form.Item
             name="name"
             label="姓名"
             rules={[{ required: true, message: '请输入姓名' }]}
           >
-            <Input placeholder="请输入用户姓名" />
+            <Input placeholder="请输入姓名" />
           </Form.Item>
 
           <Form.Item
@@ -356,127 +255,147 @@ export default function UserManagementClient() {
               { type: 'email', message: '请输入有效的邮箱地址' }
             ]}
           >
-            <Input placeholder="user@example.com" />
+            <Input placeholder="请输入邮箱" />
           </Form.Item>
 
           <Form.Item
             name="password"
             label="密码"
-            rules={[
-              { required: true, message: '请输入密码' },
-              { min: 8, message: '密码至少8个字符' }
-            ]}
+            rules={[{ required: true, message: '请输入密码', min: 8 }]}
           >
-            <Input.Password placeholder="至少8个字符" />
+            <Input.Password placeholder="请输入密码（至少8位）" />
           </Form.Item>
 
           <Form.Item
             name="role"
             label="角色"
             rules={[{ required: true, message: '请选择角色' }]}
-            initialValue="USER"
           >
-            <Select>
-              <Select.Option value="USER">普通用户</Select.Option>
+            <Select placeholder="选择角色">
+              <Select.Option value="USER">用户</Select.Option>
               <Select.Option value="ADMIN">管理员</Select.Option>
               <Select.Option value="SUPER_ADMIN">超级管理员</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item>
-            <Space className="w-full justify-end">
-              <Button onClick={() => setCreateModalVisible(false)}>
-                取消
-              </Button>
-              <Button type="primary" htmlType="submit">
-                创建
-              </Button>
-            </Space>
+          <Form.Item className="mb-0 text-right">
+            <Button onClick={() => setCreateModalVisible(false)} className="mr-2">
+              取消
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              创建
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* 编辑用户弹窗 */}
+      {/* 编辑用户模态框 */}
       <Modal
         title="编辑用户"
         open={editModalVisible}
-        onCancel={() => {
-          setEditModalVisible(false)
-          editForm.resetFields()
-          setSelectedUser(null)
-        }}
+        onCancel={() => setEditModalVisible(false)}
         footer={null}
+        width={600}
       >
         <Form
-          form={editForm}
+          form={form}
           layout="vertical"
-          onFinish={handleUpdateUser}
+          onFinish={handleEditSubmit}
         >
-          <Form.Item
-            name="image"
-            label="头像"
-          >
-            <FileUpload
-              category="avatar"
-              accept="image/*"
-              maxSize={2}
-              showPreview={true}
-            />
-          </Form.Item>
-
           <Form.Item
             name="name"
             label="姓名"
+            rules={[{ required: true, message: '请输入姓名' }]}
           >
-            <Input placeholder="请输入用户姓名" />
+            <Input placeholder="请输入姓名" />
           </Form.Item>
 
           <Form.Item
             name="email"
             label="邮箱"
             rules={[
+              { required: true, message: '请输入邮箱' },
               { type: 'email', message: '请输入有效的邮箱地址' }
             ]}
           >
-            <Input placeholder="user@example.com" />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label="新密码"
-            rules={[
-              { min: 8, message: '密码至少8个字符' }
-            ]}
-          >
-            <Input.Password placeholder="留空则不修改密码" />
+            <Input placeholder="请输入邮箱" />
           </Form.Item>
 
           <Form.Item
             name="role"
             label="角色"
+            rules={[{ required: true, message: '请选择角色' }]}
           >
-            <Select>
-              <Select.Option value="USER">普通用户</Select.Option>
+            <Select placeholder="选择角色">
+              <Select.Option value="USER">用户</Select.Option>
               <Select.Option value="ADMIN">管理员</Select.Option>
               <Select.Option value="SUPER_ADMIN">超级管理员</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item>
-            <Space className="w-full justify-end">
-              <Button onClick={() => {
-                setEditModalVisible(false)
-                editForm.resetFields()
-                setSelectedUser(null)
-              }}>
-                取消
-              </Button>
-              <Button type="primary" htmlType="submit">
-                更新
-              </Button>
-            </Space>
+          <Form.Item className="mb-0 text-right">
+            <Button onClick={() => setEditModalVisible(false)} className="mr-2">
+              取消
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              更新
+            </Button>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* 查看用户详情模态框 */}
+      <Modal
+        title="用户详情"
+        open={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={600}
+      >
+        {selectedUser && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">ID</label>
+                <div className="mt-1 text-sm text-gray-900">{selectedUser.id}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">姓名</label>
+                <div className="mt-1 text-sm text-gray-900">{selectedUser.name}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">邮箱</label>
+                <div className="mt-1 text-sm text-gray-900">{selectedUser.email}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">角色</label>
+                <div className="mt-1">{TagRenderers.userRole(selectedUser.role)}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">邮箱验证</label>
+                <div className="mt-1 text-sm text-gray-900">
+                  {selectedUser.emailVerified ? '已验证' : '未验证'}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">内容数量</label>
+                <div className="mt-1 text-sm text-gray-900">{selectedUser._count.contents}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">创建时间</label>
+                <div className="mt-1 text-sm text-gray-900">{formatRelativeTime(selectedUser.createdAt)}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">更新时间</label>
+                <div className="mt-1 text-sm text-gray-900">{formatRelativeTime(selectedUser.updatedAt)}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )
