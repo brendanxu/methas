@@ -37,6 +37,11 @@ import {
   logFormError,
 } from '@/lib/form-validation';
 
+// Production logging utilities
+const logError = (message: string, error?: any) => {
+  console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
+};
+
 const { Text, Title } = Typography;
 
 export interface NewsletterFormProps {
