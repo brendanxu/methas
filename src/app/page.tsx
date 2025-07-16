@@ -67,22 +67,6 @@ export default function Home() {
             <SuccessStories />
           </ComponentPreloader>
           
-          {/* Additional content for scroll testing */}
-          <div className="bg-muted py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-3xl font-bold mb-8">{t('home:sections.ourImpact')}</h2>
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-background rounded-lg p-6 shadow-soft">
-                    <h3 className="text-lg font-semibold mb-2">{t('home:sections.impactStory')} {i}</h3>
-                    <p className="text-muted-foreground">
-                      {t('home:content.impactDescription')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
     </>
   );

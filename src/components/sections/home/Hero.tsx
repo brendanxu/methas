@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import {  motion, useAnimation, useInView  } from '@/lib/mock-framer-motion';
-import { Statistic } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
-import { formatNumber } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 // TypeScript type definitions
@@ -19,8 +17,6 @@ export interface HeroProps {
   backgroundImage?: string;
   /** Background video URL */
   backgroundVideo?: string;
-  /** Enable statistics section */
-  showStatistics?: boolean;
   /** Custom CTA button text */
   primaryCTAText?: string;
   /** Custom secondary CTA text */
@@ -33,24 +29,15 @@ export interface HeroProps {
   className?: string;
 }
 
-// Statistics data interface
-interface StatisticData {
-  value: number;
-  title: string;
-  suffix?: string;
-  prefix?: string;
-  icon: React.ReactNode;
-}
 
 /**
  * Hero - Full-screen hero section for homepage based on Tailwind UI Salient design
- * Features split layout, gradient text, animations, and integrated statistics
+ * Features split layout, gradient text, and animations
  */
 export const Hero: React.FC<HeroProps> = ({
   backgroundType = 'image',
   backgroundImage = 'https://images.unsplash.com/photo-1569163139394-de4e4f43e4e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
   backgroundVideo,
-  showStatistics = true,
   primaryCTAText,
   secondaryCTAText,
   onPrimaryCTA,
@@ -64,49 +51,6 @@ export const Hero: React.FC<HeroProps> = ({
   const [heroRef, isInView] = useInView({ once: true });
   const controls = useAnimation();
 
-  // Statistics data with translations
-  const statisticsData: StatisticData[] = [
-    {
-      value: 1000,
-      title: t('home:hero.stats.projects'),
-      suffix: '+',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-        </svg>
-      ),
-    },
-    {
-      value: 50000000,
-      title: t('home:hero.stats.emissions'),
-      suffix: '+',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      value: 100,
-      title: t('home:hero.stats.countries'),
-      suffix: '+',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      value: 5000,
-      title: t('home:hero.stats.clients'),
-      suffix: '+',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-    },
-  ];
 
   // Animation variants
   const containerVariants = {
@@ -139,15 +83,6 @@ export const Hero: React.FC<HeroProps> = ({
     }
   }, [isInView, controls]);
 
-  // Custom statistic formatter with abbreviations
-  const formatStatistic = (value: number, suffix?: string) => {
-    if (value >= 1000000) {
-      return `${formatNumber(value / 1000000, { maximumFractionDigits: 0 })}M${suffix || ''}`;
-    } else if (value >= 1000) {
-      return `${formatNumber(value / 1000, { maximumFractionDigits: 0 })}K${suffix || ''}`;
-    }
-    return `${formatNumber(value)}${suffix || ''}`;
-  };
 
   // Render background
   const renderBackground = () => {
@@ -405,48 +340,6 @@ export const Hero: React.FC<HeroProps> = ({
           </motion.div>
         </div>
 
-        {/* Statistics section */}
-        {showStatistics && (
-          <motion.div
-            className="mt-20 pt-12 border-t border-white/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {statisticsData.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  className="text-center text-white"
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.9 }}
-                  transition={{ duration: 0.6, delay: 1.4 + index * 0.1 }}
-                >
-                  <div className="flex items-center justify-center mb-3">
-                    <div 
-                      className="p-3 rounded-lg"
-                      style={{ backgroundColor: 'rgba(96, 165, 250, 0.2)' }}
-                    >
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <div className="text-3xl md:text-4xl font-bold mb-2">
-                    <Statistic
-                      value={stat.value}
-                      formatter={(value) => formatStatistic(Number(value), stat.suffix)}
-                      valueStyle={{
-                        color: '#FFFFFF',
-                        fontSize: 'inherit',
-                        fontWeight: 'bold',
-                      }}
-                    />
-                  </div>
-                  <p className="text-gray-300 font-medium">{stat.title}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
       </div>
 
       {/* Scroll indicator */}
