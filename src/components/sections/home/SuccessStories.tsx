@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion, Stagger, Magnetic } from '@/lib/modern-animations';
 import { Button } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 
@@ -110,37 +111,61 @@ export default function SuccessStories() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* 标题部分 */}
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-foreground mb-4">
+      {/* 标题部分 - 现代化动画 */}
+      <motion.div 
+        className="text-center mb-12"
+        initial="hidden"
+        whileInView="fadeIn"
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <motion.h2 
+          className="text-4xl font-bold text-foreground mb-4 text-gradient-modern animate-modern-slide-up"
+          initial="hidden"
+          whileInView="slideUp"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
           Success Stories
-        </h2>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        </motion.h2>
+        <motion.p 
+          className="text-xl text-muted-foreground max-w-2xl mx-auto animate-modern-fade-in animate-delay-400"
+          initial="hidden"
+          whileInView="fadeIn"
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+        >
           看看我们如何帮助企业实现可持续发展
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
-      {/* 筛选标签 */}
-      <div className="flex flex-wrap justify-center gap-3 mb-12">
+      {/* 筛选标签 - 错列动画 */}
+      <Stagger
+        staggerDelay={100}
+        initial="hiddenScale"
+        animate="scaleIn"
+        className="flex flex-wrap justify-center gap-3 mb-12"
+      >
         {filterTags.map((tag) => (
-          <Button
-            key={tag.key}
-            type={activeFilter === tag.key ? 'primary' : 'default'}
-            size="large"
-            className={`filter-tag rounded-full px-6 py-2 font-medium ${
-              activeFilter === tag.key
-                ? 'bg-primary text-white border-primary shadow-lg'
-                : 'bg-muted text-muted-foreground border-border hover:bg-muted-hover'
-            }`}
-            onClick={() => {
-              setActiveFilter(tag.key);
-              setCurrentIndex(0); // 重置索引
-            }}
-          >
-            {tag.label}
-          </Button>
+          <Magnetic key={tag.key} strength={0.1}>
+            <Button
+              type={activeFilter === tag.key ? 'primary' : 'default'}
+              size="large"
+              className={`filter-tag rounded-full px-6 py-2 font-medium btn-modern hover-lift ${
+                activeFilter === tag.key
+                  ? 'bg-primary text-white border-primary shadow-lg animate-modern-glow'
+                  : 'bg-muted text-muted-foreground border-border hover:bg-muted-hover'
+              }`}
+              onClick={() => {
+                setActiveFilter(tag.key);
+                setCurrentIndex(0); // 重置索引
+              }}
+            >
+              {tag.label}
+            </Button>
+          </Magnetic>
         ))}
-      </div>
+      </Stagger>
 
       {/* 案例卡片展示区 */}
       <div className="relative">
@@ -162,18 +187,29 @@ export default function SuccessStories() {
           </>
         )}
 
-        {/* 案例卡片网格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-8">
+        {/* 案例卡片网格 - 现代动画 */}
+        <Stagger
+          staggerDelay={150}
+          initial="hiddenScale"
+          animate="scaleIn"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-8"
+        >
           {visibleStories.map((story, index) => (
-            <div
-              key={`${story.id}-${activeFilter}`}
-              className="success-stories-card bg-card rounded-lg shadow-soft border border-border overflow-hidden"
-            >
-              {/* 图片占位区域 */}
-              <div className="h-48 bg-muted rounded-t-lg flex items-center justify-center">
-                <div className="text-6xl text-muted-foreground opacity-50">
+            <Magnetic key={`${story.id}-${activeFilter}`} strength={0.05}>
+              <motion.div
+                className="success-stories-card bg-card rounded-lg shadow-soft border border-border overflow-hidden card-modern hover-lift"
+                whileHover="lift"
+                whileTap="tap"
+                transition={{ duration: 0.3 }}
+              >
+              {/* 图片占位区域 - 现代化 */}
+              <div className="h-48 bg-muted rounded-t-lg flex items-center justify-center gradient-modern-secondary gradient-animated overflow-hidden relative">
+                <div className="text-6xl text-white opacity-80 animate-modern-float">
                   📊
                 </div>
+                {/* 装饰元素 */}
+                <div className="absolute top-4 right-4 w-3 h-3 bg-white/30 rounded-full animate-modern-pulse"></div>
+                <div className="absolute bottom-4 left-4 w-2 h-2 bg-white/20 rounded-full animate-modern-bounce"></div>
               </div>
 
               {/* 卡片内容 */}
@@ -192,11 +228,11 @@ export default function SuccessStories() {
                   {story.title}
                 </h3>
 
-                {/* 数据展示 */}
-                <div className="mb-4 p-4 bg-muted rounded-lg">
+                {/* 数据展示 - 现代化 */}
+                <div className="mb-4 p-4 bg-muted rounded-lg glass-morphism">
                   <div className="flex justify-between items-center text-center">
-                    <div>
-                      <div className="text-2xl font-bold text-primary">
+                    <div className="animate-modern-fade-in">
+                      <div className="text-2xl font-bold text-primary animate-modern-glow">
                         {story.co2Reduction}
                       </div>
                       <div className="text-sm text-muted-foreground">
@@ -204,8 +240,8 @@ export default function SuccessStories() {
                       </div>
                     </div>
                     <div className="w-px h-8 bg-border"></div>
-                    <div>
-                      <div className="text-2xl font-bold text-secondary">
+                    <div className="animate-modern-fade-in animate-delay-200">
+                      <div className="text-2xl font-bold text-secondary animate-modern-glow">
                         {story.energySaving}
                       </div>
                       <div className="text-sm text-muted-foreground">
@@ -220,31 +256,40 @@ export default function SuccessStories() {
                   {story.description}
                 </p>
 
-                {/* 查看详情按钮 */}
+                {/* 查看详情按钮 - 现代化 */}
                 <Button
                   type="link"
-                  className="p-0 text-primary hover:text-primary-hover font-medium"
+                  className="p-0 text-primary hover:text-primary-hover font-medium btn-modern hover-glow"
                   icon={<ArrowRightOutlined className="ml-1" />}
                   iconPosition="end"
                 >
                   查看详情
                 </Button>
               </div>
-            </div>
+            </motion.div>
+            </Magnetic>
           ))}
-        </div>
+        </Stagger>
       </div>
 
-      {/* 查看所有案例按钮 */}
-      <div className="text-center mt-12">
-        <Button
-          type="primary"
-          size="large"
-          className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-lg font-medium shadow-lg"
-        >
-          查看所有案例
-        </Button>
-      </div>
+      {/* 查看所有案例按钮 - 现代化 */}
+      <motion.div 
+        className="text-center mt-12"
+        initial="hiddenScale"
+        whileInView="scaleIn"
+        transition={{ duration: 0.6, delay: 0.3 }}
+        viewport={{ once: true }}
+      >
+        <Magnetic strength={0.2}>
+          <Button
+            type="primary"
+            size="large"
+            className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-lg font-medium shadow-lg btn-modern hover-glow animate-modern-pulse"
+          >
+            查看所有案例
+          </Button>
+        </Magnetic>
+      </motion.div>
     </div>
   );
 }

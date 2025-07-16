@@ -141,6 +141,24 @@ export const DynamicHomeHero = dynamic(() => import('@/components/sections/home/
   )
 });
 
+// Enhanced Hero with video background (Southpole.com style)
+export const DynamicEnhancedHero = dynamic(() => import('@/components/sections/home/EnhancedHero'), {
+  ssr: true,
+  loading: () => (
+    <div className="min-h-screen bg-black animate-pulse">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/30 to-black/60"></div>
+      <div className="relative z-10 flex h-full items-center justify-center px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="h-16 bg-white/20 rounded w-4/5 mx-auto mb-6"></div>
+          <div className="h-8 bg-white/15 rounded w-3/4 mx-auto mb-6"></div>
+          <div className="h-6 bg-white/10 rounded w-full mx-auto mb-8"></div>
+          <div className="h-12 bg-white/20 rounded w-32 mx-auto"></div>
+        </div>
+      </div>
+    </div>
+  )
+});
+
 // Service components
 export const DynamicServices = dynamic(() => import('@/components/sections/home/Services').then(mod => ({ default: mod.Services })), {
   ssr: false,
@@ -315,6 +333,7 @@ const dynamicImports = {
   // Custom Components
   DynamicHero,
   DynamicHomeHero,
+  DynamicEnhancedHero,
   DynamicServices,
   DynamicCaseStudies,
   DynamicSuccessStories,

@@ -9,7 +9,9 @@ import {
   LogoutOutlined,
   BgColorsOutlined,
   MenuFoldOutlined,
-  MenuUnfoldOutlined
+  MenuUnfoldOutlined,
+  FileTextOutlined,
+  FolderOpenOutlined
 } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -31,6 +33,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       key: '/admin',
       icon: <DashboardOutlined />,
       label: <Link href="/admin">Dashboard</Link>,
+    },
+    {
+      key: '/admin/content',
+      icon: <FileTextOutlined />,
+      label: <Link href="/admin/content">Content Management</Link>,
+    },
+    {
+      key: '/admin/files',
+      icon: <FolderOpenOutlined />,
+      label: <Link href="/admin/files">File Management</Link>,
     },
     {
       key: '/admin/theme-system',

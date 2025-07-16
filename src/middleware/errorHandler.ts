@@ -100,3 +100,42 @@ export class ForbiddenError extends Error {
     this.name = 'ForbiddenError';
   }
 }
+
+// Additional utility functions for API handling
+export function createApiError(message: string, statusCode: number = 500, code?: string): Error {
+  const error = new Error(message);
+  error.name = 'ApiError';
+  (error as any).statusCode = statusCode;
+  (error as any).code = code;
+  return error;
+}
+
+export async function validateRequestBody<T>(
+  request: NextRequest,
+  validator: (data: any) => data is T
+): Promise<T> {
+  try {
+    const body = await request.json();
+    if (!validator(body)) {
+      throw new ValidationError('Invalid request body format');
+    }
+    return body;
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+    throw new ValidationError('Invalid JSON in request body');
+  }
+}
+
+export function createApiHandler(
+  handler: (request: NextRequest) => Promise<NextResponse>
+) {
+  return async (request: NextRequest): Promise<NextResponse> => {
+    try {
+      return await handler(request);
+    } catch (error) {
+      return errorHandler(error as Error, request);
+    }
+  };
+}
