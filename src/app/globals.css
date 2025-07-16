@@ -393,6 +393,49 @@ body {
   outline-offset: 2px !important;
 }
 
+/* Success Stories Component Styles */
+.success-stories-card {
+  transition: all var(--animation-duration) var(--animation-timing);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: var(--shadow-soft);
+}
+
+.success-stories-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.filter-tag {
+  transition: all var(--animation-duration) var(--animation-timing);
+  border: 1px solid var(--border);
+}
+
+.filter-tag:hover {
+  transform: translateY(-1px);
+}
+
+.industry-tag {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Utility classes */
 .container {
   width: 100%;

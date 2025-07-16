@@ -180,6 +180,30 @@ export const DynamicCaseStudies = dynamic(() => import('@/components/sections/ho
   )
 });
 
+export const DynamicSuccessStories = dynamic(() => import('@/components/sections/home/SuccessStories'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="h-10 bg-gray-200 rounded-full w-16"></div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3].map(i => (
+            <CardLoading key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+});
+
 // Demo pages (non-critical)
 export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase').then(mod => ({ default: mod.ThemeShowcase })), {
   ssr: false,
@@ -297,6 +321,7 @@ const dynamicImports = {
   DynamicHomeHero,
   DynamicServices,
   DynamicCaseStudies,
+  DynamicSuccessStories,
   DynamicThemeShowcase,
   
   // Utilities

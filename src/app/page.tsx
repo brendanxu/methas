@@ -8,6 +8,7 @@ import {
   DynamicServices,
   DynamicCaseStudies 
 } from '@/lib/dynamic-imports';
+import SuccessStories from '@/components/sections/home/SuccessStories';
 import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_SEO } from '@/lib/seo-config';
@@ -56,20 +57,15 @@ export default function Home() {
             <DynamicThemeShowcase />
           </ComponentPreloader>
           
-          {/* Test content to verify scroll effects */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <h2 className="text-3xl font-bold mb-8">{t('home:sections.climateSolutions')}</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-card rounded-lg p-6 shadow-soft border border-border">
-                  <h3 className="text-xl font-semibold mb-4">{t('home:sections.solution')} {i}</h3>
-                  <p className="text-muted-foreground">
-                    {t('home:content.solutionDescription')}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Success Stories Section */}
+          <ComponentPreloader
+            importFn={() => import('@/components/sections/home/SuccessStories')}
+            componentName="SuccessStories"
+            trigger="scroll"
+            scrollThreshold={60}
+          >
+            <SuccessStories />
+          </ComponentPreloader>
           
           {/* Additional content for scroll testing */}
           <div className="bg-muted py-16">
