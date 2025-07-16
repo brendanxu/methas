@@ -46,12 +46,32 @@ interface MegaMenuProps {
 // 智能鼠标移动检测
 const useMouseMovement = (callback: () => void, delay: number = 300) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const isHovering = useRef(false);
+  const elementRef = useRef<HTMLElement>();
   
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(callback, delay);
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    isHovering.current = false;
+    
+    // 检查鼠标是否真的离开了MegaMenu区域
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const { clientX, clientY } = e;
+    
+    // 如果鼠标移动到header区域，不关闭菜单
+    const inBounds = clientX >= rect.left && clientX <= rect.right && 
+                    clientY >= rect.top - 100 && clientY <= rect.bottom + 20; // 增加header区域容错
+    
+    if (!inBounds) {
+      timeoutRef.current = setTimeout(() => {
+        if (!isHovering.current) {
+          callback();
+        }
+      }, delay);
+    }
   };
   
   const handleMouseEnter = () => {
+    isHovering.current = true;
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -188,24 +208,29 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
       <motion.div
         key={menuKey}
         className={cn(
-          'absolute top-full left-0 w-full z-50 border-t border-border/50',
+          'absolute top-full left-0 w-full z-50',
+          'border-t border-border/30 shadow-2xl shadow-black/10',
           className
         )}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -20, scale: 0.98 }}
         transition={{ 
-          duration: settings.reducedMotion ? 0 : 0.2,
+          duration: settings.reducedMotion ? 0 : 0.3,
           ease: [0.4, 0, 0.2, 1]
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* 背景和模糊效果 */}
-        <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" />
+        {/* 增强的背景效果 */}
+        <div className="absolute inset-0 bg-background/98 backdrop-blur-2xl" />
         
-        {/* 装饰性渐变 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        {/* 多层装饰渐变 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/8 via-primary/2 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/1 to-transparent" />
+        
+        {/* 顶部光晕效果 */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
         {/* 主要内容 */}
         <div className="relative">
@@ -217,11 +242,12 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                   {sections.map((section, index) => (
                     <motion.div
                       key={section.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ 
-                        duration: settings.reducedMotion ? 0 : 0.3,
-                        delay: settings.reducedMotion ? 0 : index * 0.1
+                        duration: settings.reducedMotion ? 0 : 0.4,
+                        delay: settings.reducedMotion ? 0 : index * 0.1,
+                        ease: [0.4, 0, 0.2, 1]
                       }}
                       className="space-y-4"
                     >
@@ -232,11 +258,12 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                         {section.links.map((link, linkIndex) => (
                           <motion.div
                             key={link.href}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, x: -30, scale: 0.9 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
                             transition={{ 
-                              duration: settings.reducedMotion ? 0 : 0.2,
-                              delay: settings.reducedMotion ? 0 : (index * 0.1) + (linkIndex * 0.05)
+                              duration: settings.reducedMotion ? 0 : 0.3,
+                              delay: settings.reducedMotion ? 0 : (index * 0.1) + (linkIndex * 0.05),
+                              ease: [0.4, 0, 0.2, 1]
                             }}
                           >
                             <MegaMenuItem item={link} onClose={onClose} />
@@ -272,11 +299,12 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                       {features.map((feature, index) => (
                         <motion.div
                           key={feature.id}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
+                          initial={{ opacity: 0, x: 30, scale: 0.9 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
                           transition={{ 
-                            duration: settings.reducedMotion ? 0 : 0.3,
-                            delay: settings.reducedMotion ? 0 : 0.2 + (index * 0.1)
+                            duration: settings.reducedMotion ? 0 : 0.4,
+                            delay: settings.reducedMotion ? 0 : 0.2 + (index * 0.1),
+                            ease: [0.4, 0, 0.2, 1]
                           }}
                         >
                           <MegaMenuFeature feature={feature} onClose={onClose} />
@@ -290,8 +318,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
           </div>
         </div>
         
-        {/* 底部装饰线 */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        {/* 底部装饰线和阴影 */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <div className="h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          <div className="h-2 bg-gradient-to-b from-primary/5 to-transparent" />
+        </div>
       </motion.div>
     </AnimatePresence>
   );

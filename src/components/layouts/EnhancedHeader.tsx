@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from '@/lib/mock-framer-motion';
+import { motion, AnimatePresence } from '@/lib/modern-animations';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -59,6 +59,7 @@ const mainNavItems: NavItem[] = [
 const useSmartHover = (onOpen: () => void, onClose: () => void) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const isHovering = useRef(false);
+  const elementRef = useRef<HTMLElement>();
   
   const handleMouseEnter = () => {
     isHovering.current = true;
@@ -68,13 +69,25 @@ const useSmartHover = (onOpen: () => void, onClose: () => void) => {
     onOpen();
   };
   
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (e: React.MouseEvent) => {
     isHovering.current = false;
-    timeoutRef.current = setTimeout(() => {
-      if (!isHovering.current) {
-        onClose();
-      }
-    }, 150);
+    
+    // 检查鼠标是否真的离开了元素区域
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const { clientX, clientY } = e;
+    
+    // 如果鼠标在元素边界内，不关闭菜单
+    const inBounds = clientX >= rect.left && clientX <= rect.right && 
+                    clientY >= rect.top && clientY <= rect.bottom + 20; // 增加20px的容错区域
+    
+    if (!inBounds) {
+      timeoutRef.current = setTimeout(() => {
+        if (!isHovering.current) {
+          onClose();
+        }
+      }, 300); // 增加延迟时间
+    }
   };
   
   useEffect(() => {
@@ -169,10 +182,16 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
   // 获取当前激活的菜单数据
   const getActiveMegaMenuData = () => {
     const activeItem = mainNavItems.find(item => item.id === activeMegaMenu);
-    if (activeItem && activeItem.submenuKey) {
-      return navigationMenuData[activeItem.submenuKey];
+    if (activeItem && activeItem.submenuKey && navigationMenuData[activeItem.submenuKey]) {
+      const menuData = navigationMenuData[activeItem.submenuKey];
+      // 确保数据结构完整
+      return {
+        sections: menuData.sections || [],
+        features: menuData.features || []
+      };
     }
-    return null;
+    // 返回默认空数据而不是null
+    return { sections: [], features: [] };
   };
 
   return (
@@ -358,16 +377,19 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
 
         {/* MegaMenu */}
         <AnimatePresence>
-          {activeMegaMenu && (
-            <MegaMenu
-              key={activeMegaMenu}
-              menuKey={activeMegaMenu}
-              sections={getActiveMegaMenuData()?.sections || []}
-              features={getActiveMegaMenuData()?.features || []}
-              isOpen={!!activeMegaMenu}
-              onClose={closeMegaMenu}
-            />
-          )}
+          {activeMegaMenu && (() => {
+            const menuData = getActiveMegaMenuData();
+            return (
+              <MegaMenu
+                key={activeMegaMenu}
+                menuKey={activeMegaMenu}
+                sections={menuData.sections}
+                features={menuData.features}
+                isOpen={!!activeMegaMenu}
+                onClose={closeMegaMenu}
+              />
+            );
+          })()}
         </AnimatePresence>
       </motion.header>
 
