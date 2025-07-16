@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useI18n } from '@/hooks/useI18n';
 import { Button } from 'antd';
-import { ArrowLeftOutlined, ArrowRightOutlined, ArrowRightOutlined as ArrowIcon } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Motion, AnimatedCard } from '@/components/animations/EnhancedMotion';
 
 // 筛选标签数据
@@ -232,7 +232,7 @@ export default function SuccessStories() {
                 <Button
                   type="link"
                   className="p-0 text-primary hover:text-primary-hover font-medium"
-                  icon={<ArrowIcon className="ml-1" />}
+                  icon={<ArrowRightOutlined className="ml-1" />}
                   iconPosition="end"
                 >
                   查看详情

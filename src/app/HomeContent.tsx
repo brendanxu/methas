@@ -9,6 +9,7 @@ import {
   DynamicCaseStudies,
   DynamicSuccessStories
 } from '@/lib/dynamic-imports';
+import SuccessStories from '@/components/sections/home/SuccessStories';
 import { ClientOnlyComponentPreloader } from '@/components/optimization/ClientOnlyComponentPreloader';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_SEO } from '@/lib/seo-config';
@@ -81,14 +82,9 @@ export default function HomeContent() {
           <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
             <p className="text-lg text-muted-foreground">Failed to load success stories section</p>
           </div>}>
-            <ClientOnlyComponentPreloader
-              importFn={() => import('@/components/sections/home/SuccessStories')}
-              componentName="SuccessStories"
-              trigger="scroll"
-              scrollThreshold={60}
-            >
-              <DynamicSuccessStories />
-            </ClientOnlyComponentPreloader>
+            <Motion.div whileInView="slideUp">
+              <SuccessStories />
+            </Motion.div>
           </ErrorBoundary>
           
           {/* Our Impact Section with Enhanced Animations */}
