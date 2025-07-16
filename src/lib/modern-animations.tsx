@@ -8,6 +8,7 @@ interface AnimationConfig {
   duration?: number;
   delay?: number;
   easing?: string;
+  ease?: string | number[]; // 支持Framer Motion格式
   fill?: FillMode;
   iterations?: number;
 }
@@ -21,6 +22,7 @@ interface MotionProps {
   onHoverEnd?: () => void;
   initial?: keyof typeof animationPresets | object;
   animate?: keyof typeof animationPresets | object;
+  exit?: keyof typeof animationPresets | object;
   whileHover?: keyof typeof animationPresets | object;
   whileTap?: keyof typeof animationPresets | object;
   whileInView?: keyof typeof animationPresets | object;
@@ -32,38 +34,42 @@ interface MotionProps {
 // ===== Animation Presets =====
 
 const animationPresets = {
-  // Entrance animations
-  fadeIn: { opacity: 1, transform: 'translateY(0px)' },
-  slideUp: { opacity: 1, transform: 'translateY(0px)' },
-  slideDown: { opacity: 1, transform: 'translateY(0px)' },
-  slideLeft: { opacity: 1, transform: 'translateX(0px)' },
-  slideRight: { opacity: 1, transform: 'translateX(0px)' },
-  scaleIn: { opacity: 1, transform: 'scale(1)' },
-  rotateIn: { opacity: 1, transform: 'rotate(0deg)' },
+  // Entrance animations (final states)
+  fadeIn: { opacity: 1, y: 0 },
+  slideUp: { opacity: 1, y: 0 },
+  slideDown: { opacity: 1, y: 0 },
+  slideLeft: { opacity: 1, x: 0 },
+  slideRight: { opacity: 1, x: 0 },
+  scaleIn: { opacity: 1, scale: 1 },
+  rotateIn: { opacity: 1, rotate: 0 },
   
   // Exit animations
-  fadeOut: { opacity: 0, transform: 'translateY(-20px)' },
-  slideUpOut: { opacity: 0, transform: 'translateY(-30px)' },
-  slideDownOut: { opacity: 0, transform: 'translateY(30px)' },
-  scaleOut: { opacity: 0, transform: 'scale(0.8)' },
+  fadeOut: { opacity: 0, y: -20 },
+  slideUpOut: { opacity: 0, y: -30 },
+  slideDownOut: { opacity: 0, y: 30 },
+  slideLeftOut: { opacity: 0, x: -30 },
+  slideRightOut: { opacity: 0, x: 30 },
+  scaleOut: { opacity: 0, scale: 0.8 },
   
   // Hover animations
-  lift: { transform: 'translateY(-8px) scale(1.02)', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' },
-  glow: { boxShadow: '0 0 30px rgba(74, 158, 255, 0.4)', transform: 'scale(1.05)' },
+  lift: { y: -8, scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' },
+  glow: { boxShadow: '0 0 30px rgba(74, 158, 255, 0.4)', scale: 1.05 },
   tilt: { transform: 'perspective(1000px) rotateX(5deg) rotateY(5deg) translateY(-10px)' },
   
   // Tap animations
-  tap: { transform: 'scale(0.95)' },
-  bounce: { transform: 'scale(1.1)' },
+  tap: { scale: 0.95 },
+  bounce: { scale: 1.1 },
   
   // Initial states
-  hidden: { opacity: 0, transform: 'translateY(30px)' },
-  hiddenLeft: { opacity: 0, transform: 'translateX(-30px)' },
-  hiddenRight: { opacity: 0, transform: 'translateX(30px)' },
-  hiddenScale: { opacity: 0, transform: 'scale(0.8)' },
+  hidden: { opacity: 0, y: 30 },
+  hiddenLeft: { opacity: 0, x: -30 },
+  hiddenRight: { opacity: 0, x: 30 },
+  hiddenScale: { opacity: 0, scale: 0.8 },
+  hiddenUp: { opacity: 0, y: -20 },
+  hiddenDown: { opacity: 0, y: 20 },
   
   // Loading states
-  pulse: { transform: 'scale(1.05)', opacity: 0.8 },
+  pulse: { scale: 1.05, opacity: 0.8 },
   shimmer: { backgroundPosition: '200% 0' },
 };
 
@@ -105,29 +111,67 @@ export const useInView = (options: { once?: boolean; margin?: string } = {}) => 
 // ===== Animation Utilities =====
 
 const createKeyframes = (initial: any, animate: any): Keyframe[] => {
+  // 处理transform属性
+  const buildTransform = (obj: any) => {
+    const transforms = [];
+    if (obj.x !== undefined) transforms.push(`translateX(${obj.x}px)`);
+    if (obj.y !== undefined) transforms.push(`translateY(${obj.y}px)`);
+    if (obj.scale !== undefined) transforms.push(`scale(${obj.scale})`);
+    if (obj.rotate !== undefined) transforms.push(`rotate(${obj.rotate}deg)`);
+    if (obj.rotateX !== undefined) transforms.push(`rotateX(${obj.rotateX}deg)`);
+    if (obj.rotateY !== undefined) transforms.push(`rotateY(${obj.rotateY}deg)`);
+    if (obj.skewX !== undefined) transforms.push(`skewX(${obj.skewX}deg)`);
+    if (obj.skewY !== undefined) transforms.push(`skewY(${obj.skewY}deg)`);
+    if (obj.transform) transforms.push(obj.transform);
+    return transforms.length > 0 ? transforms.join(' ') : 'none';
+  };
+  
   return [
     {
       opacity: initial.opacity ?? 1,
-      transform: initial.transform ?? 'none',
+      transform: buildTransform(initial),
       boxShadow: initial.boxShadow ?? 'none',
-      ...initial,
+      ...Object.fromEntries(
+        Object.entries(initial).filter(([key]) => 
+          !['opacity', 'transform', 'boxShadow', 'x', 'y', 'scale', 'rotate', 'rotateX', 'rotateY', 'skewX', 'skewY'].includes(key)
+        )
+      ),
     },
     {
       opacity: animate.opacity ?? 1,
-      transform: animate.transform ?? 'none',
+      transform: buildTransform(animate),
       boxShadow: animate.boxShadow ?? 'none',
-      ...animate,
+      ...Object.fromEntries(
+        Object.entries(animate).filter(([key]) => 
+          !['opacity', 'transform', 'boxShadow', 'x', 'y', 'scale', 'rotate', 'rotateX', 'rotateY', 'skewX', 'skewY'].includes(key)
+        )
+      ),
     },
   ];
 };
 
-const getAnimationConfig = (transition?: AnimationConfig): KeyframeAnimationOptions => ({
-  duration: transition?.duration ?? 600,
-  delay: transition?.delay ?? 0,
-  easing: transition?.easing ?? 'cubic-bezier(0.4, 0, 0.2, 1)',
-  fill: transition?.fill ?? 'both',
-  iterations: transition?.iterations ?? 1,
-});
+const getAnimationConfig = (transition?: AnimationConfig): KeyframeAnimationOptions => {
+  let easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  
+  if (transition?.easing) {
+    easing = transition.easing;
+  } else if (transition?.ease) {
+    if (Array.isArray(transition.ease) && transition.ease.length === 4) {
+      // 处理Framer Motion格式的ease数组 [0.4, 0, 0.2, 1]
+      easing = `cubic-bezier(${transition.ease.join(', ')})`;
+    } else if (typeof transition.ease === 'string') {
+      easing = transition.ease;
+    }
+  }
+  
+  return {
+    duration: transition?.duration ? transition.duration * 1000 : 600, // 转换为毫秒
+    delay: transition?.delay ? transition.delay * 1000 : 0,
+    easing,
+    fill: transition?.fill ?? 'both',
+    iterations: transition?.iterations ?? 1,
+  };
+};
 
 // ===== Motion Component Factory =====
 
@@ -161,7 +205,27 @@ const createMotionComponent = (tagName: string) => {
         if (!element || !initial) return;
 
         const initialState = typeof initial === 'string' ? animationPresets[initial as keyof typeof animationPresets] : initial;
-        Object.assign(element.style, initialState);
+        
+        // 正确设置初始CSS样式
+        if (initialState.opacity !== undefined) {
+          element.style.opacity = String(initialState.opacity);
+        }
+        if (initialState.x !== undefined || initialState.y !== undefined || initialState.scale !== undefined) {
+          const transforms = [];
+          if (initialState.x !== undefined) transforms.push(`translateX(${initialState.x}px)`);
+          if (initialState.y !== undefined) transforms.push(`translateY(${initialState.y}px)`);
+          if (initialState.scale !== undefined) transforms.push(`scale(${initialState.scale})`);
+          element.style.transform = transforms.join(' ');
+        } else if (initialState.transform) {
+          element.style.transform = initialState.transform;
+        }
+        
+        // 设置其他CSS属性
+        Object.entries(initialState).forEach(([key, value]) => {
+          if (!['opacity', 'transform', 'x', 'y', 'scale', 'rotate'].includes(key)) {
+            (element.style as any)[key] = value;
+          }
+        });
       }, [initial]);
 
       // Animate when in view
@@ -188,18 +252,31 @@ const createMotionComponent = (tagName: string) => {
         const element = elementRef.current;
         if (!element || !animate || whileInView) return;
 
-        const initialState = typeof initial === 'string' ? animationPresets[initial as keyof typeof animationPresets] : initial;
-        const animateState = typeof animate === 'string' ? animationPresets[animate as keyof typeof animationPresets] : animate;
+        // 添加小延迟确保DOM已准备好
+        const timer = setTimeout(() => {
+          const initialState = typeof initial === 'string' ? animationPresets[initial as keyof typeof animationPresets] : initial || {};
+          const animateState = typeof animate === 'string' ? animationPresets[animate as keyof typeof animationPresets] : animate;
 
-        if (initialState && animateState) {
-          const keyframes = createKeyframes(initialState, animateState);
-          const config = getAnimationConfig(transition);
-          
-          const animation = element.animate(keyframes, config);
-          setCurrentAnimation(animation);
+          if (animateState) {
+            const keyframes = createKeyframes(initialState, animateState);
+            const config = getAnimationConfig(transition);
+            
+            const animation = element.animate(keyframes, config);
+            setCurrentAnimation(animation);
+            
+            // 动画完成后设置最终状态
+            animation.addEventListener('finish', () => {
+              Object.assign(element.style, {
+                opacity: animateState.opacity ?? 1,
+                transform: createKeyframes({}, animateState)[1].transform,
+              });
+            });
 
-          return () => animation.cancel();
-        }
+            return () => animation.cancel();
+          }
+        }, 50);
+
+        return () => clearTimeout(timer);
       }, [initial, animate, transition, whileInView]);
 
       // Hover effects
@@ -256,6 +333,7 @@ const createMotionComponent = (tagName: string) => {
       const {
         initial: _initial,
         animate: _animate,
+        exit: _exit,
         whileHover: _whileHover,
         whileTap: _whileTap,
         whileInView: _whileInView,
@@ -319,8 +397,46 @@ export const motion = {
 export const AnimatePresence: React.FC<{
   children: React.ReactNode;
   mode?: 'wait' | 'sync' | 'popLayout';
-}> = ({ children }) => {
-  return <>{children}</>;
+}> = ({ children, mode = 'sync' }) => {
+  const [childrenArray, setChildrenArray] = useState<React.ReactNode[]>([]);
+  const [isExiting, setIsExiting] = useState(false);
+  const prevChildrenRef = useRef<React.ReactNode[]>([]);
+  
+  useEffect(() => {
+    const newChildren = React.Children.toArray(children);
+    const prevChildren = prevChildrenRef.current;
+    
+    // 检查是否有元素被移除
+    const removedChildren = prevChildren.filter(
+      (prevChild: any) => !newChildren.some((newChild: any) => 
+        newChild.key === prevChild.key || newChild === prevChild
+      )
+    );
+    
+    if (removedChildren.length > 0 && mode === 'wait') {
+      // 如果有元素被移除且模式是wait，先执行退出动画
+      setIsExiting(true);
+      setTimeout(() => {
+        setChildrenArray(newChildren);
+        setIsExiting(false);
+        prevChildrenRef.current = newChildren;
+      }, 300); // 给退出动画时间
+    } else {
+      // 直接更新子元素
+      setChildrenArray(newChildren);
+      prevChildrenRef.current = newChildren;
+    }
+  }, [children, mode]);
+  
+  return (
+    <div style={{ position: 'relative' }}>
+      {childrenArray.map((child, index) => (
+        <div key={index} style={{ position: 'relative' }}>
+          {child}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 // ===== Animation Hooks =====
