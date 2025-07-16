@@ -4,7 +4,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   DynamicHomeHero,
-  DynamicThemeShowcase, 
   DynamicServices,
   DynamicCaseStudies 
 } from '@/lib/dynamic-imports';
@@ -46,15 +45,6 @@ export default function Home() {
             scrollThreshold={50}
           >
             <DynamicCaseStudies />
-          </ComponentPreloader>
-          
-          <ComponentPreloader
-            importFn={() => import('@/components/sections/ThemeShowcase')}
-            componentName="ThemeShowcase"
-            trigger="scroll"
-            scrollThreshold={70}
-          >
-            <DynamicThemeShowcase />
           </ComponentPreloader>
           
           {/* Success Stories Section */}

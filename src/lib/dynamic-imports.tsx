@@ -204,11 +204,7 @@ export const DynamicSuccessStories = dynamic(() => import('@/components/sections
   )
 });
 
-// Demo pages (non-critical)
-export const DynamicThemeShowcase = dynamic(() => import('@/components/sections/ThemeShowcase').then(mod => ({ default: mod.ThemeShowcase })), {
-  ssr: false,
-  loading: DefaultLoadingSkeleton
-});
+// Demo pages (non-critical) - ThemeShowcase moved to admin panel
 
 // Form components
 export const DynamicContactForm = dynamic(() => import('@/components/forms/ContactForm'), {
@@ -322,7 +318,6 @@ const dynamicImports = {
   DynamicServices,
   DynamicCaseStudies,
   DynamicSuccessStories,
-  DynamicThemeShowcase,
   
   // Utilities
   createDynamicComponent,
