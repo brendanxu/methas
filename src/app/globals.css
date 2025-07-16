@@ -1,6 +1,6 @@
-/* Import custom styles must come first */
+/* Import unified design system styles */
+@import '../design-system/styles/unified-styles.css';
 @import '../styles/mobile.css';
-@import '../styles/lightweight-animations.css';
 
 @tailwind base;
 @tailwind components;
@@ -23,55 +23,41 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-/* South Pole CSS Variables System */
+/* Legacy CSS Variables - 迁移到统一设计系统中 */
 :root {
-  /* South Pole Brand Colors */
-  --sp-primary: #002145;
-  --sp-secondary: #00875a;
-  --sp-warning: #ff8b00;
-  --sp-success: #00875a;
-  --sp-error: #dc2626;
-  --sp-info: #0ea5e9;
+  /* 向后兼容性 - 使用统一设计系统的变量 */
+  --background: var(--sp-background);
+  --foreground: var(--sp-foreground);
+  --muted: var(--sp-muted);
+  --muted-foreground: var(--sp-muted-foreground);
+  --border: var(--sp-border);
+  --input: var(--sp-input);
+  --card: var(--sp-card);
+  --card-foreground: var(--sp-card-foreground);
+  --popover: var(--sp-popover);
+  --popover-foreground: var(--sp-popover-foreground);
   
-  /* Light Theme - Semantic Colors */
-  --background: #ffffff;
-  --foreground: #374151;
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
-  --input: #ffffff;
-  --card: #ffffff;
-  --card-foreground: #374151;
-  --popover: #ffffff;
-  --popover-foreground: #374151;
-  
-  /* Primary Colors - Using South Pole Brand */
+  /* 主色调 - 使用统一设计系统 */
   --primary: var(--sp-primary);
-  --primary-foreground: #ffffff;
+  --primary-foreground: var(--sp-white);
   
-  /* Secondary Colors */
-  --secondary: #f3f4f6;
-  --secondary-foreground: #374151;
+  /* 次要色调 */
+  --secondary: var(--sp-accent);
+  --secondary-foreground: var(--sp-accent-foreground);
   
-  /* Accent Colors */
-  --accent: #f3f4f6;
-  --accent-foreground: #374151;
+  /* 强调色 */
+  --accent: var(--sp-accent);
+  --accent-foreground: var(--sp-accent-foreground);
   
-  /* Destructive Colors */
-  --destructive: var(--sp-error);
-  --destructive-foreground: #ffffff;
-  
-  /* Success Colors */
+  /* 状态色 */
+  --destructive: var(--sp-destructive);
+  --destructive-foreground: var(--sp-destructive-foreground);
   --success: var(--sp-success);
-  --success-foreground: #ffffff;
-  
-  /* Warning Colors */
+  --success-foreground: var(--sp-white);
   --warning: var(--sp-warning);
-  --warning-foreground: #000000;
-  
-  /* Info Colors */
-  --info: var(--sp-info);
-  --info-foreground: #ffffff;
+  --warning-foreground: var(--sp-white);
+  --info: var(--sp-primary);
+  --info-foreground: var(--sp-white);
   
   /* Ring/Focus - Using brand primary */
   --ring: var(--sp-primary);

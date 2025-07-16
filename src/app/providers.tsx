@@ -4,11 +4,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { ConfigProvider } from 'antd';
 import { SessionProvider } from 'next-auth/react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { I18nProvider } from '@/components/providers/I18nProvider';
+import { I18nLiteProvider, LanguageDetector } from '@/components/providers/I18nLiteProvider';
 import { antThemeConfig, antDarkThemeConfig, southPoleColors } from '@/styles/ant-theme';
 import { cssOptimizer, debounce, memoryMonitor } from '@/lib/performance'
-import { performanceMonitor } from '@/lib/monitoring/performance-monitor'
-import { errorTracker } from '@/lib/monitoring/error-tracker';
+import { corePerformanceMonitor } from '@/lib/monitoring/lazy-monitor'
+import LazyMonitorProvider from '@/components/providers/LazyMonitorProvider';
 import { Session } from 'next-auth';
 
 // Theme context types
@@ -44,26 +44,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  // 启动性能监控 (client-side only)
+  // 启动轻量级监控 (client-side only)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       memoryMonitor.start();
       
-      // 初始化性能监控
-      performanceMonitor.configure({
-        reportingEnabled: true,
-        debugMode: process.env.NODE_ENV === 'development'
-      })
-
-      // 初始化错误追踪
-      errorTracker.configure({
-        enabled: true,
-        flushInterval: 30000
-      })
+      // 初始化核心性能监控（轻量级）
+      corePerformanceMonitor.init()
       
       return () => {
         memoryMonitor.stop()
-        performanceMonitor.reset()
+        corePerformanceMonitor.reset()
       }
     }
     return undefined; // Explicit return for server-side
@@ -160,11 +151,22 @@ export const Providers: React.FC<ProvidersProps> = ({
   return (
     <ErrorBoundary>
       <SessionProvider session={session}>
-        <ThemeProvider defaultTheme={defaultTheme}>
-          <AntdProvider>
-            {children}
-          </AntdProvider>
-        </ThemeProvider>
+        <I18nLiteProvider>
+          <LanguageDetector>
+            <ThemeProvider defaultTheme={defaultTheme}>
+              <AntdProvider>
+                <LazyMonitorProvider 
+                  enabledComponents={['performance', 'errors']}
+                  debugMode={process.env.NODE_ENV === 'development'}
+                >
+                  <GlobalStylesProvider>
+                    {children}
+                  </GlobalStylesProvider>
+                </LazyMonitorProvider>
+              </AntdProvider>
+            </ThemeProvider>
+          </LanguageDetector>
+        </I18nLiteProvider>
       </SessionProvider>
     </ErrorBoundary>
   );

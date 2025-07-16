@@ -3,13 +3,17 @@
 import React from 'react';
 import { Dropdown, Button } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
-import { useI18n } from '@/hooks/useI18n';
-import { 
-  SUPPORTED_LOCALES, 
-  LOCALE_NAMES,
-  type Locale 
-} from '@/lib/i18n-lite';
+import { useI18n, useLanguage } from '@/hooks/useI18n';
 import { cn } from '@/lib/utils';
+
+// 支持的语言
+const SUPPORTED_LOCALES = ['en', 'zh'] as const;
+const LOCALE_NAMES = {
+  en: 'English',
+  zh: '中文'
+} as const;
+
+type Locale = typeof SUPPORTED_LOCALES[number];
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -24,11 +28,11 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   type = 'text',
   showText = true,
 }) => {
-  const { locale, setLocale, t } = useI18n();
+  const { locale, switchLanguage, getLanguageName } = useLanguage();
 
   const handleLanguageChange = (language: Locale) => {
     if (language !== locale) {
-      setLocale(language);
+      switchLanguage(language);
     }
   };
 
@@ -39,7 +43,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <span className="text-lg">
           {lang === 'en' ? '🇺🇸' : '🇨🇳'}
         </span>
-        <span>{LOCALE_NAMES[lang]}</span>
+        <span>{getLanguageName(lang)}</span>
         {lang === locale && (
           <span className="text-primary">✓</span>
         )}
@@ -68,7 +72,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <span className="text-lg">{getCurrentLanguageFlag()}</span>
         {showText && (
           <span className="hidden sm:inline">
-            {LOCALE_NAMES[locale]}
+            {getLanguageName(locale)}
           </span>
         )}
       </Button>
@@ -94,11 +98,11 @@ export const LanguageSwitcherCompact: React.FC<{ className?: string }> = ({
 export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({ 
   className 
 }) => {
-  const { locale, setLocale } = useI18n();
+  const { locale, switchLanguage, getLanguageName } = useLanguage();
   
   const handleLanguageChange = (language: Locale) => {
     if (language !== locale) {
-      setLocale(language);
+      switchLanguage(language);
     }
   };
 
@@ -110,7 +114,7 @@ export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({
           <span className="text-lg">
             {lang === 'en' ? '🇺🇸' : '🇨🇳'}
           </span>
-          <span className="font-medium">{LOCALE_NAMES[lang]}</span>
+          <span className="font-medium">{getLanguageName(lang)}</span>
         </div>
         {lang === locale && (
           <span className="text-primary text-sm">✓</span>
@@ -136,7 +140,7 @@ export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({
           {locale === 'en' ? '🇺🇸' : '🇨🇳'}
         </span>
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {LOCALE_NAMES[locale]}
+          {getLanguageName(locale)}
         </span>
       </Button>
     </Dropdown>

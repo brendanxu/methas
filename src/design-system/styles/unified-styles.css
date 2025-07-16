@@ -1,0 +1,598 @@
+/**
+ * 统一的CSS样式
+ * 替换所有重复的样式定义，建立一致的设计语言
+ */
+
+/* CSS 变量定义 - 替换重复的颜色定义 */
+:root {
+  /* 品牌颜色 */
+  --sp-primary: #002145;
+  --sp-secondary: #00A651;
+  --sp-success: #50E3C2;
+  --sp-warning: #F5A623;
+  --sp-error: #D0021B;
+  --sp-white: #FFFFFF;
+  --sp-black: #000000;
+  
+  /* 灰度色阶 */
+  --sp-gray-50: #F9FAFB;
+  --sp-gray-100: #F3F4F6;
+  --sp-gray-200: #E5E7EB;
+  --sp-gray-300: #D1D5DB;
+  --sp-gray-400: #9CA3AF;
+  --sp-gray-500: #6B7280;
+  --sp-gray-600: #4B5563;
+  --sp-gray-700: #374151;
+  --sp-gray-800: #1F2937;
+  --sp-gray-900: #111827;
+  
+  /* 语义化颜色 - 明亮主题 */
+  --sp-background: var(--sp-white);
+  --sp-foreground: var(--sp-gray-900);
+  --sp-muted: var(--sp-gray-50);
+  --sp-muted-foreground: var(--sp-gray-500);
+  --sp-border: var(--sp-gray-200);
+  --sp-input: var(--sp-white);
+  --sp-card: var(--sp-white);
+  --sp-card-foreground: var(--sp-gray-900);
+  --sp-popover: var(--sp-white);
+  --sp-popover-foreground: var(--sp-gray-900);
+  --sp-accent: var(--sp-gray-100);
+  --sp-accent-foreground: var(--sp-gray-900);
+  --sp-destructive: var(--sp-error);
+  --sp-destructive-foreground: var(--sp-white);
+  --sp-ring: var(--sp-primary);
+  
+  /* 间距系统 */
+  --sp-spacing-0: 0;
+  --sp-spacing-1: 4px;
+  --sp-spacing-2: 8px;
+  --sp-spacing-3: 12px;
+  --sp-spacing-4: 16px;
+  --sp-spacing-5: 20px;
+  --sp-spacing-6: 24px;
+  --sp-spacing-7: 28px;
+  --sp-spacing-8: 32px;
+  --sp-spacing-10: 40px;
+  --sp-spacing-12: 48px;
+  --sp-spacing-16: 64px;
+  --sp-spacing-20: 80px;
+  --sp-spacing-24: 96px;
+  --sp-spacing-32: 128px;
+  --sp-spacing-40: 160px;
+  --sp-spacing-48: 192px;
+  --sp-spacing-56: 224px;
+  --sp-spacing-64: 256px;
+  
+  /* 字体系统 */
+  --sp-font-family-sans: 'Inter', system-ui, sans-serif;
+  --sp-font-family-mono: 'JetBrains Mono', Monaco, monospace;
+  --sp-font-family-serif: Georgia, 'Times New Roman', serif;
+  
+  --sp-font-size-xs: 12px;
+  --sp-font-size-sm: 14px;
+  --sp-font-size-base: 16px;
+  --sp-font-size-lg: 18px;
+  --sp-font-size-xl: 20px;
+  --sp-font-size-2xl: 24px;
+  --sp-font-size-3xl: 32px;
+  --sp-font-size-4xl: 40px;
+  --sp-font-size-5xl: 48px;
+  --sp-font-size-6xl: 64px;
+  
+  --sp-font-weight-light: 300;
+  --sp-font-weight-normal: 400;
+  --sp-font-weight-medium: 500;
+  --sp-font-weight-semibold: 600;
+  --sp-font-weight-bold: 700;
+  
+  --sp-line-height-tight: 1.25;
+  --sp-line-height-normal: 1.5;
+  --sp-line-height-relaxed: 1.75;
+  
+  --sp-letter-spacing-tight: -0.025em;
+  --sp-letter-spacing-normal: 0;
+  --sp-letter-spacing-wide: 0.025em;
+  
+  /* 圆角系统 */
+  --sp-border-radius-none: 0;
+  --sp-border-radius-sm: 6px;
+  --sp-border-radius-md: 8px;
+  --sp-border-radius-lg: 12px;
+  --sp-border-radius-xl: 20px;
+  --sp-border-radius-2xl: 24px;
+  --sp-border-radius-3xl: 32px;
+  --sp-border-radius-full: 50%;
+  
+  /* 阴影系统 */
+  --sp-shadow-none: none;
+  --sp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sp-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --sp-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --sp-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --sp-shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --sp-shadow-primary: 0 4px 14px rgba(0, 33, 69, 0.2);
+  --sp-shadow-secondary: 0 4px 14px rgba(0, 166, 81, 0.2);
+  --sp-shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  /* 层级系统 */
+  --sp-z-index-base: 0;
+  --sp-z-index-dropdown: 1000;
+  --sp-z-index-sticky: 1020;
+  --sp-z-index-fixed: 1030;
+  --sp-z-index-modal: 1040;
+  --sp-z-index-popover: 1050;
+  --sp-z-index-tooltip: 1060;
+  --sp-z-index-toast: 1070;
+  --sp-z-index-max: 9999;
+  
+  /* 动画系统 */
+  --sp-duration-fast: 150ms;
+  --sp-duration-normal: 300ms;
+  --sp-duration-slow: 500ms;
+  
+  --sp-easing-linear: linear;
+  --sp-easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --sp-easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --sp-easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --sp-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* 组件尺寸 */
+  --sp-button-small-height: 32px;
+  --sp-button-small-padding: 0 12px;
+  --sp-button-medium-height: 40px;
+  --sp-button-medium-padding: 0 16px;
+  --sp-button-large-height: 48px;
+  --sp-button-large-padding: 0 24px;
+  
+  --sp-input-small-height: 32px;
+  --sp-input-small-padding: 0 12px;
+  --sp-input-medium-height: 40px;
+  --sp-input-medium-padding: 0 16px;
+  --sp-input-large-height: 48px;
+  --sp-input-large-padding: 0 20px;
+  
+  /* 断点系统 */
+  --sp-breakpoint-xs: 0px;
+  --sp-breakpoint-sm: 640px;
+  --sp-breakpoint-md: 768px;
+  --sp-breakpoint-lg: 1024px;
+  --sp-breakpoint-xl: 1280px;
+  --sp-breakpoint-2xl: 1536px;
+}
+
+/* 暗色主题 */
+.dark {
+  --sp-background: var(--sp-gray-900);
+  --sp-foreground: var(--sp-gray-50);
+  --sp-muted: var(--sp-gray-800);
+  --sp-muted-foreground: var(--sp-gray-400);
+  --sp-border: var(--sp-gray-700);
+  --sp-input: var(--sp-gray-800);
+  --sp-card: var(--sp-gray-800);
+  --sp-card-foreground: var(--sp-gray-50);
+  --sp-popover: var(--sp-gray-800);
+  --sp-popover-foreground: var(--sp-gray-50);
+  --sp-accent: var(--sp-gray-700);
+  --sp-accent-foreground: var(--sp-gray-50);
+  --sp-destructive: var(--sp-error);
+  --sp-destructive-foreground: var(--sp-white);
+  --sp-ring: var(--sp-primary);
+}
+
+/* 系统主题偏好 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sp-background: var(--sp-gray-900);
+    --sp-foreground: var(--sp-gray-50);
+    --sp-muted: var(--sp-gray-800);
+    --sp-muted-foreground: var(--sp-gray-400);
+    --sp-border: var(--sp-gray-700);
+    --sp-input: var(--sp-gray-800);
+    --sp-card: var(--sp-gray-800);
+    --sp-card-foreground: var(--sp-gray-50);
+    --sp-popover: var(--sp-gray-800);
+    --sp-popover-foreground: var(--sp-gray-50);
+    --sp-accent: var(--sp-gray-700);
+    --sp-accent-foreground: var(--sp-gray-50);
+  }
+}
+
+/* 强制明亮主题 */
+.light {
+  --sp-background: var(--sp-white);
+  --sp-foreground: var(--sp-gray-900);
+  --sp-muted: var(--sp-gray-50);
+  --sp-muted-foreground: var(--sp-gray-500);
+  --sp-border: var(--sp-gray-200);
+  --sp-input: var(--sp-white);
+  --sp-card: var(--sp-white);
+  --sp-card-foreground: var(--sp-gray-900);
+  --sp-popover: var(--sp-white);
+  --sp-popover-foreground: var(--sp-gray-900);
+  --sp-accent: var(--sp-gray-100);
+  --sp-accent-foreground: var(--sp-gray-900);
+}
+
+/* 统一的动画关键帧 - 替换重复的动画定义 */
+@keyframes sp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes sp-slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes sp-slide-down {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes sp-slide-left {
+  from { 
+    opacity: 0; 
+    transform: translateX(20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes sp-slide-right {
+  from { 
+    opacity: 0; 
+    transform: translateX(-20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes sp-scale-in {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+@keyframes sp-scale-out {
+  from { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  to { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+}
+
+@keyframes sp-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -10px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -5px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes sp-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes sp-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes sp-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 统一的基础样式 - 替换重复的重置样式 */
+.sp-reset {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sp-clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.sp-center-y {
+  display: flex;
+  align-items: center;
+}
+
+.sp-center-x {
+  display: flex;
+  justify-content: center;
+}
+
+.sp-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sp-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.sp-line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.sp-line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.sp-button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+.sp-list-reset {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sp-responsive-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.sp-focus-ring {
+  outline: none;
+}
+
+.sp-focus-ring:focus {
+  box-shadow: 0 0 0 2px var(--sp-ring);
+}
+
+.sp-accessible-hide {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* 统一的组件样式 - 替换重复的组件样式 */
+.unified-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-spacing-2);
+  border: 1px solid;
+  border-radius: var(--sp-border-radius-md);
+  font-weight: var(--sp-font-weight-medium);
+  line-height: var(--sp-line-height-normal);
+  transition: all var(--sp-duration-fast) var(--sp-easing-ease-in-out);
+  cursor: pointer;
+  outline: none;
+}
+
+.unified-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.unified-button:focus {
+  box-shadow: 0 0 0 2px var(--sp-ring);
+}
+
+.unified-button--primary {
+  background-color: var(--sp-primary);
+  border-color: var(--sp-primary);
+  color: var(--sp-white);
+}
+
+.unified-button--primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.unified-button--secondary {
+  background-color: var(--sp-secondary);
+  border-color: var(--sp-secondary);
+  color: var(--sp-white);
+}
+
+.unified-button--secondary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.unified-button--small {
+  height: var(--sp-button-small-height);
+  padding: var(--sp-button-small-padding);
+  font-size: var(--sp-font-size-sm);
+}
+
+.unified-button--medium {
+  height: var(--sp-button-medium-height);
+  padding: var(--sp-button-medium-padding);
+  font-size: var(--sp-font-size-base);
+}
+
+.unified-button--large {
+  height: var(--sp-button-large-height);
+  padding: var(--sp-button-large-padding);
+  font-size: var(--sp-font-size-lg);
+}
+
+.unified-card {
+  background-color: var(--sp-card);
+  border-color: var(--sp-border);
+  color: var(--sp-card-foreground);
+  box-shadow: var(--sp-shadow-sm);
+  border-radius: var(--sp-border-radius-lg);
+  transition: all var(--sp-duration-normal) var(--sp-easing-ease-in-out);
+  overflow: hidden;
+  position: relative;
+}
+
+.unified-card--default {
+  background-color: var(--sp-card);
+  border-color: var(--sp-border);
+}
+
+.unified-card--inner {
+  background-color: var(--sp-muted);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.unified-card--meta {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.unified-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sp-shadow-lg);
+}
+
+/* 响应式工具类 */
+@media (max-width: 640px) {
+  .sp-hidden-sm {
+    display: none;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .sp-hidden-md {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sp-hidden-lg {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .sp-hidden-xl {
+    display: none;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .sp-no-print {
+    display: none !important;
+  }
+  
+  .sp-print-only {
+    display: block !important;
+  }
+  
+  .unified-button,
+  .unified-card {
+    box-shadow: none !important;
+  }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .unified-button {
+    border-width: 2px;
+  }
+  
+  .unified-card {
+    border-width: 2px;
+  }
+}

@@ -11,13 +11,40 @@ const { Title, Paragraph, Text } = Typography
  * 展示新的轻量级国际化系统的示例组件
  */
 function I18nExampleContent() {
-  const { locale, t, formatDate, formatNumber, formatCurrency, formatRelativeTime } = useI18n()
+  const { locale, t } = useI18n()
 
   // 示例数据
   const currentDate = new Date()
   const pastDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2天前
   const sampleNumber = 1234567.89
   const sampleAmount = 99.99
+
+  // 简化的格式化函数
+  const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions) => {
+    return new Intl.DateTimeFormat(locale, options).format(date)
+  }
+
+  const formatNumber = (num: number, options?: Intl.NumberFormatOptions) => {
+    return new Intl.NumberFormat(locale, options).format(num)
+  }
+
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount)
+  }
+
+  const formatRelativeTime = (date: Date) => {
+    const now = new Date()
+    const diff = date.getTime() - now.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    
+    if (Math.abs(days) < 1) {
+      return locale === 'zh' ? '今天' : 'Today'
+    } else if (days < 0) {
+      return locale === 'zh' ? `${Math.abs(days)}天前` : `${Math.abs(days)} days ago`
+    } else {
+      return locale === 'zh' ? `${days}天后` : `${days} days later`
+    }
+  }
 
   return (
     <div style={{ padding: '24px', maxWidth: '800px' }}>

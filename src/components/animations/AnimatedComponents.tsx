@@ -3,18 +3,18 @@
 import React, { forwardRef, useEffect, useState, useRef } from 'react'
 import { 
   Motion, 
-  AnimatePresence, 
-  FadeIn as LWFadeIn,
-  SlideUp as LWSlideUp,
-  ScaleIn as LWScaleIn,
-  SlideInFromLeft as LWSlideInFromLeft,
-  SlideInFromRight as LWSlideInFromRight,
-  StaggerContainer,
-  ScrollTrigger,
-  AnimationType
-} from './LightweightMotion'
+  FadeIn as EnhancedFadeIn,
+  SlideUp as EnhancedSlideUp,
+  ScaleIn as EnhancedScaleIn,
+  AnimatedButton as EnhancedAnimatedButton,
+  AnimatedCard as EnhancedAnimatedCard,
+  PageTransition,
+  LoadingSpinner,
+  ErrorMessage,
+  SuccessMessage
+} from './EnhancedMotion'
+import { useInViewAnimation, AnimationType } from '@/lib/enhanced-animations'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
-import { shouldEnableAnimations } from '@/lib/lightweight-animations'
 
 // 基础动画组件类型
 interface BaseAnimationProps {
@@ -41,13 +41,13 @@ export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerPro
   ({ 
     children, 
     className, 
-    animation = 'fade-in', 
+    animation = 'fadeIn', 
     delay = 0, 
     once = true, 
     threshold = 0.1, 
     rootMargin = '0px',
     disabled = false,
-    duration = 0.3,
+    duration = 300,
     custom,
     ...props 
   }, ref) => {
@@ -56,9 +56,9 @@ export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerPro
       rootMargin,
     })
 
-    const shouldAnimate = !disabled && (once ? hasIntersected : isIntersecting) && shouldEnableAnimations()
+    const shouldAnimate = !disabled && (once ? hasIntersected : isIntersecting)
 
-    if (disabled || !shouldEnableAnimations()) {
+    if (disabled) {
       return (
         <div ref={observerRef} className={className} {...props}>
           {children}
@@ -67,16 +67,16 @@ export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerPro
     }
 
     return (
-      <Motion
+      <Motion.div
         ref={observerRef}
         className={className}
         whileInView={shouldAnimate ? animation : undefined}
-        viewport={{ once, amount: threshold }}
+        viewport={{ threshold }}
         transition={{ duration, delay }}
         {...props}
       >
         {children}
-      </Motion>
+      </Motion.div>
     )
   }
 )
@@ -93,13 +93,11 @@ export const FadeIn: React.FC<BaseAnimationProps & { duration?: number }> = ({
   once = true, 
   threshold = 0.1, 
   rootMargin = '0px',
-  duration = 0.3
+  duration = 300
 }) => (
-  <LWFadeIn delay={delay} duration={duration}>
-    <div className={className}>
-      {children}
-    </div>
-  </LWFadeIn>
+  <EnhancedFadeIn className={className} delay={delay}>
+    {children}
+  </EnhancedFadeIn>
 )
 
 /**
@@ -117,13 +115,13 @@ export const Slide: React.FC<SlideProps> = ({
   delay = 0, 
   once = true, 
   threshold = 0.1,
-  duration = 0.3
+  duration = 300
 }) => {
   const animationMap: Record<string, AnimationType> = {
-    up: 'slide-up',
-    down: 'slide-down', 
-    left: 'slide-left',
-    right: 'slide-right'
+    up: 'slideUp',
+    down: 'slideDown', 
+    left: 'slideLeft',
+    right: 'slideRight'
   }
 
   return (
@@ -155,12 +153,12 @@ export const Scale: React.FC<ScaleProps> = ({
   delay = 0, 
   once = true, 
   threshold = 0.1,
-  duration = 0.3
+  duration = 300
 }) => {
   const animationMap: Record<string, AnimationType> = {
-    in: 'scale-in',
-    out: 'scale-out',
-    bounce: 'bounce-in'
+    in: 'scaleIn',
+    out: 'scaleOut',
+    bounce: 'bounce'
   }
 
   return (
@@ -183,7 +181,7 @@ export const Scale: React.FC<ScaleProps> = ({
 interface AnimatedButtonProps {
   children: React.ReactNode
   className?: string
-  variant?: 'default' | 'scale' | 'lift' | 'glow'
+  variant?: 'default' | 'scale' | 'lift' | 'glow' | 'primary' | 'secondary' | 'outline'
   disabled?: boolean
   onClick?: () => void
 }
@@ -195,6 +193,19 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   disabled = false,
   onClick,
 }) => {
+  // 如果是新的变体，使用增强版按钮
+  if (['primary', 'secondary', 'outline'].includes(variant)) {
+    return (
+      <EnhancedAnimatedButton
+        className={className}
+        variant={variant as 'primary' | 'secondary' | 'outline'}
+        onClick={onClick}
+      >
+        {children}
+      </EnhancedAnimatedButton>
+    )
+  }
+
   const baseClasses = 'transition-all duration-200 ease-in-out'
   const variantClasses = {
     default: 'hover:opacity-80',
@@ -204,37 +215,15 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   }
 
   return (
-    <button
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-      disabled={disabled}
-      onClick={onClick}
-      style={{
-        transform: 'scale(1)',
-        transition: 'transform 0.2s ease'
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled && variant === 'scale') {
-          e.currentTarget.style.transform = 'scale(1.05)'
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = 'scale(1)'
-        }
-      }}
-      onMouseDown={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = 'scale(0.95)'
-        }
-      }}
-      onMouseUp={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = variant === 'scale' ? 'scale(1.05)' : 'scale(1)'
-        }
-      }}
+    <Motion.div
+      className={`${baseClasses} ${variantClasses[variant as keyof typeof variantClasses] || variantClasses.default} ${className}`}
+      onClick={disabled ? undefined : onClick}
+      whileHover={disabled ? undefined : "scaleIn"}
+      whileTap={disabled ? undefined : "pulse"}
+      style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1 }}
     >
       {children}
-    </button>
+    </Motion.div>
   )
 }
 
@@ -260,7 +249,7 @@ export const AnimatedCounter: React.FC<CounterProps> = ({
   const { ref, isIntersecting } = useIntersectionObserver()
 
   useEffect(() => {
-    if (!isIntersecting || !shouldEnableAnimations()) {
+    if (!isIntersecting) {
       setCount(to)
       return
     }
@@ -287,9 +276,9 @@ export const AnimatedCounter: React.FC<CounterProps> = ({
   }, [from, to, duration, isIntersecting])
 
   return (
-    <span ref={ref} className={className}>
+    <Motion.span ref={ref} className={className} whileInView="fadeIn">
       {formatter(count)}
-    </span>
+    </Motion.span>
   )
 }
 
@@ -359,7 +348,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
   const { ref, isIntersecting } = useIntersectionObserver()
 
   useEffect(() => {
-    if (!isIntersecting || !shouldEnableAnimations()) {
+    if (!isIntersecting) {
       setDisplayText(text)
       setShowCursor(false)
       return
@@ -409,43 +398,29 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
   children,
   className = ''
 }) => {
-  if (!shouldEnableAnimations()) {
-    return isOpen ? (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-        <div className={`relative bg-white rounded-lg p-6 ${className}`}>
-          {children}
-        </div>
-      </div>
-    ) : null
-  }
+  if (!isOpen) return null
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Motion
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/50"
-            onClick={onClose}
-          >
-            <div />
-          </Motion>
-          <Motion
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ duration: 0.3 }}
-            className={`relative bg-white rounded-lg p-6 ${className}`}
-          >
-            {children}
-          </Motion>
-        </div>
-      )}
-    </AnimatePresence>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <Motion.div
+        initial="fadeOut"
+        animate="fadeIn"
+        exit="fadeOut"
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+      >
+        <div />
+      </Motion.div>
+      <Motion.div
+        initial="scaleOut"
+        animate="scaleIn"
+        exit="scaleOut"
+        transition={{ duration: 300 }}
+        className={`relative bg-white rounded-lg p-6 ${className}`}
+      >
+        {children}
+      </Motion.div>
+    </div>
   )
 }
 
@@ -460,37 +435,36 @@ interface SequenceAnimationProps {
 
 export const SequenceAnimation: React.FC<SequenceAnimationProps> = ({
   children,
-  staggerDelay = 0.1,
+  staggerDelay = 100,
   className = ''
 }) => {
   return (
-    <StaggerContainer staggerDelay={staggerDelay} className={className}>
+    <div className={className}>
       {children.map((child, index) => (
-        <Motion
+        <Motion.div
           key={index}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="animate-fade-in"
-          style={{ animationDelay: `${index * staggerDelay}s` }}
+          whileInView="slideUp"
+          viewport={{ threshold: 0.1 }}
+          transition={{ delay: index * staggerDelay, duration: 400 }}
         >
           {child}
-        </Motion>
+        </Motion.div>
       ))}
-    </StaggerContainer>
+    </div>
   )
 }
 
-// 导出预设组件以保持向后兼容
+// 导出增强版组件
 export { 
-  LWFadeIn as FadeInLegacy,
-  LWSlideUp as SlideUpLegacy,
-  LWScaleIn as ScaleInLegacy,
-  LWSlideInFromLeft as SlideInFromLeftLegacy,
-  LWSlideInFromRight as SlideInFromRightLegacy,
+  EnhancedFadeIn as FadeInLegacy,
+  EnhancedSlideUp as SlideUpLegacy,
+  EnhancedScaleIn as ScaleInLegacy,
+  EnhancedAnimatedCard as AnimatedCardLegacy,
   Motion,
-  AnimatePresence,
-  ScrollTrigger
+  PageTransition,
+  LoadingSpinner,
+  ErrorMessage,
+  SuccessMessage
 }
 
 export type { AnimationType }
