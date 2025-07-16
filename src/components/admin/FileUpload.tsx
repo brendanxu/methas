@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Upload, message, Button, Image, Progress, Card } from 'antd';
+import { Upload, message, Image, Progress, Card } from 'antd';
 import { 
   UploadOutlined, 
   DeleteOutlined, 
@@ -13,6 +13,7 @@ import {
   FileTextOutlined
 } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload';
+import UnifiedButton from '@/components/ui/UnifiedButton';
 
 interface FileUploadProps {
   value?: string[];
@@ -197,8 +198,23 @@ const FileUpload: React.FC<FileUploadProps> = ({
         size="small" 
         className="file-item"
         actions={[
-          <EyeOutlined key="preview" onClick={() => handlePreview(file)} />,
-          <DeleteOutlined key="delete" onClick={() => handleRemove(file)} />
+          <UnifiedButton
+            key="preview"
+            variant="ghost"
+            size="small"
+            onClick={() => handlePreview(file)}
+            icon={<EyeOutlined />}
+            aria-label="预览"
+          />,
+          <UnifiedButton
+            key="delete"
+            variant="ghost"
+            size="small"
+            onClick={() => handleRemove(file)}
+            icon={<DeleteOutlined />}
+            customColor="#f5222d"
+            aria-label="删除"
+          />
         ]}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

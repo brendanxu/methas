@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/Button';
+import UnifiedButton from '@/components/ui/UnifiedButton';
 import { useTheme } from '@/app/providers';
 
 // Demo icons using SVG
@@ -68,137 +68,134 @@ export default function ButtonDemoPage() {
             Unified Button component combining Tailwind styles with Ant Design functionality
           </p>
           <div className="flex gap-4">
-            <Button variant="ghost" onClick={toggleTheme}>
+            <UnifiedButton variant="ghost" onClick={toggleTheme}>
               Toggle {isDark ? 'Light' : 'Dark'} Mode
-            </Button>
+            </UnifiedButton>
           </div>
         </div>
 
         {/* Variants Demo */}
         <DemoSection title="Variants">
           <ButtonRow label="Primary">
-            <Button variant="primary" size="small">Small Primary</Button>
-            <Button variant="primary" size="medium">Medium Primary</Button>
-            <Button variant="primary" size="large">Large Primary</Button>
+            <UnifiedButton variant="primary" size="small">Small Primary</UnifiedButton>
+            <UnifiedButton variant="primary" size="medium">Medium Primary</UnifiedButton>
+            <UnifiedButton variant="primary" size="large">Large Primary</UnifiedButton>
           </ButtonRow>
           
           <ButtonRow label="Secondary">
-            <Button variant="secondary" size="small">Small Secondary</Button>
-            <Button variant="secondary" size="medium">Medium Secondary</Button>
-            <Button variant="secondary" size="large">Large Secondary</Button>
+            <UnifiedButton variant="secondary" size="small">Small Secondary</UnifiedButton>
+            <UnifiedButton variant="secondary" size="medium">Medium Secondary</UnifiedButton>
+            <UnifiedButton variant="secondary" size="large">Large Secondary</UnifiedButton>
           </ButtonRow>
           
           <ButtonRow label="Ghost">
-            <Button variant="ghost" size="small">Small Ghost</Button>
-            <Button variant="ghost" size="medium">Medium Ghost</Button>
-            <Button variant="ghost" size="large">Large Ghost</Button>
+            <UnifiedButton variant="ghost" size="small">Small Ghost</UnifiedButton>
+            <UnifiedButton variant="ghost" size="medium">Medium Ghost</UnifiedButton>
+            <UnifiedButton variant="ghost" size="large">Large Ghost</UnifiedButton>
           </ButtonRow>
           
           <ButtonRow label="Success">
-            <Button variant="success" size="small">Small Success</Button>
-            <Button variant="success" size="medium">Medium Success</Button>
-            <Button variant="success" size="large">Large Success</Button>
+            <UnifiedButton variant="success" size="small">Small Success</UnifiedButton>
+            <UnifiedButton variant="success" size="medium">Medium Success</UnifiedButton>
+            <UnifiedButton variant="success" size="large">Large Success</UnifiedButton>
           </ButtonRow>
         </DemoSection>
 
         {/* Icons Demo */}
         <DemoSection title="With Icons">
           <ButtonRow label="Left Icons">
-            <Button variant="primary" icon={<ArrowRightIcon />} iconPosition="left">
+            <UnifiedButton variant="primary" icon={<ArrowRightIcon />} iconPosition="left">
               Get Started
-            </Button>
-            <Button variant="secondary" icon={<DownloadIcon />} iconPosition="left">
+            </UnifiedButton>
+            <UnifiedButton variant="secondary" icon={<DownloadIcon />} iconPosition="left">
               Download
-            </Button>
-            <Button variant="ghost" icon={<HeartIcon />} iconPosition="left">
+            </UnifiedButton>
+            <UnifiedButton variant="ghost" icon={<HeartIcon />} iconPosition="left">
               Like
-            </Button>
-            <Button variant="success" icon={<CheckIcon />} iconPosition="left">
+            </UnifiedButton>
+            <UnifiedButton variant="success" icon={<CheckIcon />} iconPosition="left">
               Complete
-            </Button>
+            </UnifiedButton>
           </ButtonRow>
           
           <ButtonRow label="Right Icons">
-            <Button variant="primary" icon={<ArrowRightIcon />} iconPosition="right">
+            <UnifiedButton variant="primary" icon={<ArrowRightIcon />} iconPosition="right">
               Continue
-            </Button>
-            <Button variant="secondary" icon={<DownloadIcon />} iconPosition="right">
+            </UnifiedButton>
+            <UnifiedButton variant="secondary" icon={<DownloadIcon />} iconPosition="right">
               Export
-            </Button>
-            <Button variant="ghost" icon={<HeartIcon />} iconPosition="right">
+            </UnifiedButton>
+            <UnifiedButton variant="ghost" icon={<HeartIcon />} iconPosition="right">
               Favorite
-            </Button>
-            <Button variant="success" icon={<CheckIcon />} iconPosition="right">
+            </UnifiedButton>
+            <UnifiedButton variant="success" icon={<CheckIcon />} iconPosition="right">
               Confirm
-            </Button>
+            </UnifiedButton>
           </ButtonRow>
 
           <ButtonRow label="Icon Only">
-            <Button variant="primary" icon={<ArrowRightIcon />} aria-label="Navigate forward" />
-            <Button variant="secondary" icon={<DownloadIcon />} aria-label="Download file" />
-            <Button variant="ghost" icon={<HeartIcon />} aria-label="Add to favorites" />
-            <Button variant="success" icon={<CheckIcon />} aria-label="Mark complete" />
+            <UnifiedButton variant="primary" icon={<ArrowRightIcon />} aria-label="Navigate forward" />
+            <UnifiedButton variant="secondary" icon={<DownloadIcon />} aria-label="Download file" />
+            <UnifiedButton variant="ghost" icon={<HeartIcon />} aria-label="Add to favorites" />
+            <UnifiedButton variant="success" icon={<CheckIcon />} aria-label="Mark complete" />
           </ButtonRow>
         </DemoSection>
 
         {/* Loading States Demo */}
         <DemoSection title="Loading States">
           <ButtonRow label="Loading">
-            <Button 
+            <UnifiedButton 
               variant="primary" 
               loading={loadingStates.loading1}
               onClick={() => toggleLoading('loading1')}
             >
               {loadingStates.loading1 ? 'Loading...' : 'Click to Load'}
-            </Button>
-            <Button 
+            </UnifiedButton>
+            <UnifiedButton 
               variant="secondary" 
               loading={loadingStates.loading2}
               onClick={() => toggleLoading('loading2')}
-              loadingText="Processing"
             >
               Process Data
-            </Button>
-            <Button 
+            </UnifiedButton>
+            <UnifiedButton 
               variant="success" 
               loading={loadingStates.loading3}
               onClick={() => toggleLoading('loading3')}
               icon={<CheckIcon />}
-              loadingText="Saving"
             >
               Save Changes
-            </Button>
+            </UnifiedButton>
           </ButtonRow>
         </DemoSection>
 
         {/* Disabled States Demo */}
         <DemoSection title="Disabled States">
           <ButtonRow label="Disabled">
-            <Button variant="primary" disabled>Primary Disabled</Button>
-            <Button variant="secondary" disabled>Secondary Disabled</Button>
-            <Button variant="ghost" disabled>Ghost Disabled</Button>
-            <Button variant="success" disabled>Success Disabled</Button>
+            <UnifiedButton variant="primary" disabled>Primary Disabled</UnifiedButton>
+            <UnifiedButton variant="secondary" disabled>Secondary Disabled</UnifiedButton>
+            <UnifiedButton variant="ghost" disabled>Ghost Disabled</UnifiedButton>
+            <UnifiedButton variant="success" disabled>Success Disabled</UnifiedButton>
           </ButtonRow>
         </DemoSection>
 
         {/* Full Width Demo */}
         <DemoSection title="Full Width">
           <div className="space-y-4">
-            <Button variant="primary" fullWidth size="large">
+            <UnifiedButton variant="primary" fullWidth size="large">
               Full Width Primary Button
-            </Button>
-            <Button variant="secondary" fullWidth icon={<DownloadIcon />}>
+            </UnifiedButton>
+            <UnifiedButton variant="secondary" fullWidth icon={<DownloadIcon />}>
               Full Width Secondary with Icon
-            </Button>
-            <Button 
+            </UnifiedButton>
+            <UnifiedButton 
               variant="success" 
               fullWidth 
               loading={loadingStates.fullWidth}
               onClick={() => toggleLoading('fullWidth')}
-              loadingText="Processing your request"
             >
               Full Width Loading Button
-            </Button>
+            </UnifiedButton>
           </div>
         </DemoSection>
 
@@ -213,12 +210,12 @@ export default function ButtonDemoPage() {
                 <h4 className="text-xl font-medium text-foreground">Get Started Today</h4>
                 <p className="text-muted-foreground">Join thousands of companies using our climate solutions</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="primary" size="large" icon={<ArrowRightIcon />}>
+                  <UnifiedButton variant="primary" size="large" icon={<ArrowRightIcon />}>
                     Start Free Trial
-                  </Button>
-                  <Button variant="secondary" size="large">
+                  </UnifiedButton>
+                  <UnifiedButton variant="secondary" size="large">
                     Watch Demo
-                  </Button>
+                  </UnifiedButton>
                 </div>
               </div>
 
@@ -226,11 +223,11 @@ export default function ButtonDemoPage() {
               <div className="border border-border rounded p-4">
                 <h4 className="text-lg font-medium mb-4 text-foreground">Form Actions</h4>
                 <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                  <Button variant="ghost">Cancel</Button>
-                  <Button variant="secondary">Save Draft</Button>
-                  <Button variant="primary" icon={<CheckIcon />}>
+                  <UnifiedButton variant="ghost">Cancel</UnifiedButton>
+                  <UnifiedButton variant="secondary">Save Draft</UnifiedButton>
+                  <UnifiedButton variant="primary" icon={<CheckIcon />}>
                     Publish
-                  </Button>
+                  </UnifiedButton>
                 </div>
               </div>
 
@@ -238,24 +235,23 @@ export default function ButtonDemoPage() {
               <div className="border border-border rounded p-4">
                 <h4 className="text-lg font-medium mb-4 text-foreground">Async Actions</h4>
                 <div className="flex gap-3">
-                  <Button 
+                  <UnifiedButton 
                     variant="primary"
                     loading={loadingStates.simulate}
                     onClick={() => {
                       toggleLoading('simulate');
                       setTimeout(() => toggleLoading('simulate'), 3000);
                     }}
-                    loadingText="Calculating carbon footprint"
                   >
                     Calculate Impact
-                  </Button>
-                  <Button 
+                  </UnifiedButton>
+                  <UnifiedButton 
                     variant="success"
                     icon={<DownloadIcon />}
                     onClick={() => alert('Report downloaded!')}
                   >
                     Download Report
-                  </Button>
+                  </UnifiedButton>
                 </div>
               </div>
             </div>
@@ -270,38 +266,37 @@ export default function ButtonDemoPage() {
               <div>
                 <p className="text-muted-foreground mb-2">Basic button with variant and size:</p>
                 <code className="bg-background p-2 rounded block text-foreground">
-                  {`<Button variant="primary" size="large">Get Started</Button>`}
+                  {`<UnifiedButton variant="primary" size="large">Get Started</UnifiedButton>`}
                 </code>
               </div>
               
               <div>
                 <p className="text-muted-foreground mb-2">Button with icon:</p>
                 <code className="bg-background p-2 rounded block text-foreground">
-                  {`<Button variant="primary" icon={<ArrowRight />} iconPosition="right">
+                  {`<UnifiedButton variant="primary" icon={<ArrowRight />} iconPosition="right">
   Continue
-</Button>`}
+</UnifiedButton>`}
                 </code>
               </div>
               
               <div>
-                <p className="text-muted-foreground mb-2">Loading button with custom text:</p>
+                <p className="text-muted-foreground mb-2">Loading button:</p>
                 <code className="bg-background p-2 rounded block text-foreground">
-                  {`<Button 
+                  {`<UnifiedButton 
   variant="primary" 
   loading={isLoading}
-  loadingText="Processing"
 >
   Submit Form
-</Button>`}
+</UnifiedButton>`}
                 </code>
               </div>
               
               <div>
                 <p className="text-muted-foreground mb-2">Full width button:</p>
                 <code className="bg-background p-2 rounded block text-foreground">
-                  {`<Button variant="secondary" fullWidth>
+                  {`<UnifiedButton variant="secondary" fullWidth>
   Full Width Action
-</Button>`}
+</UnifiedButton>`}
                 </code>
               </div>
             </div>

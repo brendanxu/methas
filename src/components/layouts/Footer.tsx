@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {  motion  } from '@/lib/mock-framer-motion';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, message } from 'antd';
 import { useTheme, useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import UnifiedButton from '@/components/ui/UnifiedButton';
 import { cn } from '@/lib/utils';
 
 
@@ -337,24 +338,20 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                   />
                 </Form.Item>
                 <Form.Item className="mb-0">
-                  <Button
-                    type="primary"
+                  <UnifiedButton
+                    variant="primary"
                     size="large"
                     htmlType="submit"
                     loading={isSubmitting}
                     className={cn(
-                      'rounded-lg px-8 font-semibold transition-all duration-200',
-                      'hover:scale-105 active:scale-95',
+                      'px-8 font-semibold',
                       settings.highContrast && 'border-2 font-bold'
                     )}
-                    style={{
-                      backgroundColor: colors.primary,
-                      borderColor: colors.primary,
-                      color: '#FFFFFF',
-                    }}
+                    customColor={colors.primary}
+                    shadow="medium"
                   >
                     Subscribe
-                  </Button>
+                  </UnifiedButton>
                 </Form.Item>
               </Form>
             </div>

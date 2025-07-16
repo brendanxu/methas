@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
-  Button, 
   Input, 
   Select, 
   Space, 
@@ -39,6 +38,7 @@ import {
 import Link from 'next/link';
 import { File, FileQueryParams } from '@/lib/database';
 import { motion } from '@/lib/modern-animations';
+import UnifiedButton from '@/components/ui/UnifiedButton';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -172,17 +172,19 @@ const FileTable: React.FC<FileTableProps> = ({
       width: 120,
       render: (record: File) => (
         <Space size="small">
-          <Button
-            type="text"
+          <UnifiedButton
+            variant="ghost"
+            size="small"
             icon={<EyeOutlined />}
             onClick={() => handlePreview(record)}
-            title="预览"
+            aria-label="预览"
           />
-          <Button
-            type="text"
+          <UnifiedButton
+            variant="ghost"
+            size="small"
             icon={<DownloadOutlined />}
             onClick={() => window.open(record.url, '_blank')}
-            title="下载"
+            aria-label="下载"
           />
           <Popconfirm
             title="确定要删除这个文件吗？"
@@ -190,11 +192,12 @@ const FileTable: React.FC<FileTableProps> = ({
             okText="是"
             cancelText="否"
           >
-            <Button
-              type="text"
+            <UnifiedButton
+              variant="ghost"
+              size="small"
               icon={<DeleteOutlined />}
-              danger
-              title="删除"
+              customColor="#f5222d"
+              aria-label="删除"
             />
           </Popconfirm>
         </Space>
@@ -450,13 +453,15 @@ export default function FilesManagementPage() {
               </Select>
             </Col>
             <Col>
-              <Button
-                type="primary"
+              <UnifiedButton
+                variant="primary"
+                size="medium"
                 icon={<UploadOutlined />}
                 onClick={() => setUploadModalVisible(true)}
+                shadow="medium"
               >
                 上传文件
-              </Button>
+              </UnifiedButton>
             </Col>
           </Row>
         </Card>

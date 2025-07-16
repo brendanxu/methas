@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { motion } from '@/lib/modern-animations';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useVideoOptimization } from '@/hooks/useVideoOptimization';
+import UnifiedButton from '@/components/ui/UnifiedButton';
 import { cn } from '@/lib/utils';
 
 interface EnhancedHeroProps {
@@ -160,12 +160,15 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
         {hasError && (
           <div className="absolute top-4 left-4 bg-red-500/80 text-white px-4 py-2 rounded-lg text-sm">
             <span>Video failed to load</span>
-            <button 
+            <UnifiedButton
+              variant="ghost"
+              size="small"
               onClick={retry}
-              className="ml-2 underline hover:no-underline"
+              className="ml-2 text-white hover:text-white"
+              customColor="#FFFFFF"
             >
               Retry
-            </button>
+            </UnifiedButton>
           </div>
         )}
 
@@ -238,21 +241,18 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
                 visual.textAlignment === 'right' && 'flex justify-end'
               )}
             >
-              <Button 
-                type="primary"
+              <UnifiedButton 
+                variant="primary"
                 size="large"
                 onClick={handleCTAClick}
-                className={cn(
-                  'bg-[#00A651] hover:bg-[#008A44] border-none text-white font-semibold',
-                  'px-8 py-6 h-auto text-lg rounded-lg shadow-lg hover:shadow-xl',
-                  'transition-all duration-300 transform hover:scale-105',
-                  'focus:outline-none focus:ring-4 focus:ring-[#00A651]/30'
-                )}
-                icon={<ArrowRightOutlined className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />}
-                iconPosition="end"
+                className="px-8 py-6 h-auto text-lg font-semibold"
+                customColor="#00A651"
+                icon={<ArrowRightOutlined className="transition-transform duration-300 group-hover:translate-x-1" />}
+                iconPosition="right"
+                shadow="large"
               >
                 {content.ctaText}
-              </Button>
+              </UnifiedButton>
             </motion.div>
           </div>
         </div>
