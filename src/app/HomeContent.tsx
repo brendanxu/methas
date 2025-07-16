@@ -6,7 +6,8 @@ import {
   DynamicHomeHero,
   DynamicThemeShowcase, 
   DynamicServices,
-  DynamicCaseStudies 
+  DynamicCaseStudies,
+  DynamicSuccessStories
 } from '@/lib/dynamic-imports';
 import { ClientOnlyComponentPreloader } from '@/components/optimization/ClientOnlyComponentPreloader';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -76,26 +77,19 @@ export default function HomeContent() {
             </ClientOnlyComponentPreloader>
           </ErrorBoundary>
           
-          {/* Climate Solutions Section with Enhanced Animations */}
-          <Motion.div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" whileInView="slideUp">
-            <Motion.h2 
-              className="text-3xl font-bold mb-8" 
-              whileInView="slideUp"
-              transition={{ delay: 100 }}
+          {/* Success Stories Section */}
+          <ErrorBoundary fallback={<div className="min-h-[40vh] flex items-center justify-center">
+            <p className="text-lg text-muted-foreground">Failed to load success stories section</p>
+          </div>}>
+            <ClientOnlyComponentPreloader
+              importFn={() => import('@/components/sections/home/SuccessStories')}
+              componentName="SuccessStories"
+              trigger="scroll"
+              scrollThreshold={60}
             >
-              {t('home.climateSolutions', 'Climate Solutions')}
-            </Motion.h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <AnimatedCard key={i} className="bg-card rounded-lg p-6 shadow-soft border border-border" delay={i * 0.1}>
-                  <h3 className="text-xl font-semibold mb-4">{t(`home.solution${i}`, `Solution ${i}`)}</h3>
-                  <p className="text-muted-foreground">
-                    {t('home.solutionDescription', 'Comprehensive climate solutions for your business')}
-                  </p>
-                </AnimatedCard>
-              ))}
-            </div>
-          </Motion.div>
+              <DynamicSuccessStories />
+            </ClientOnlyComponentPreloader>
+          </ErrorBoundary>
           
           {/* Our Impact Section with Enhanced Animations */}
           <Motion.div className="bg-muted py-16" whileInView="slideUp">
