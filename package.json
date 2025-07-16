@@ -42,8 +42,6 @@
     "security:fix": "npm audit fix",
     "clean": "rm -rf .next && rm -rf out && rm -rf dist && rm -rf coverage",
     "clean:cache": "npm run clean && rm -rf node_modules/.cache",
-    "prepare": "husky install",
-    "pre-commit": "npm run validate",
     "release": "npm run clean && npm run validate:ci && npm run build:production"
   },
   "dependencies": {
