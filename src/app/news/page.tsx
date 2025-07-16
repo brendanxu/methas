@@ -12,12 +12,12 @@ import DatePicker from 'antd/lib/date-picker';
 import Card from 'antd/lib/card';
 import { Input, Radio, Pagination, Tag, Form, Skeleton, Button as AntButton, Empty } from '@/lib/antd-optimized';
 import { 
-  SearchOutlined, 
-  CalendarOutlined, 
-  DownloadOutlined,
-  MailOutlined,
-  FilterOutlined
-} from '@/lib/antd-optimized';
+  SearchIcon, 
+  CalendarIcon, 
+  DownloadIcon,
+  MailIcon,
+  FilterIcon
+} from '@/components/icons/LightweightIcons';
 import dayjs, { Dayjs } from 'dayjs';
 import { NewsCard } from '@/components/ui/NewsCard';
 import { Button } from '@/components/ui/Button';
@@ -352,7 +352,7 @@ export default function NewsPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="flex items-center gap-2 mb-4">
-                <FilterOutlined className="text-primary" />
+                <FilterIcon className="text-primary" />
                 <h3 className="text-lg font-semibold text-foreground">筛选和搜索</h3>
               </div>
               
@@ -382,7 +382,7 @@ export default function NewsPage() {
                     onChange={(value) => handleFilterChange('timeFilter', value)}
                     className="w-full"
                     size="large"
-                    suffixIcon={<CalendarOutlined />}
+                    suffixIcon={<CalendarIcon />}
                   >
                     <Option value="all">全部时间</Option>
                     {timeFilterOptions.map(option => (
@@ -429,7 +429,7 @@ export default function NewsPage() {
                   onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
                   onSearch={(value) => handleFilterChange('searchQuery', value)}
                   size="large"
-                  enterButton={<SearchOutlined />}
+                  enterButton={<SearchIcon />}
                   allowClear
                 />
               </div>
@@ -560,7 +560,7 @@ export default function NewsPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
                 <div className="flex items-center gap-2 mb-4">
-                  <MailOutlined className="text-primary" />
+                  <MailIcon className="text-primary" />
                   <h3 className="text-lg font-semibold text-foreground">订阅动态</h3>
                 </div>
                 <p className="text-muted-foreground mb-4">
@@ -594,7 +594,7 @@ export default function NewsPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <div className="flex items-center gap-2 mb-4">
-                  <DownloadOutlined className="text-primary" />
+                  <DownloadIcon className="text-primary" />
                   <h3 className="text-lg font-semibold text-foreground">资源下载</h3>
                 </div>
                 <div className="space-y-4">
@@ -609,7 +609,7 @@ export default function NewsPage() {
                         <span className="text-xs text-muted-foreground">
                           {resource.type} • {resource.size}
                         </span>
-                        <AntButton size="small" type="link" icon={<DownloadOutlined />}>
+                        <AntButton size="small" type="link" icon={<DownloadIcon />}>
                           下载
                         </AntButton>
                       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Button, Table, Tag, Space, Modal, message, Select, Input, Typography } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
+import { PlusIcon, EditIcon, DeleteIcon, EyeIcon } from '@/components/icons/LightweightIcons'
 import { useRouter } from 'next/navigation'
 import type { ColumnsType } from 'antd/es/table'
 
@@ -47,10 +47,11 @@ export default function ContentManagementClient() {
         page: page.toString(),
         limit: pagination.pageSize.toString(),
         ...(filters.type && { type: filters.type }),
-        ...(filters.status && { status: filters.status })
+        ...(filters.status && { status: filters.status }),
+        ...(filters.search && { search: filters.search })
       })
 
-      const response = await fetch(`/api/content?${params}`)
+      const response = await fetch(`/api/admin/content?${params}`)
       
       if (response.ok) {
         const data = await response.json()
@@ -68,7 +69,7 @@ export default function ContentManagementClient() {
     } finally {
       setLoading(false)
     }
-  }, [pagination.pageSize, filters.type, filters.status])
+  }, [pagination.pageSize, filters.type, filters.status, filters.search])
 
   useEffect(() => {
     fetchContents()
@@ -83,7 +84,7 @@ export default function ContentManagementClient() {
       cancelText: '取消',
       onOk: async () => {
         try {
-          const response = await fetch(`/api/content/${id}`, {
+          const response = await fetch(`/api/admin/content/${id}`, {
             method: 'DELETE'
           })
 
@@ -180,14 +181,14 @@ export default function ContentManagementClient() {
         <Space>
           <Button
             type="link"
-            icon={<EyeOutlined />}
+            icon={<EyeIcon />}
             onClick={() => router.push(`/admin/content/${record.id}`)}
           >
             查看
           </Button>
           <Button
             type="link"
-            icon={<EditOutlined />}
+            icon={<EditIcon />}
             onClick={() => router.push(`/admin/content/${record.id}/edit`)}
           >
             编辑
@@ -195,7 +196,7 @@ export default function ContentManagementClient() {
           <Button
             type="link"
             danger
-            icon={<DeleteOutlined />}
+            icon={<DeleteIcon />}
             onClick={() => handleDelete(record.id, record.title)}
           >
             删除
@@ -211,7 +212,7 @@ export default function ContentManagementClient() {
         <Title level={2}>内容管理</Title>
         <Button
           type="primary"
-          icon={<PlusOutlined />}
+          icon={<PlusIcon />}
           onClick={() => router.push('/admin/content/new')}
         >
           新建内容
@@ -238,8 +239,9 @@ export default function ContentManagementClient() {
           style={{ width: 240 }}
           onSearch={(value) => {
             setFilters(prev => ({ ...prev, search: value }))
-            // 实际项目中需要实现搜索API
+            setPagination(prev => ({ ...prev, current: 1 }))
           }}
+          allowClear
         />
       </div>
 

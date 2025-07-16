@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Form, Input, Button, Card, Alert, Typography } from 'antd'
-import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { UserIcon, LockIcon } from '@/components/icons/LightweightIcons'
 
 const { Title } = Typography
 
@@ -83,7 +83,7 @@ export default function AdminLoginClient() {
             ]}
           >
             <Input 
-              prefix={<UserOutlined />} 
+              prefix={<UserIcon />} 
               placeholder="admin@southpole.com" 
             />
           </Form.Item>
@@ -94,7 +94,7 @@ export default function AdminLoginClient() {
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
             <Input.Password 
-              prefix={<LockOutlined />} 
+              prefix={<LockIcon />} 
               placeholder="Password" 
             />
           </Form.Item>

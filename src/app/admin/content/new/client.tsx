@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Form, Input, Select, Button, message, Card, Typography } from 'antd'
+import { Form, Input, Select, Button, message, Card, Typography, Space } from 'antd'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import FileUploadButton from '@/components/admin/FileUploadButton'
 
 // 动态导入富文本编辑器（避免SSR问题）
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
-import 'react-quill/dist/quill.snow.css'
+const RichTextEditor = dynamic(() => import('@/components/editor/RichTextEditor'), { ssr: false })
 
 const { Title } = Typography
 const { TextArea } = Input
@@ -45,7 +45,7 @@ export default function NewContentClient() {
   const handleSubmit = async (values: any) => {
     setLoading(true)
     try {
-      const response = await fetch('/api/content', {
+      const response = await fetch('/api/admin/content', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,21 +86,32 @@ export default function NewContentClient() {
     form.setFieldsValue({ slug })
   }
 
-  // Quill编辑器配置
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link', 'image'],
-      ['clean']
-    ]
+  // 保存功能
+  const handleSave = () => {
+    form.validateFields().then(values => {
+      handleSubmit({
+        ...values,
+        content,
+        tags: values.tags || []
+      })
+    }).catch(errorInfo => {
+      message.error('请检查表单信息')
+    })
   }
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
         <Title level={2}>新建内容</Title>
+        <Space>
+          <FileUploadButton 
+            onUploadSuccess={(url, file) => {
+              message.success(`文件 ${file.filename} 上传成功`)
+            }}
+            accept="image/*"
+            buttonText="上传图片"
+          />
+        </Space>
       </div>
 
       <Card>
@@ -192,15 +203,13 @@ export default function NewContentClient() {
                 label="内容正文"
                 required
               >
-                <div style={{ minHeight: '300px' }}>
-                  <ReactQuill
-                    theme="snow"
-                    value={content}
-                    onChange={setContent}
-                    modules={quillModules}
-                    placeholder="请输入内容正文..."
-                  />
-                </div>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder="请输入内容正文..."
+                  height={400}
+                  onSave={handleSave}
+                />
               </Form.Item>
             </div>
           </div>

@@ -12,7 +12,8 @@ import {
   MailOutlined,
   SettingOutlined,
   LogoutOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  TranslationOutlined
 } from '@ant-design/icons'
 import { signOut } from 'next-auth/react'
 
@@ -40,6 +41,11 @@ const menuItems = [
     label: 'Form Submissions',
   },
   {
+    key: '/admin/emails',
+    icon: <MailOutlined />,
+    label: 'Email Management',
+  },
+  {
     key: '/admin/users',
     icon: <UserOutlined />,
     label: 'User Management',
@@ -58,6 +64,11 @@ const menuItems = [
     key: '/admin/rate-limits',
     icon: <ThunderboltOutlined />,
     label: 'Rate Limits',
+  },
+  {
+    key: '/admin/i18n',
+    icon: <TranslationOutlined />,
+    label: 'I18n Management',
   },
   {
     key: '/admin/settings',

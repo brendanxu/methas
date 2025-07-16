@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from '@/lib/mock-framer-motion';
+import { Motion, AnimatePresence } from '@/components/animations/LightweightMotion';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/app/providers';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -107,7 +107,7 @@ export const EnhancedMobileMenu: React.FC<EnhancedMobileMenuProps> = ({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <Motion
         className="fixed inset-0 z-50 lg:hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -115,27 +115,27 @@ export const EnhancedMobileMenu: React.FC<EnhancedMobileMenuProps> = ({
         transition={{ duration: settings.reducedMotion ? 0 : 0.2 }}
       >
         {/* Backdrop */}
-        <motion.div
+        <Motion
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-        />
+        >
+          <div />
+        </Motion>
 
         {/* Menu Panel */}
-        <motion.div
+        <Motion
           ref={swipeRef}
           className="absolute right-0 top-0 h-full w-full max-w-sm shadow-2xl"
           style={{ backgroundColor: colors.background }}
-          initial={{ x: '100%' }}
+          initial={{ x: 30 }}
           animate={{ x: 0 }}
-          exit={{ x: '100%' }}
+          exit={{ x: 30 }}
           transition={{ 
-            type: 'spring',
-            damping: 25,
-            stiffness: 200,
-            duration: settings.reducedMotion ? 0 : undefined,
+            duration: settings.reducedMotion ? 0 : 0.3,
+            easing: 'easeOut'
           }}
         >
           {/* Header */}
@@ -248,8 +248,8 @@ export const EnhancedMobileMenu: React.FC<EnhancedMobileMenuProps> = ({
               {currentView === 'submenu' ? '← 向左滑动返回' : '← 向左滑动关闭'}
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </Motion>
+      </Motion>
     </AnimatePresence>
   );
 };
@@ -274,7 +274,7 @@ const MainMenuView: React.FC<MainMenuViewProps> = ({
   const { settings } = useAccessibility();
 
   return (
-    <motion.div
+    <Motion
       className="h-full overflow-y-auto p-6"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -294,7 +294,7 @@ const MainMenuView: React.FC<MainMenuViewProps> = ({
           />
         ))}
       </nav>
-    </motion.div>
+    </Motion>
   );
 };
 
@@ -312,7 +312,7 @@ const SubmenuView: React.FC<SubmenuViewProps> = ({ item, onBack, onClose }) => {
   if (!item || !item.children) return null;
 
   return (
-    <motion.div
+    <Motion
       className="h-full overflow-y-auto"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -354,7 +354,7 @@ const SubmenuView: React.FC<SubmenuViewProps> = ({ item, onBack, onClose }) => {
       {/* Submenu Items */}
       <div className="p-6 space-y-4">
         {item.children.map((child, index) => (
-          <motion.div
+          <Motion
             key={child.label}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -405,10 +405,10 @@ const SubmenuView: React.FC<SubmenuViewProps> = ({ item, onBack, onClose }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
-          </motion.div>
+          </Motion>
         ))}
       </div>
-    </motion.div>
+    </Motion>
   );
 };
 
@@ -436,7 +436,7 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
 
   if (item.children) {
     return (
-      <motion.div
+      <Motion
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ 
@@ -470,12 +470,12 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
             </svg>
           </div>
         </button>
-      </motion.div>
+      </Motion>
     );
   }
 
   return (
-    <motion.div
+    <Motion
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ 
@@ -491,7 +491,7 @@ const MobileNavigationItem: React.FC<MobileNavigationItemProps> = ({
       >
         <span className="font-medium">{item.label}</span>
       </Link>
-    </motion.div>
+    </Motion>
   );
 };
 

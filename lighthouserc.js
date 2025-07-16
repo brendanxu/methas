@@ -11,9 +11,9 @@ module.exports = {
       // URLs to test
       url: [
         'http://localhost:3000',
-        'http://localhost:3000/services',
-        'http://localhost:3000/case-studies',
         'http://localhost:3000/contact',
+        'http://localhost:3000/services/carbon-footprint-assessment',
+        'http://localhost:3000/news'
       ],
       // Lighthouse settings
       settings: {

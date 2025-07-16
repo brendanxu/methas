@@ -31,6 +31,8 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([provider])
 }
 
 model Session {
@@ -39,6 +41,9 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
 }
 
 model User {
@@ -56,6 +61,12 @@ model User {
   sessions Session[]
   contents Content[]
   auditLogs AuditLog[]
+  uploadedFiles File[]
+  userPermissions UserPermission[]
+
+  @@index([role])
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model VerificationToken {
@@ -70,6 +81,62 @@ enum UserRole {
   USER
   ADMIN
   SUPER_ADMIN
+}
+
+// 权限管理
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique  // 权限名称，如 'content:read', 'users:write'
+  description String?             // 权限描述
+  resource    String              // 资源类型，如 'content', 'users', 'files'
+  action      String              // 操作类型，如 'read', 'write', 'delete'
+  createdAt   DateTime @default(now())
+
+  // Relations
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
+  @@index([resource])
+  @@index([action])
+  @@index([resource, action])
+}
+
+// 角色权限关联表
+model RolePermission {
+  id           String     @id @default(cuid())
+  role         UserRole
+  permissionId String
+  granted      Boolean    @default(true)  // 是否授予权限
+  createdAt    DateTime   @default(now())
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([role, permissionId])
+  @@index([role])
+  @@index([permissionId])
+  @@index([granted])
+}
+
+// 用户特定权限（覆盖角色权限）
+model UserPermission {
+  id           String   @id @default(cuid())
+  userId       String
+  permissionId String
+  granted      Boolean  // true=授予, false=拒绝（覆盖角色权限）
+  reason       String?  // 授予/拒绝原因
+  expiresAt    DateTime? // 权限过期时间
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+  @@index([userId])
+  @@index([permissionId])
+  @@index([granted])
+  @@index([expiresAt])
+  @@index([createdAt])
 }
 
 // Content Management
@@ -89,6 +156,14 @@ model Content {
   updatedAt DateTime      @updatedAt
 
   author User @relation(fields: [authorId], references: [id])
+
+  @@index([type])
+  @@index([status])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([type, status])
+  @@index([status, createdAt])
 }
 
 enum ContentType {
@@ -113,6 +188,13 @@ model FormSubmission {
   notes     String?            // For storing error messages or additional info
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([type, status])
+  @@index([status, createdAt])
 }
 
 enum FormSubmissionType {
@@ -131,14 +213,28 @@ enum SubmissionStatus {
 
 // File Management
 model File {
-  id        String   @id @default(cuid())
-  filename  String
-  originalName String
-  url       String
-  size      Int
-  mimeType  String
-  uploadedBy String?
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  filename        String
+  storedFilename  String
+  url             String
+  size            Int
+  mimeType        String
+  type            FileType @default(IMAGE)
+  uploadedBy      String?
+  uploadedById    String?  
+  uploadedByUser  User?    @relation(fields: [uploadedById], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@index([type])
+  @@index([uploadedById])
+  @@index([createdAt])
+  @@index([mimeType])
+  @@index([type, createdAt])
+}
+
+enum FileType {
+  IMAGE
+  DOCUMENT
 }
 
 // Audit Logs
@@ -151,4 +247,12 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@index([userId, action])
+  @@index([resource, action])
+  @@index([createdAt, action])
 }

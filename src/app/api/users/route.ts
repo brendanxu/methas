@@ -11,6 +11,7 @@ import {
   ErrorCode,
   validateRequestBody
 } from '@/lib/api-error-handler'
+import { CachedQueries } from '@/lib/cache/cached-queries'
 
 const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -48,39 +49,20 @@ const handleGetUsers = async (request: NextRequest, context: any) => {
   }
 
   try {
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          emailVerified: true,
-          image: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              contents: true,
-            }
-          }
-        }
-      }),
-      prisma.user.count({ where })
-    ])
+    // 使用缓存查询
+    const result = await CachedQueries.getUsersWithFilters({
+      page,
+      limit,
+      role: role || undefined,
+      search: search || undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    })
 
     return createSuccessResponse({
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
+      ...result.data,
+      cached: result.fromCache,
+      timestamp: result.timestamp
     })
   } catch (error) {
     throw new APIError(
@@ -165,6 +147,9 @@ const handleCreateUser = async (request: NextRequest, context: any) => {
         }
       }
     })
+
+    // 清除用户相关缓存
+    await CachedQueries.invalidateUserCache(user.id)
 
     return createSuccessResponse(user, { created: true })
     

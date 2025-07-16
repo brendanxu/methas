@@ -1,12 +1,67 @@
 'use client';
 
 import React from 'react';
-import { Dashboard } from '@/components/charts/Dashboard';
-import { EmissionChart, generateSampleEmissionData } from '@/components/charts/EmissionChart';
-import { ProgressChart, generateSampleProgressData } from '@/components/charts/ProgressChart';
-import { ImpactChart, generateSampleImpactData } from '@/components/charts/ImpactChart';
+import dynamic from 'next/dynamic';
 import { Card, Row, Col, Typography, Divider, Button, Space } from 'antd';
-import { BarChartOutlined, DashboardOutlined, LineChartOutlined } from '@ant-design/icons';
+import { DatabaseIcon } from '@/components/icons/LightweightIcons';
+
+// 图表组件懒加载
+const Dashboard = dynamic(() => import('@/components/charts/Dashboard').then(mod => ({ default: mod.Dashboard })), {
+  loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-lg flex items-center justify-center">
+    <div className="text-center">
+      <DatabaseIcon className="text-4xl text-gray-400 mb-2" />
+      <p className="text-gray-500">加载仪表板中...</p>
+    </div>
+  </div>,
+  ssr: false
+});
+
+const EmissionChart = dynamic(() => import('@/components/charts/EmissionChart').then(mod => ({ 
+  default: mod.EmissionChart 
+})), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-100 rounded-lg flex items-center justify-center">
+    <div className="text-center">
+      <DatabaseIcon className="text-2xl text-gray-400 mb-2" />
+      <p className="text-gray-500">加载排放图表...</p>
+    </div>
+  </div>,
+  ssr: false
+});
+
+const ProgressChart = dynamic(() => import('@/components/charts/ProgressChart').then(mod => ({ 
+  default: mod.ProgressChart 
+})), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-100 rounded-lg flex items-center justify-center">
+    <div className="text-center">
+      <DatabaseIcon className="text-2xl text-gray-400 mb-2" />
+      <p className="text-gray-500">加载进度图表...</p>
+    </div>
+  </div>,
+  ssr: false
+});
+
+const ImpactChart = dynamic(() => import('@/components/charts/ImpactChart').then(mod => ({ 
+  default: mod.ImpactChart 
+})), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-100 rounded-lg flex items-center justify-center">
+    <div className="text-center">
+      <DatabaseIcon className="text-2xl text-gray-400 mb-2" />
+      <p className="text-gray-500">加载影响图表...</p>
+    </div>
+  </div>,
+  ssr: false
+});
+
+// 数据生成函数直接导入（需要在渲染时使用）
+import { 
+  generateSampleEmissionData 
+} from '@/components/charts/EmissionChart';
+import { 
+  generateSampleProgressData 
+} from '@/components/charts/ProgressChart';
+import { 
+  generateSampleImpactData 
+} from '@/components/charts/ImpactChart';
 
 const { Title, Paragraph } = Typography;
 
@@ -18,7 +73,7 @@ export default function ChartsDemoContent() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="text-center">
             <Title level={1} className="mb-4">
-              <BarChartOutlined className="mr-3" />
+              <DatabaseIcon className="mr-3" />
               数据可视化展示
             </Title>
             <Paragraph className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -27,10 +82,10 @@ export default function ChartsDemoContent() {
             </Paragraph>
             
             <Space className="mt-6">
-              <Button type="primary" size="large" icon={<DashboardOutlined />}>
+              <Button type="primary" size="large" icon={<DatabaseIcon />}>
                 查看完整仪表板
               </Button>
-              <Button size="large" icon={<LineChartOutlined />}>
+              <Button size="large" icon={<DatabaseIcon />}>
                 详细数据分析
               </Button>
             </Space>
@@ -43,7 +98,7 @@ export default function ChartsDemoContent() {
         <section className="mb-12">
           <Card className="shadow-lg">
             <Title level={2} className="mb-6">
-              <DashboardOutlined className="mr-2" />
+              <DatabaseIcon className="mr-2" />
               综合数据仪表板
             </Title>
             <Paragraph className="mb-6 text-gray-600">
@@ -169,7 +224,7 @@ export default function ChartsDemoContent() {
           <Row gutter={[24, 24]}>
             <Col xs={24} md={8}>
               <Card className="text-center h-full">
-                <LineChartOutlined className="text-4xl text-blue-500 mb-4" />
+                <DatabaseIcon className="text-4xl text-blue-500 mb-4" />
                 <Title level={4}>多样化图表类型</Title>
                 <Paragraph className="text-gray-600">
                   支持线图、柱图、饼图、面积图、仪表盘等多种图表类型，满足不同数据展示需求。
@@ -179,7 +234,7 @@ export default function ChartsDemoContent() {
 
             <Col xs={24} md={8}>
               <Card className="text-center h-full">
-                <DashboardOutlined className="text-4xl text-green-500 mb-4" />
+                <DatabaseIcon className="text-4xl text-green-500 mb-4" />
                 <Title level={4}>实时数据更新</Title>
                 <Paragraph className="text-gray-600">
                   支持自动数据刷新、缓存管理和实时监控，确保数据的时效性和准确性。
@@ -189,7 +244,7 @@ export default function ChartsDemoContent() {
 
             <Col xs={24} md={8}>
               <Card className="text-center h-full">
-                <BarChartOutlined className="text-4xl text-purple-500 mb-4" />
+                <DatabaseIcon className="text-4xl text-purple-500 mb-4" />
                 <Title level={4}>交互式操作</Title>
                 <Paragraph className="text-gray-600">
                   支持图表类型切换、数据筛选、导出功能，提供丰富的用户交互体验。

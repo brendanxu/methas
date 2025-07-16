@@ -13,6 +13,7 @@ export interface ActionConfig {
   icon?: React.ReactNode
   type?: 'primary' | 'default' | 'dashed' | 'link' | 'text'
   danger?: boolean
+  disabled?: boolean
   onClick: (record: any) => void
 }
 
@@ -165,6 +166,7 @@ export const ActionColumnUtils = {
             type={action.type || 'link'}
             icon={action.icon}
             danger={action.danger}
+            disabled={action.disabled}
             size="small"
             onClick={() => action.onClick(record)}
           >

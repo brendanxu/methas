@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { DatabaseHealthCheck, QueryOptimizer, OptimizedQueries } from '@/lib/database/query-optimizer'
 
 interface HealthCheck {
   status: 'healthy' | 'degraded' | 'unhealthy'
@@ -46,37 +47,18 @@ export async function GET(request: NextRequest) {
     }
     const recommendations: string[] = []
 
-    // Test connection
-    try {
-      await prisma.$connect()
-      checks.connection = true
-    } catch (error) {
-      recommendations.push('Database connection failed - check DATABASE_URL configuration')
+    // Test connection using health check utility
+    const connectionCheck = await DatabaseHealthCheck.checkConnection()
+    checks.connection = connectionCheck.status === 'healthy'
+    if (connectionCheck.status !== 'healthy') {
+      recommendations.push(connectionCheck.message)
     }
 
-    // Get table statistics
-    const [
-      userCount,
-      contentCount,
-      formCount,
-      fileCount,
-      auditLogCount,
-    ] = await Promise.all([
-      prisma.user.count(),
-      prisma.content.count(),
-      prisma.formSubmission.count(),
-      prisma.file.count(),
-      prisma.auditLog.count(),
-    ])
+    // Get table statistics using optimized method
+    const tableStats = await DatabaseHealthCheck.getTableStats()
 
-    checks.recordCounts = {
-      users: userCount,
-      contents: contentCount,
-      formSubmissions: formCount,
-      files: fileCount,
-      auditLogs: auditLogCount,
-    }
-    checks.tableCount = 5
+    checks.recordCounts = tableStats
+    checks.tableCount = Object.keys(tableStats).length
 
     // Check recent activity
     const [lastUser, lastContent, lastForm] = await Promise.all([
@@ -91,19 +73,15 @@ export async function GET(request: NextRequest) {
       lastFormSubmission: lastForm?.createdAt,
     }
 
-    // Test query performance
-    const perfStart = Date.now()
-    await prisma.content.findMany({
-      where: { status: 'PUBLISHED' },
-      include: { author: true },
-      take: 10,
-    })
-    const queryTime = Date.now() - perfStart
-    checks.performance.avgQueryTime = queryTime
+    // Analyze query performance using optimizer
+    const slowQueryAnalysis = await DatabaseHealthCheck.analyzeSlowQueries()
+    checks.performance.avgQueryTime = slowQueryAnalysis.totalQueries > 0 
+      ? slowQueryAnalysis.slowQueryDetails.reduce((sum, q) => sum + q.averageTime, 0) / slowQueryAnalysis.totalQueries 
+      : 0
+    checks.performance.slowQueries = slowQueryAnalysis.slowQueries
 
-    if (queryTime > 100) {
-      checks.performance.slowQueries++
-      recommendations.push('Query performance is degraded - consider optimizing queries or adding indexes')
+    if (slowQueryAnalysis.slowQueries > 0) {
+      recommendations.push(...slowQueryAnalysis.recommendations)
     }
 
     // Database-specific checks for SQLite
@@ -189,21 +167,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, message: 'Database statistics updated' })
 
       case 'cleanup':
-        // Clean up old audit logs (older than 90 days)
-        const cutoffDate = new Date()
-        cutoffDate.setDate(cutoffDate.getDate() - 90)
-        
-        const deleted = await prisma.auditLog.deleteMany({
-          where: {
-            createdAt: {
-              lt: cutoffDate,
-            },
-          },
-        })
+        // Use optimized cleanup method
+        const cleanupResult = await OptimizedQueries.cleanupExpiredData()
         
         return NextResponse.json({ 
           success: true, 
-          message: `Cleaned up ${deleted.count} old audit log entries` 
+          message: `Cleaned up ${cleanupResult.deletedSessions} expired sessions and ${cleanupResult.deletedPermissions} expired permissions`
         })
 
       default:

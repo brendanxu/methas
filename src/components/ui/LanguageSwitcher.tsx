@@ -3,14 +3,12 @@
 import React from 'react';
 import { Dropdown, Button } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/hooks/useI18n';
 import { 
-  changeLanguage, 
-  getCurrentLanguage, 
-  languageNames, 
-  supportedLanguages,
-  type SupportedLanguage 
-} from '@/lib/i18n';
+  SUPPORTED_LOCALES, 
+  LOCALE_NAMES,
+  type Locale 
+} from '@/lib/i18n-lite';
 import { cn } from '@/lib/utils';
 
 interface LanguageSwitcherProps {
@@ -26,25 +24,23 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   type = 'text',
   showText = true,
 }) => {
-  const { t } = useTranslation('common');
-  const currentLanguage = getCurrentLanguage();
+  const { locale, setLocale, t } = useI18n();
 
-  const handleLanguageChange = async (language: SupportedLanguage) => {
-    if (language !== currentLanguage) {
-      await changeLanguage(language);
-      // No need to reload - URL navigation and i18n context will handle the update
+  const handleLanguageChange = (language: Locale) => {
+    if (language !== locale) {
+      setLocale(language);
     }
   };
 
-  const menuItems = supportedLanguages.map((lang) => ({
+  const menuItems = SUPPORTED_LOCALES.map((lang) => ({
     key: lang,
     label: (
       <div className="flex items-center gap-2">
         <span className="text-lg">
           {lang === 'en' ? '🇺🇸' : '🇨🇳'}
         </span>
-        <span>{languageNames[lang]}</span>
-        {lang === currentLanguage && (
+        <span>{LOCALE_NAMES[lang]}</span>
+        {lang === locale && (
           <span className="text-primary">✓</span>
         )}
       </div>
@@ -53,7 +49,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   }));
 
   const getCurrentLanguageFlag = () => {
-    return currentLanguage === 'en' ? '🇺🇸' : '🇨🇳';
+    return locale === 'en' ? '🇺🇸' : '🇨🇳';
   };
 
   return (
@@ -72,7 +68,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <span className="text-lg">{getCurrentLanguageFlag()}</span>
         {showText && (
           <span className="hidden sm:inline">
-            {languageNames[currentLanguage]}
+            {LOCALE_NAMES[locale]}
           </span>
         )}
       </Button>
@@ -98,16 +94,15 @@ export const LanguageSwitcherCompact: React.FC<{ className?: string }> = ({
 export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({ 
   className 
 }) => {
-  const currentLanguage = getCurrentLanguage();
+  const { locale, setLocale } = useI18n();
   
-  const handleLanguageChange = async (language: SupportedLanguage) => {
-    if (language !== currentLanguage) {
-      await changeLanguage(language);
-      // No need to reload - URL navigation and i18n context will handle the update
+  const handleLanguageChange = (language: Locale) => {
+    if (language !== locale) {
+      setLocale(language);
     }
   };
 
-  const menuItems = supportedLanguages.map((lang) => ({
+  const menuItems = SUPPORTED_LOCALES.map((lang) => ({
     key: lang,
     label: (
       <div className="flex items-center justify-between gap-3 min-w-[120px]">
@@ -115,9 +110,9 @@ export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({
           <span className="text-lg">
             {lang === 'en' ? '🇺🇸' : '🇨🇳'}
           </span>
-          <span className="font-medium">{languageNames[lang]}</span>
+          <span className="font-medium">{LOCALE_NAMES[lang]}</span>
         </div>
-        {lang === currentLanguage && (
+        {lang === locale && (
           <span className="text-primary text-sm">✓</span>
         )}
       </div>
@@ -138,10 +133,10 @@ export const LanguageSwitcherFull: React.FC<{ className?: string }> = ({
       >
         <GlobalOutlined className="text-gray-600 dark:text-gray-400" />
         <span className="text-lg">
-          {currentLanguage === 'en' ? '🇺🇸' : '🇨🇳'}
+          {locale === 'en' ? '🇺🇸' : '🇨🇳'}
         </span>
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {languageNames[currentLanguage]}
+          {LOCALE_NAMES[locale]}
         </span>
       </Button>
     </Dropdown>

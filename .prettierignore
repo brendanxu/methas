@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Cache
+.cache/
+.vercel/
+.turbo/
+
+# Coverage
+coverage/
+
+# Test results
+test-results/
+playwright-report/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/migrations/
+
+# Generated files
+*.d.ts
+!src/**/*.d.ts
+
+# Package manager
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Bundle analysis
+bundle-analysis/

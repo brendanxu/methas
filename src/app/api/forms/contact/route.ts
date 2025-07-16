@@ -118,18 +118,25 @@ async function sendContactNotification(data: ContactFormData): Promise<{ notific
   }
 }
 
-// 保存到数据库函数（模拟）
-async function saveContactSubmission(data: ContactFormData): Promise<string> {
+// 保存到数据库函数
+async function saveContactSubmission(data: ContactFormData, clientInfo: any): Promise<string> {
   try {
-    // 在实际生产环境中，这里应该保存到数据库
-    // 例如：MongoDB, PostgreSQL, MySQL 等
+    const { prisma } = await import('@/lib/prisma');
     
-    const submissionId = `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // 保存到FormSubmission表
+    const submission = await prisma.formSubmission.create({
+      data: {
+        type: 'CONTACT',
+        status: 'NEW',
+        data: {
+          ...data,
+          clientInfo,
+          timestamp: new Date().toISOString()
+        }
+      }
+    });
 
-    // 模拟数据库保存延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    return submissionId;
+    return submission.id;
   } catch (error) {
     logError('Failed to save contact submission:', error);
     throw new Error('Database save failed');
@@ -258,8 +265,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 获取客户端信息
+    const clientInfo = {
+      ip,
+      userAgent: request.headers.get('user-agent') || '',
+      referer: request.headers.get('referer') || undefined,
+      timestamp: new Date().toISOString()
+    };
+
     // 保存到数据库
-    const submissionId = await saveContactSubmission(sanitizedData);
+    const submissionId = await saveContactSubmission(sanitizedData, clientInfo);
 
     // 发送邮件通知
     const emailResults = await sendContactNotification(sanitizedData);

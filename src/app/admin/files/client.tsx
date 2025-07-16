@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Table, Button, Tag, Space, Modal, message, Input, Typography, Image, Select } from 'antd'
 import { 
-  DeleteOutlined, 
-  EyeOutlined,
-  DownloadOutlined,
-  SearchOutlined
-} from '@ant-design/icons'
+  DeleteIcon, 
+  EyeIcon,
+  DownloadIcon,
+  SearchIcon
+} from '@/components/icons/LightweightIcons'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title } = Typography
@@ -16,11 +16,16 @@ const { Search } = Input
 interface FileRecord {
   id: string
   filename: string
-  originalName: string
+  storedFilename: string
   url: string
   size: number
   mimeType: string
-  uploadedBy: string | null
+  type: 'IMAGE' | 'DOCUMENT'
+  uploadedByUser: {
+    id: string
+    name: string
+    email: string
+  } | null
   createdAt: string
 }
 
@@ -35,7 +40,6 @@ export default function FileManagementClient() {
     total: 0
   })
   const [filters, setFilters] = useState({
-    category: undefined as string | undefined,
     type: undefined as string | undefined,
     search: ''
   })
@@ -46,11 +50,11 @@ export default function FileManagementClient() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: pagination.pageSize.toString(),
-        ...(filters.category && { category: filters.category }),
-        ...(filters.type && { type: filters.type })
+        ...(filters.type && { type: filters.type }),
+        ...(filters.search && { search: filters.search })
       })
 
-      const response = await fetch(`/api/upload?${params}`)
+      const response = await fetch(`/api/admin/upload?${params}`)
       
       if (response.ok) {
         const data = await response.json()
@@ -68,7 +72,7 @@ export default function FileManagementClient() {
     } finally {
       setLoading(false)
     }
-  }, [pagination.pageSize, filters.category, filters.type])
+  }, [pagination.pageSize, filters.type, filters.search])
 
   useEffect(() => {
     fetchFiles()
@@ -77,13 +81,13 @@ export default function FileManagementClient() {
   const handleDelete = (file: FileRecord) => {
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除文件 "${file.originalName}" 吗？此操作不可恢复。`,
+      content: `确定要删除文件 "${file.filename}" 吗？此操作不可恢复。`,
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
-          const response = await fetch(`/api/upload/${file.id}`, {
+          const response = await fetch(`/api/admin/upload/${file.id}`, {
             method: 'DELETE'
           })
 
@@ -109,25 +113,13 @@ export default function FileManagementClient() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const getFileTypeTag = (mimeType: string) => {
-    if (mimeType.startsWith('image/')) {
+  const getFileTypeTag = (type: string) => {
+    if (type === 'IMAGE') {
       return <Tag color="green">图片</Tag>
-    } else if (mimeType.includes('pdf')) {
-      return <Tag color="red">PDF</Tag>
-    } else if (mimeType.includes('word') || mimeType.includes('document')) {
+    } else if (type === 'DOCUMENT') {
       return <Tag color="blue">文档</Tag>
     } else {
       return <Tag color="default">其他</Tag>
-    }
-  }
-
-  const getCategoryTag = (url: string) => {
-    if (url.includes('/avatar/')) {
-      return <Tag color="purple">头像</Tag>
-    } else if (url.includes('/content/')) {
-      return <Tag color="orange">内容</Tag>
-    } else {
-      return <Tag color="default">通用</Tag>
     }
   }
 
@@ -142,7 +134,7 @@ export default function FileManagementClient() {
         isImage(record.mimeType) ? (
           <Image
             src={record.url}
-            alt={record.originalName}
+            alt={record.filename}
             width={60}
             height={60}
             className="object-cover rounded"
@@ -163,14 +155,13 @@ export default function FileManagementClient() {
       render: (_, record) => (
         <div>
           <div className="font-medium truncate max-w-[200px]">
-            {record.originalName}
-          </div>
-          <div className="text-gray-500 text-sm">
             {record.filename}
           </div>
+          <div className="text-gray-500 text-sm">
+            {record.storedFilename}
+          </div>
           <div className="flex gap-2 mt-1">
-            {getFileTypeTag(record.mimeType)}
-            {getCategoryTag(record.url)}
+            {getFileTypeTag(record.type)}
           </div>
         </div>
       ),
@@ -196,7 +187,7 @@ export default function FileManagementClient() {
         <Space>
           <Button
             type="link"
-            icon={<EyeOutlined />}
+            icon={<EyeIcon />}
             onClick={() => {
               setPreviewFile(record)
               setPreviewVisible(true)
@@ -206,11 +197,11 @@ export default function FileManagementClient() {
           </Button>
           <Button
             type="link"
-            icon={<DownloadOutlined />}
+            icon={<DownloadIcon />}
             onClick={() => {
               const link = document.createElement('a')
               link.href = record.url
-              link.download = record.originalName
+              link.download = record.filename
               link.click()
             }}
           >
@@ -219,7 +210,7 @@ export default function FileManagementClient() {
           <Button
             type="link"
             danger
-            icon={<DeleteOutlined />}
+            icon={<DeleteIcon />}
             onClick={() => handleDelete(record)}
           >
             删除
@@ -229,17 +220,10 @@ export default function FileManagementClient() {
     },
   ]
 
-  const categoryOptions = [
-    { label: '全部分类', value: undefined },
-    { label: '头像', value: 'avatar' },
-    { label: '内容', value: 'content' },
-    { label: '通用', value: 'general' }
-  ]
-
   const typeOptions = [
     { label: '全部类型', value: undefined },
-    { label: '图片', value: 'image' },
-    { label: '文档', value: 'application' }
+    { label: '图片', value: 'IMAGE' },
+    { label: '文档', value: 'DOCUMENT' }
   ]
 
   return (
@@ -249,13 +233,6 @@ export default function FileManagementClient() {
       </div>
 
       <div className="mb-4 flex gap-4">
-        <Select
-          style={{ width: 120 }}
-          placeholder="选择分类"
-          value={filters.category}
-          onChange={(value) => setFilters(prev => ({ ...prev, category: value }))}
-          options={categoryOptions}
-        />
         <Select
           style={{ width: 120 }}
           placeholder="选择类型"
@@ -268,9 +245,9 @@ export default function FileManagementClient() {
           style={{ width: 300 }}
           onSearch={(value) => {
             setFilters(prev => ({ ...prev, search: value }))
-            // 搜索功能需要在API中实现
+            setPagination(prev => ({ ...prev, current: 1 }))
           }}
-          enterButton={<SearchOutlined />}
+          enterButton={<SearchIcon />}
         />
       </div>
 
@@ -297,11 +274,11 @@ export default function FileManagementClient() {
         open={previewVisible}
         onCancel={() => setPreviewVisible(false)}
         footer={[
-          <Button key="download" icon={<DownloadOutlined />} onClick={() => {
+          <Button key="download" icon={<DownloadIcon />} onClick={() => {
             if (previewFile) {
               const link = document.createElement('a')
               link.href = previewFile.url
-              link.download = previewFile.originalName
+              link.download = previewFile.filename
               link.click()
             }
           }}>
@@ -316,7 +293,7 @@ export default function FileManagementClient() {
         {previewFile && (
           <div>
             <div className="mb-4">
-              <p><strong>文件名:</strong> {previewFile.originalName}</p>
+              <p><strong>文件名:</strong> {previewFile.filename}</p>
               <p><strong>大小:</strong> {formatFileSize(previewFile.size)}</p>
               <p><strong>类型:</strong> {previewFile.mimeType}</p>
               <p><strong>上传时间:</strong> {new Date(previewFile.createdAt).toLocaleString('zh-CN')}</p>
@@ -326,7 +303,7 @@ export default function FileManagementClient() {
               <div className="text-center">
                 <Image
                   src={previewFile.url}
-                  alt={previewFile.originalName}
+                  alt={previewFile.filename}
                   className="max-w-full"
                   fallback="/images/placeholder.png"
                 />

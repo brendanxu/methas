@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from '@/lib/mock-framer-motion';
+import { Motion, AnimatePresence } from '@/components/animations/LightweightMotion';
 import { useInView } from 'react-intersection-observer';
 import { 
   UserOutlined, 
@@ -361,7 +361,7 @@ export default function InteractiveContactForm() {
 
   if (isSubmitted) {
     return (
-      <motion.div
+      <Motion
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-background rounded-lg p-8 shadow-soft text-center"
@@ -377,12 +377,12 @@ export default function InteractiveContactForm() {
         >
           Send Another Message
         </button>
-      </motion.div>
+      </Motion>
     );
   }
 
   return (
-    <motion.div
+    <Motion
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -398,18 +398,16 @@ export default function InteractiveContactForm() {
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <motion.div
-            className="bg-primary h-2 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${(currentStep / (formSteps.length - 1)) * 100}%` }}
-            transition={{ duration: 0.3 }}
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(currentStep / (formSteps.length - 1)) * 100}%` }}
           />
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6">
         <AnimatePresence mode="wait">
-          <motion.div
+          <Motion
             key={currentStep}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -420,17 +418,17 @@ export default function InteractiveContactForm() {
             
             <div className="grid gap-6">
               {getCurrentStepFields().map(fieldName => (
-                <motion.div
+                <Motion
                   key={fieldName}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
                   {renderFormField(fieldName)}
-                </motion.div>
+                </Motion>
               ))}
             </div>
-          </motion.div>
+          </Motion>
         </AnimatePresence>
 
         {/* Navigation Buttons */}
@@ -486,6 +484,6 @@ export default function InteractiveContactForm() {
           )}
         </div>
       </form>
-    </motion.div>
+    </Motion>
   );
 }

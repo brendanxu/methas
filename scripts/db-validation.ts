@@ -173,12 +173,13 @@ async function testCRUDOperations() {
   await runTest('File - Create', async () => {
     const file = await prisma.file.create({
       data: {
-        filename: 'test-file.pdf',
-        originalName: 'Test Document.pdf',
+        filename: 'Test Document.pdf',
+        storedFilename: 'test-file.pdf',
         url: 'https://example.com/test-file.pdf',
         size: 1024000,
         mimeType: 'application/pdf',
-        uploadedBy: testUserId,
+        type: 'DOCUMENT',
+        uploadedById: testUserId,
       },
     })
     testFileId = file.id

@@ -6,7 +6,9 @@ import { SessionProvider } from 'next-auth/react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { I18nProvider } from '@/components/providers/I18nProvider';
 import { antThemeConfig, antDarkThemeConfig, southPoleColors } from '@/styles/ant-theme';
-import { cssOptimizer, debounce, memoryMonitor } from '@/lib/performance';
+import { cssOptimizer, debounce, memoryMonitor } from '@/lib/performance'
+import { performanceMonitor } from '@/lib/monitoring/performance-monitor'
+import { errorTracker } from '@/lib/monitoring/error-tracker';
 import { Session } from 'next-auth';
 
 // Theme context types
@@ -46,7 +48,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       memoryMonitor.start();
-      return () => memoryMonitor.stop();
+      
+      // 初始化性能监控
+      performanceMonitor.configure({
+        reportingEnabled: true,
+        debugMode: process.env.NODE_ENV === 'development'
+      })
+
+      // 初始化错误追踪
+      errorTracker.configure({
+        enabled: true,
+        flushInterval: 30000
+      })
+      
+      return () => {
+        memoryMonitor.stop()
+        performanceMonitor.reset()
+      }
     }
     return undefined; // Explicit return for server-side
   }, []);

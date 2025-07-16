@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {  motion  } from '@/lib/mock-framer-motion';
+import { Motion } from '@/components/animations/LightweightMotion';
 import { 
   Tabs, 
   Statistic, 
@@ -81,7 +81,7 @@ const HeroSection: React.FC<{ service: Service }> = ({ service }) => {
       {/* 内容 */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container mx-auto px-4">
-          <motion.div
+          <Motion
             className="max-w-4xl mx-auto text-center text-white"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ const HeroSection: React.FC<{ service: Service }> = ({ service }) => {
                 下载资料
               </Button>
             </div>
-          </motion.div>
+          </Motion>
         </div>
       </div>
       
@@ -137,7 +137,7 @@ const OverviewSection: React.FC<{ overview: Service['overview'] }> = ({ overview
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
-        <motion.div
+        <Motion
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -150,14 +150,14 @@ const OverviewSection: React.FC<{ overview: Service['overview'] }> = ({ overview
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {overview.description}
           </p>
-        </motion.div>
+        </Motion>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {overview.valuePoints.map((point, index) => {
             const IconComponent = iconMap[point.icon] as React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
             
             return (
-              <motion.div
+              <Motion
                 key={index}
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
@@ -170,7 +170,7 @@ const OverviewSection: React.FC<{ overview: Service['overview'] }> = ({ overview
                   style={{ backgroundColor: colors.card }}
                 >
                   <div className="p-6">
-                    <motion.div
+                    <Motion
                       className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center"
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.3 }}
@@ -181,7 +181,7 @@ const OverviewSection: React.FC<{ overview: Service['overview'] }> = ({ overview
                           style={{ color: colors.primary }}
                         />
                       )}
-                    </motion.div>
+                    </Motion>
                     
                     <h3 className="text-xl font-semibold text-foreground mb-3">
                       {point.title}
@@ -192,7 +192,7 @@ const OverviewSection: React.FC<{ overview: Service['overview'] }> = ({ overview
                     </p>
                   </div>
                 </Card>
-              </motion.div>
+              </Motion>
             );
           })}
         </div>
@@ -207,7 +207,7 @@ const DetailsSection: React.FC<{ details: Service['details'] }> = ({ details }) 
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
-        <motion.div
+        <Motion
           className="max-w-6xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -366,7 +366,7 @@ const DetailsSection: React.FC<{ details: Service['details'] }> = ({ details }) 
               </div>
             </TabPane>
           </Tabs>
-        </motion.div>
+        </Motion>
       </div>
     </section>
   );
@@ -383,7 +383,7 @@ const StatisticsSection: React.FC<{
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* 统计数据 */}
-        <motion.div
+        <Motion
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -397,7 +397,7 @@ const StatisticsSection: React.FC<{
           <Row gutter={[32, 32]} justify="center">
             {statistics.data.map((stat, index) => (
               <Col key={index} xs={12} sm={6}>
-                <motion.div
+                <Motion
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -415,15 +415,15 @@ const StatisticsSection: React.FC<{
                     }}
                     className="text-center"
                   />
-                </motion.div>
+                </Motion>
               </Col>
             ))}
           </Row>
-        </motion.div>
+        </Motion>
         
         {/* 认证标志 */}
         {certifications.length > 0 && (
-          <motion.div
+          <Motion
             className="text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -461,7 +461,7 @@ const StatisticsSection: React.FC<{
                 </Col>
               ))}
             </Row>
-          </motion.div>
+          </Motion>
         )}
       </div>
     </section>
@@ -495,7 +495,7 @@ const CTASection: React.FC<{ ctaForm: Service['ctaForm'] }> = ({ ctaForm }) => {
       <div className="absolute inset-0 bg-black/10" />
       
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
+        <Motion
           className="max-w-4xl mx-auto text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -630,7 +630,7 @@ const CTASection: React.FC<{ ctaForm: Service['ctaForm'] }> = ({ ctaForm }) => {
               </div>
             </Col>
           </Row>
-        </motion.div>
+        </Motion>
       </div>
       
       {/* 装饰性元素 */}
@@ -651,7 +651,7 @@ const RelatedServicesSection: React.FC<{
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
-        <motion.div
+        <Motion
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -664,12 +664,12 @@ const RelatedServicesSection: React.FC<{
           <p className="text-xl text-muted-foreground">
             探索更多专业的可持续发展解决方案
           </p>
-        </motion.div>
+        </Motion>
         
         <Row gutter={[32, 32]}>
           {relatedServices.map((service, index) => (
             <Col key={service.id} xs={24} md={12} lg={8}>
-              <motion.div
+              <Motion
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -708,7 +708,7 @@ const RelatedServicesSection: React.FC<{
                     </div>
                   </Card>
                 </Link>
-              </motion.div>
+              </Motion>
             </Col>
           ))}
         </Row>

@@ -1,43 +1,46 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  Card, 
-  Table, 
-  Button, 
-  Space, 
-  Modal, 
-  Form, 
-  Select, 
-  DatePicker, 
-  InputNumber, 
-  Switch, 
-  message, 
-  Tag, 
-  Descriptions,
-  Statistic,
-  Row,
-  Col,
-  Alert,
-  Tooltip,
-  Badge,
-  Progress,
-  Divider,
-  Input,
-  Checkbox
-} from 'antd'
-import { 
-  DownloadOutlined, 
-  ExportOutlined, 
-  ReloadOutlined, 
-  FileTextOutlined,
-  CalendarOutlined,
-  DatabaseOutlined,
-  SettingOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons'
+import dynamic from 'next/dynamic'
+import { message } from 'antd'
 import dayjs from 'dayjs'
 
+// 基础组件 - 立即加载
+import { Card, Button, Space, Alert } from 'antd'
+import { ExportIcon, RefreshIcon } from '@/components/icons/LightweightIcons'
+
+// 高级组件 - 懒加载
+const Table = dynamic(() => import('antd').then(mod => ({ default: mod.Table })), {
+  loading: () => <div className="h-32 animate-pulse bg-gray-100 rounded" />
+})
+
+// Modal和Form需要静态方法和hooks，直接导入
+import { Modal, Form } from 'antd'
+
+// 表单相关组件直接导入（因为需要hooks和子组件）
+import { Select, DatePicker, InputNumber, Input, Switch, Tag } from 'antd'
+
+// 复杂显示组件懒加载
+const Descriptions = dynamic(() => import('antd').then(mod => ({ default: mod.Descriptions })))
+const Statistic = dynamic(() => import('antd').then(mod => ({ default: mod.Statistic })))
+const Row = dynamic(() => import('antd').then(mod => ({ default: mod.Row })))
+const Col = dynamic(() => import('antd').then(mod => ({ default: mod.Col })))
+const Tooltip = dynamic(() => import('antd').then(mod => ({ default: mod.Tooltip })))
+const Badge = dynamic(() => import('antd').then(mod => ({ default: mod.Badge })))
+const Progress = dynamic(() => import('antd').then(mod => ({ default: mod.Progress })))
+const Divider = dynamic(() => import('antd').then(mod => ({ default: mod.Divider })))
+const Checkbox = dynamic(() => import('antd').then(mod => ({ default: mod.Checkbox })))
+
+// 使用轻量级图标替换
+import { 
+  DownloadIcon, 
+  CalendarIcon, 
+  DatabaseIcon, 
+  SettingsIcon, 
+  InfoIcon 
+} from '@/components/icons/LightweightIcons'
+
+// 子组件引用
 const { Option } = Select
 const { RangePicker } = DatePicker
 
@@ -152,7 +155,7 @@ export default function ExportsPageClient() {
               <p>文件大小: {(result.data.result.size / 1024).toFixed(2)} KB</p>
               <Button 
                 type="primary" 
-                icon={<DownloadOutlined />}
+                icon={<DownloadIcon />}
                 onClick={() => window.open(result.data.result.downloadUrl, '_blank')}
                 className="mt-2"
               >
@@ -297,7 +300,7 @@ export default function ExportsPageClient() {
               <Button 
                 type="text" 
                 size="small" 
-                icon={<DownloadOutlined />}
+                icon={<DownloadIcon />}
                 disabled={isExpired || !filename}
                 onClick={() => handleDownload(filename)}
               />
@@ -313,16 +316,16 @@ export default function ExportsPageClient() {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold flex items-center">
-            <ExportOutlined className="mr-2" />
+            <ExportIcon className="mr-2" />
             数据导出
           </h1>
           <Space>
-            <Button icon={<ReloadOutlined />} onClick={loadData} loading={loading}>
+            <Button icon={<RefreshIcon />} onClick={loadData} loading={loading}>
               刷新
             </Button>
             <Button 
               type="primary" 
-              icon={<ExportOutlined />} 
+              icon={<ExportIcon />} 
               onClick={() => setExportModalVisible(true)}
             >
               新建导出
@@ -338,7 +341,7 @@ export default function ExportsPageClient() {
                 <Statistic
                   title="总导出数"
                   value={data.stats.totalExports}
-                  prefix={<DatabaseOutlined />}
+                  prefix={<DatabaseIcon />}
                 />
               </Card>
             </Col>
@@ -383,7 +386,7 @@ export default function ExportsPageClient() {
                 <Statistic
                   title="最近30天"
                   value={data.stats.sourceStats?.reduce((sum: number, stat: any) => sum + stat.count, 0) || 0}
-                  prefix={<CalendarOutlined />}
+                  prefix={<CalendarIcon />}
                   valueStyle={{ color: '#3f8600' }}
                 />
               </Card>
@@ -581,7 +584,7 @@ export default function ExportsPageClient() {
                 <Checkbox>
                   包含关联数据
                   <Tooltip title="如用户数据包含相关内容和日志">
-                    <InfoCircleOutlined className="ml-1" />
+                    <InfoIcon className="ml-1" />
                   </Tooltip>
                 </Checkbox>
               </Form.Item>
@@ -594,7 +597,7 @@ export default function ExportsPageClient() {
                 <Checkbox>
                   压缩文件
                   <Tooltip title="对大文件进行压缩以减少下载时间">
-                    <InfoCircleOutlined className="ml-1" />
+                    <InfoIcon className="ml-1" />
                   </Tooltip>
                 </Checkbox>
               </Form.Item>

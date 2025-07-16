@@ -88,7 +88,7 @@ export async function DELETE(
         resource: 'file',
         details: {
           fileId: params.id,
-          fileName: file.originalName,
+          fileName: file.filename,
           fileUrl: file.url
         }
       }

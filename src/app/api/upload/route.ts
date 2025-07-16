@@ -118,12 +118,13 @@ const handleFileUpload = async (request: NextRequest, context: any) => {
     // 保存文件信息到数据库
     const fileRecord = await prisma.file.create({
       data: {
-        filename: fileName,
-        originalName: file.name,
+        filename: file.name,
+        storedFilename: fileName,
         url: `/uploads/${category}/${fileName}`,
         size: file.size,
         mimeType: file.type,
-        uploadedBy: session.user.id,
+        type: file.type.startsWith('image/') ? 'IMAGE' : 'DOCUMENT',
+        uploadedById: session.user.id,
       }
     })
 
@@ -155,7 +156,7 @@ const handleFileUpload = async (request: NextRequest, context: any) => {
       file: {
         id: fileRecord.id,
         name: fileRecord.filename,
-        originalName: fileRecord.originalName,
+        storedFilename: fileRecord.storedFilename,
         url: fileRecord.url,
         size: fileRecord.size,
         type: fileRecord.mimeType,
@@ -254,11 +255,13 @@ const handleGetFiles = async (request: NextRequest, context: any) => {
         select: {
           id: true,
           filename: true,
-          originalName: true,
+          storedFilename: true,
           url: true,
           size: true,
           mimeType: true,
+          type: true,
           uploadedBy: true,
+          uploadedById: true,
           createdAt: true
         }
       }),

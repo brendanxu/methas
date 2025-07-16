@@ -103,11 +103,11 @@ const nextConfig = {
         },
       });
 
-      // 完全禁用服务器端的chunk分离，避免webpack-runtime问题
+      // 服务器端优化配置
       config.optimization = config.optimization || {};
-      config.optimization.splitChunks = false;
+      config.optimization.splitChunks = false; // 服务器端禁用分割
       config.optimization.runtimeChunk = false;
-      config.optimization.minimize = false; // 禁用压缩，可能导致问题
+      config.optimization.minimize = false;
       
       // 禁用模块联邦和其他可能导致runtime问题的特性
       config.optimization.moduleIds = 'named'; // 使用named而不是deterministic
@@ -136,21 +136,69 @@ const nextConfig = {
       );
     }
 
-    // Production optimizations - 禁用所有chunk分离，包括客户端
-    if (!dev) {
+    // Client-side production optimizations
+    if (!dev && !isServer) {
       // Enable tree shaking
       config.optimization.usedExports = true;
       config.optimization.sideEffects = false;
       
-      // 完全禁用chunk分离，所有代码打包到一个文件
-      config.optimization.splitChunks = false;
-      config.optimization.runtimeChunk = false;
-
-      // 禁用模块连接，避免复杂的依赖关系
-      config.optimization.concatenateModules = false;
+      // Enable smart code splitting for better caching
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 100000,
+        cacheGroups: {
+          // Separate vendor libraries for better caching
+          default: false,
+          vendors: false,
+          // Ant Design components
+          antd: {
+            test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
+            name: 'antd',
+            chunks: 'all',
+            priority: 30,
+            reuseExistingChunk: true
+          },
+          // Other vendor libraries
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 20,
+            reuseExistingChunk: true
+          },
+          // Charts components in separate chunk - 仅对实际访问时加载
+          charts: {
+            test: /[\\/]src[\\/]components[\\/]charts[\\/]/,
+            name: 'charts',
+            chunks: 'async',
+            priority: 15,
+            reuseExistingChunk: true
+          },
+          // Admin components in separate chunk - 仅对实际访问时加载
+          admin: {
+            test: /[\\/]src[\\/](app[\\/]admin|components[\\/]admin|hooks[\\/]admin|lib[\\/]admin)[\\/]/,
+            name: 'admin',
+            chunks: 'async',
+            priority: 10,
+            reuseExistingChunk: true
+          },
+          // Common components
+          common: {
+            test: /[\\/]src[\\/]components[\\/]/,
+            name: 'common',
+            chunks: 'all',
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true
+          }
+        }
+      };
+      config.optimization.runtimeChunk = 'single'; // Single runtime chunk
       
       // Remove unused code
       config.optimization.innerGraph = true;
+      config.optimization.concatenateModules = true; // 启用模块连接
     }
 
     // SVG optimization

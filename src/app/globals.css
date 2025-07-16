@@ -1,5 +1,6 @@
 /* Import custom styles must come first */
 @import '../styles/mobile.css';
+@import '../styles/lightweight-animations.css';
 
 @tailwind base;
 @tailwind components;
