@@ -254,7 +254,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
 
       <motion.header
         className={cn(
-          'fixed left-0 right-0 z-50 transition-all duration-300',
+          'fixed left-0 right-0 z-[70] transition-all duration-300',
           isScrolled 
             ? 'top-0 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
             : 'top-10 bg-transparent',
@@ -484,25 +484,31 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 lg:hidden"
+            className="fixed inset-0 z-[60] lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* 背景遮罩 */}
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={toggleMobileMenu} />
+            {/* 背景遮罩 - 覆盖整个屏幕包括header */}
+            <div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
+              onClick={toggleMobileMenu} 
+              style={{ zIndex: 1 }}
+            />
             
             {/* 移动端菜单内容 */}
             <motion.div
-              className={cn(
-                "fixed left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 overflow-y-auto",
-                isScrolled ? "top-20" : "top-30"
-              )}
-              initial={{ y: -20, opacity: 0 }}
+              className="fixed left-0 right-0 bottom-0 bg-white/98 backdrop-blur-xl border-t border-gray-200 overflow-y-auto"
+              style={{ 
+                top: isScrolled ? '80px' : '120px', // 80px = 顶部导航(40px) + 主导航(40px), 120px = 顶部导航(40px) + 主导航(80px)
+                zIndex: 2,
+                maxHeight: isScrolled ? 'calc(100vh - 80px)' : 'calc(100vh - 120px)'
+              }}
+              initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             >
               <div className="max-w-7xl mx-auto px-4 py-6">
                 <nav className="space-y-6">
@@ -515,30 +521,37 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                         duration: 0.3,
                         delay: index * 0.1
                       }}
-                      className="border-b border-gray-200 pb-6"
+                      className="border-b border-gray-100 pb-4"
                     >
                       <Link
                         href={item.href || '#'}
-                        className="block text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                        className="block py-3 px-2 text-lg font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200 active:bg-gray-100"
                         onClick={toggleMobileMenu}
                       >
                         {item.label}
                       </Link>
+                      {/* 可选：添加菜单项描述 */}
+                      {item.hasSubmenu && (
+                        <p className="mt-1 px-2 text-sm text-gray-500">
+                          查看{item.label}相关内容
+                        </p>
+                      )}
                     </motion.div>
                   ))}
                 </nav>
                 
                 {/* 移动端CTA */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="mt-8 pt-6 border-t border-gray-100">
                   <Link href="/contact-us" className="block">
                     <motion.button
-                      className="w-full px-6 py-3 text-sm font-medium text-white rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
+                      className="w-full px-6 py-4 text-base font-medium text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:shadow-lg"
                       style={{ 
-                        backgroundColor: SOUTH_POLE_COLORS.primary
+                        backgroundColor: SOUTH_POLE_COLORS.primary,
+                        minHeight: '48px' // 确保触摸目标足够大
                       }}
                       onClick={toggleMobileMenu}
                       whileHover={{ 
-                        scale: 1.02,
+                        scale: 1.01,
                         backgroundColor: '#001e3d'
                       }}
                       whileTap={{ scale: 0.98 }}
@@ -546,6 +559,18 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                       Contact us
                     </motion.button>
                   </Link>
+                  
+                  {/* 移动端额外选项 */}
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex justify-center space-x-6 text-sm text-gray-500">
+                      <Link href="/careers" className="hover:text-gray-700 transition-colors">
+                        Careers
+                      </Link>
+                      <Link href="/shop" className="hover:text-gray-700 transition-colors">
+                        Marketplace
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
