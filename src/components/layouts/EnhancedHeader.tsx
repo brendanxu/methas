@@ -50,24 +50,28 @@ const mainNavItems: NavItem[] = [
   {
     id: 'about',
     label: 'About us',
+    href: '/about-us',
     hasSubmenu: true,
     submenuKey: 'aboutUs'
   },
   {
     id: 'services',
     label: 'What we do',
+    href: '/what-we-do',
     hasSubmenu: true,
     submenuKey: 'services'
   },
   {
     id: 'work',
     label: 'Our work & impact',
+    href: '/work-and-impact',
     hasSubmenu: true,
     submenuKey: 'workAndImpact'
   },
   {
     id: 'insights',
     label: 'News & insights',
+    href: '/engage',
     hasSubmenu: true,
     submenuKey: 'insights'
   }
@@ -248,10 +252,10 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
 
       <motion.header
         className={cn(
-          'fixed top-10 left-0 right-0 z-50 transition-all duration-300',
+          'fixed left-0 right-0 z-50 transition-all duration-300',
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
-            : 'bg-transparent',
+            ? 'top-0 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
+            : 'top-10 bg-transparent',
           className
         )}
         initial={{ y: -100 }}
@@ -450,7 +454,10 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
             
             {/* 移动端菜单内容 */}
             <motion.div
-              className="fixed top-30 left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 overflow-y-auto"
+              className={cn(
+                "fixed left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 overflow-y-auto",
+                isScrolled ? "top-20" : "top-30"
+              )}
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
