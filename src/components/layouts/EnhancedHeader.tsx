@@ -13,17 +13,19 @@ import { MegaMenu } from './MegaMenu';
 import { navigationMenuData } from '@/data/navigation';
 import { cn } from '@/lib/utils';
 
-// South Pole 品牌颜色配置
+// South Pole 品牌颜色配置 - 使用统一的颜色系统
 const SOUTH_POLE_COLORS = {
   primary: '#002145',
   secondary: '#00875A',
+  warning: '#E65100',
   text: {
     light: '#FFFFFF',
     dark: '#374151'
   },
   background: {
     transparent: 'rgba(255, 255, 255, 0)',
-    solid: 'rgba(255, 255, 255, 0.95)'
+    solid: 'rgba(255, 255, 255, 0.95)',
+    solidScrolled: 'rgba(255, 255, 255, 0.98)'
   }
 };
 
@@ -254,10 +256,13 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
         className={cn(
           'fixed left-0 right-0 z-50 transition-all duration-300',
           isScrolled 
-            ? 'top-0 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
+            ? 'top-0 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
             : 'top-10 bg-transparent',
           className
         )}
+        style={{
+          backgroundColor: isScrolled ? SOUTH_POLE_COLORS.background.solidScrolled : SOUTH_POLE_COLORS.background.transparent
+        }}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
@@ -371,11 +376,13 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                 <div className="hidden lg:block relative">
                   <button
                     onClick={openSearch}
-                    className="flex items-center space-x-2 px-4 py-2 text-sm transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-lg border border-white/20"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg border"
                     style={{ 
                       color: getAccessibleMutedColor(isScrolled),
-                      borderColor: isScrolled ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)'
-                    }}
+                      borderColor: isScrolled ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)',
+                      backgroundColor: isScrolled ? 'rgba(249, 250, 251, 0.8)' : 'rgba(255, 255, 255, 0.1)',
+                      '--tw-ring-color': SOUTH_POLE_COLORS.primary + '30'
+                    } as React.CSSProperties}
                     aria-label="Search"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,11 +390,11 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                     </svg>
                     <span>Search</span>
                     <div 
-                      className="px-2 py-1 text-xs rounded border"
+                      className="px-2 py-1 text-xs rounded border font-mono"
                       style={{ 
                         color: getAccessibleMutedColor(isScrolled),
                         borderColor: isScrolled ? '#d1d5db' : 'rgba(255, 255, 255, 0.3)',
-                        backgroundColor: isScrolled ? '#f9fafb' : 'rgba(255, 255, 255, 0.1)'
+                        backgroundColor: isScrolled ? 'rgba(249, 250, 251, 0.9)' : 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       ⌘K
@@ -411,9 +418,15 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                 <div className="hidden sm:block">
                   <Link href="/contact-us">
                     <motion.button
-                      className="px-6 py-2 text-sm font-medium text-white rounded-md transition-all duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
-                      style={{ backgroundColor: SOUTH_POLE_COLORS.primary }}
-                      whileHover={{ scale: 1.02 }}
+                      className="px-6 py-2 text-sm font-medium text-white rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm hover:shadow-md"
+                      style={{ 
+                        backgroundColor: SOUTH_POLE_COLORS.primary,
+                        '--tw-ring-color': SOUTH_POLE_COLORS.primary + '30'
+                      } as React.CSSProperties}
+                      whileHover={{ 
+                        scale: 1.02,
+                        backgroundColor: '#001e3d'
+                      }}
                       whileTap={{ scale: 0.98 }}
                     >
                       Contact us
@@ -519,10 +532,15 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <Link href="/contact-us" className="block">
                     <motion.button
-                      className="w-full px-6 py-3 text-sm font-medium text-white rounded-md transition-all duration-200"
-                      style={{ backgroundColor: SOUTH_POLE_COLORS.primary }}
+                      className="w-full px-6 py-3 text-sm font-medium text-white rounded-md transition-all duration-200 shadow-sm hover:shadow-md"
+                      style={{ 
+                        backgroundColor: SOUTH_POLE_COLORS.primary
+                      }}
                       onClick={toggleMobileMenu}
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ 
+                        scale: 1.02,
+                        backgroundColor: '#001e3d'
+                      }}
                       whileTap={{ scale: 0.98 }}
                     >
                       Contact us
