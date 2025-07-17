@@ -13,29 +13,31 @@ import { MegaMenu } from './MegaMenu';
 import { navigationMenuData } from '@/data/navigation';
 import { cn } from '@/lib/utils';
 
-// 对比度感知的颜色工具
-const getAccessibleTextColor = (isScrolled: boolean, colors: any) => {
-  // 当未滚动时，假设背景是深色或有图片，使用白色
-  // 当滚动时，背景变为浅色，使用深色文字
-  if (isScrolled) {
-    return colors.foreground; // 深色文字，适合浅色背景
-  } else {
-    // 使用高对比度的白色，确保在深色背景上可读
-    return '#FFFFFF'; // 白色文字，适合深色背景
+// South Pole 品牌颜色配置
+const SOUTH_POLE_COLORS = {
+  primary: '#002145',
+  secondary: '#00875A',
+  text: {
+    light: '#FFFFFF',
+    dark: '#374151'
+  },
+  background: {
+    transparent: 'rgba(255, 255, 255, 0)',
+    solid: 'rgba(255, 255, 255, 0.95)'
   }
+};
+
+// 对比度感知的颜色工具
+const getAccessibleTextColor = (isScrolled: boolean) => {
+  return isScrolled ? SOUTH_POLE_COLORS.text.dark : SOUTH_POLE_COLORS.text.light;
 };
 
 // 对比度感知的次要文字颜色
-const getAccessibleMutedColor = (isScrolled: boolean, colors: any) => {
-  if (isScrolled) {
-    return colors.mutedForeground; // 使用主题的次要前景色
-  } else {
-    // 使用高对比度的半透明白色，确保在深色背景上可读
-    return 'rgba(255, 255, 255, 0.85)'; // 提高透明度以增强对比度
-  }
+const getAccessibleMutedColor = (isScrolled: boolean) => {
+  return isScrolled ? 'rgba(55, 65, 81, 0.7)' : 'rgba(255, 255, 255, 0.85)';
 };
 
-// 主导航项配置
+// 主导航项配置 - 完全按照 South Pole 网站结构
 interface NavItem {
   id: string;
   label: string;
@@ -47,31 +49,25 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   {
     id: 'about',
-    label: '关于我们',
+    label: 'About us',
     hasSubmenu: true,
     submenuKey: 'aboutUs'
   },
   {
     id: 'services',
-    label: '我们的服务',
+    label: 'What we do',
     hasSubmenu: true,
     submenuKey: 'services'
   },
   {
-    id: 'solutions',
-    label: '解决方案',
+    id: 'work',
+    label: 'Our work & impact',
     hasSubmenu: true,
-    submenuKey: 'solutions'
-  },
-  {
-    id: 'impact',
-    label: '影响力',
-    hasSubmenu: true,
-    submenuKey: 'impact'
+    submenuKey: 'workAndImpact'
   },
   {
     id: 'insights',
-    label: '洞察资源',
+    label: 'News & insights',
     hasSubmenu: true,
     submenuKey: 'insights'
   }
@@ -218,11 +214,43 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
 
   return (
     <div className="relative">
+      {/* 顶部导航栏 - 完全参照 South Pole 网站设计 */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-10 text-xs">
+            {/* 左侧语言切换 */}
+            <div className="flex items-center space-x-4">
+              <LanguageSwitcherFull />
+            </div>
+            
+            {/* 右侧快捷链接 */}
+            <div className="flex items-center space-x-6 text-gray-600">
+              <Link 
+                href="https://careers.southpole.com/" 
+                className="hover:text-gray-900 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Careers
+              </Link>
+              <Link 
+                href="https://shop.southpole.com/" 
+                className="hover:text-gray-900 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Purchase credits directly in our Marketplace
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <motion.header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+          'fixed top-10 left-0 right-0 z-50 transition-all duration-300',
           isScrolled 
-            ? 'bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-black/5' 
+            ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5' 
             : 'bg-transparent',
           className
         )}
@@ -236,44 +264,52 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
         <div className="relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
-              {/* Logo */}
+              {/* Logo - 完全参照 South Pole 网站设计 */}
               <motion.div 
                 className="flex-shrink-0"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
                 <Link 
                   href="/" 
                   className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-lg p-2"
-                  aria-label="South Pole - 首页"
+                  aria-label="South Pole - Climate solutions for a net zero future"
                 >
-                  <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md"
-                    style={{ backgroundColor: colors.primary }}
-                  >
-                    SP
-                  </div>
-                  <div className="hidden sm:block">
-                    <div 
-                      className="text-xl font-bold transition-colors duration-300"
-                      style={{ color: getAccessibleTextColor(isScrolled, colors) }}
+                  {/* South Pole Logo SVG */}
+                  <div className="flex items-center">
+                    <svg 
+                      width="40" 
+                      height="32" 
+                      viewBox="0 0 40 32" 
+                      fill="none"
+                      className="transition-all duration-300"
                     >
-                      South Pole
-                    </div>
-                    <div 
-                      className="text-xs font-medium transition-colors duration-300"
-                      style={{ 
-                        color: getAccessibleMutedColor(isScrolled, colors)
-                      }}
-                    >
-                      Climate Solutions
+                      <path
+                        d="M8 4 C8 4 16 12 24 4 C24 4 32 12 24 20 C24 20 16 28 8 20 C8 20 0 12 8 4 Z"
+                        fill={getAccessibleTextColor(isScrolled)}
+                        fillOpacity="0.9"
+                      />
+                      <circle
+                        cx="20"
+                        cy="16"
+                        r="3"
+                        fill={SOUTH_POLE_COLORS.primary}
+                      />
+                    </svg>
+                    <div className="ml-3 flex flex-col">
+                      <span 
+                        className="text-lg font-bold tracking-tight transition-colors duration-300"
+                        style={{ color: getAccessibleTextColor(isScrolled) }}
+                      >
+                        south pole
+                      </span>
                     </div>
                   </div>
                 </Link>
               </motion.div>
 
-              {/* 桌面导航 */}
-              <nav className="hidden lg:flex items-center space-x-1">
+              {/* 桌面导航 - 完全参照 South Pole 网站设计 */}
+              <nav className="hidden lg:flex items-center space-x-8">
                 {mainNavItems.map((item) => (
                   <div
                     key={item.id}
@@ -284,12 +320,12 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                       <Link
                         href={item.href}
                         className={cn(
-                          'flex items-center space-x-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200',
-                          'hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2',
-                          activeMegaMenu === item.id && 'bg-white/10'
+                          'flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-all duration-200',
+                          'hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2',
+                          activeMegaMenu === item.id && 'opacity-70'
                         )}
                         style={{
-                          color: getAccessibleTextColor(isScrolled, colors),
+                          color: getAccessibleTextColor(isScrolled),
                         }}
                       >
                         <span>{item.label}</span>
@@ -297,12 +333,12 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                     ) : (
                       <button
                         className={cn(
-                          'flex items-center space-x-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200',
-                          'hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2',
-                          activeMegaMenu === item.id && 'bg-white/10'
+                          'flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-all duration-200',
+                          'hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2',
+                          activeMegaMenu === item.id && 'opacity-70'
                         )}
                         style={{
-                          color: getAccessibleTextColor(isScrolled, colors),
+                          color: getAccessibleTextColor(isScrolled),
                         }}
                         aria-expanded={activeMegaMenu === item.id}
                         aria-haspopup="true"
@@ -310,7 +346,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                         <span>{item.label}</span>
                         {item.hasSubmenu && (
                           <motion.svg
-                            className="w-4 h-4 transition-transform duration-200"
+                            className="w-4 h-4 ml-1 transition-transform duration-200"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -325,54 +361,40 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                 ))}
               </nav>
 
-              {/* 右侧操作区域 */}
-              <div className="flex items-center space-x-4">
+              {/* 右侧操作区域 - 完全参照 South Pole 网站设计 */}
+              <div className="flex items-center space-x-6">
                 {/* 搜索按钮 */}
-                <UnifiedButton
-                  variant="ghost"
-                  size="small"
+                <button
                   onClick={openSearch}
-                  icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>}
-                  customColor={getAccessibleTextColor(isScrolled, colors)}
-                  aria-label={t('common:search')}
-                  className="hidden sm:inline-flex"
+                  className="hidden sm:flex items-center justify-center w-8 h-8 transition-opacity duration-200 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-md"
+                  style={{ color: getAccessibleTextColor(isScrolled) }}
+                  aria-label="Search"
                 >
-                  <span className="hidden md:inline">{t('common:search')}</span>
-                  <span className="hidden lg:inline text-xs opacity-60 ml-2">
-                    {typeof navigator !== 'undefined' && navigator.platform?.includes('Mac') ? '⌘K' : 'Ctrl+K'}
-                  </span>
-                </UnifiedButton>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
 
-                {/* 语言切换 */}
+                {/* CTA按钮 - 完全参照 South Pole 网站设计 */}
                 <div className="hidden sm:block">
-                  <LanguageSwitcherFull />
-                </div>
-
-                {/* CTA按钮 */}
-                <div className="hidden sm:block">
-                  <Link href="/contact">
-                    <UnifiedButton
-                      variant="primary"
-                      size="medium"
-                      className="font-semibold"
-                      customColor={colors.primary}
-                      shadow="medium"
+                  <Link href="/contact-us">
+                    <motion.button
+                      className="px-6 py-2 text-sm font-medium text-white rounded-md transition-all duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
+                      style={{ backgroundColor: SOUTH_POLE_COLORS.primary }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {t('common:scheduleCall')}
-                    </UnifiedButton>
+                      Contact us
+                    </motion.button>
                   </Link>
                 </div>
 
                 {/* 移动端菜单按钮 */}
-                <UnifiedButton
-                  variant="ghost"
-                  size="small"
+                <button
                   onClick={toggleMobileMenu}
-                  className="lg:hidden"
-                  customColor={getAccessibleTextColor(isScrolled, colors)}
-                  aria-label={isMobileMenuOpen ? '关闭菜单' : '打开菜单'}
+                  className="lg:hidden flex items-center justify-center w-8 h-8 transition-opacity duration-200 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-md"
+                  style={{ color: getAccessibleTextColor(isScrolled) }}
+                  aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={isMobileMenuOpen}
                 >
                   <motion.div
@@ -389,7 +411,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                       </svg>
                     )}
                   </motion.div>
-                </UnifiedButton>
+                </button>
               </div>
             </div>
           </div>
@@ -428,7 +450,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
             
             {/* 移动端菜单内容 */}
             <motion.div
-              className="fixed top-20 left-0 right-0 bottom-0 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-y-auto"
+              className="fixed top-30 left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 overflow-y-auto"
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
@@ -445,11 +467,11 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                         duration: 0.3,
                         delay: index * 0.1
                       }}
-                      className="border-b border-border/30 pb-6"
+                      className="border-b border-gray-200 pb-6"
                     >
                       <Link
                         href={item.href || '#'}
-                        className="block text-lg font-semibold text-foreground hover:text-primary transition-colors"
+                        className="block text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                         onClick={toggleMobileMenu}
                       >
                         {item.label}
@@ -459,18 +481,17 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                 </nav>
                 
                 {/* 移动端CTA */}
-                <div className="mt-8 pt-6 border-t border-border/30">
-                  <Link href="/contact" className="block">
-                    <UnifiedButton
-                      variant="primary"
-                      size="large"
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <Link href="/contact-us" className="block">
+                    <motion.button
+                      className="w-full px-6 py-3 text-sm font-medium text-white rounded-md transition-all duration-200"
+                      style={{ backgroundColor: SOUTH_POLE_COLORS.primary }}
                       onClick={toggleMobileMenu}
-                      className="w-full font-semibold"
-                      customColor={colors.primary}
-                      shadow="medium"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {t('common:scheduleCall')}
-                    </UnifiedButton>
+                      Contact us
+                    </motion.button>
                   </Link>
                 </div>
               </div>
