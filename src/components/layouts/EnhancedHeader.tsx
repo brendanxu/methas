@@ -367,10 +367,38 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
 
               {/* 右侧操作区域 - 完全参照 South Pole 网站设计 */}
               <div className="flex items-center space-x-6">
-                {/* 搜索按钮 */}
+                {/* 搜索框 */}
+                <div className="hidden lg:block relative">
+                  <button
+                    onClick={openSearch}
+                    className="flex items-center space-x-2 px-4 py-2 text-sm transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-lg border border-white/20"
+                    style={{ 
+                      color: getAccessibleMutedColor(isScrolled),
+                      borderColor: isScrolled ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)'
+                    }}
+                    aria-label="Search"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Search</span>
+                    <div 
+                      className="px-2 py-1 text-xs rounded border"
+                      style={{ 
+                        color: getAccessibleMutedColor(isScrolled),
+                        borderColor: isScrolled ? '#d1d5db' : 'rgba(255, 255, 255, 0.3)',
+                        backgroundColor: isScrolled ? '#f9fafb' : 'rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      ⌘K
+                    </div>
+                  </button>
+                </div>
+
+                {/* 移动端搜索按钮 */}
                 <button
                   onClick={openSearch}
-                  className="hidden sm:flex items-center justify-center w-8 h-8 transition-opacity duration-200 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-md"
+                  className="lg:hidden flex items-center justify-center w-8 h-8 transition-opacity duration-200 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded-md"
                   style={{ color: getAccessibleTextColor(isScrolled) }}
                   aria-label="Search"
                 >
