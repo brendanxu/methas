@@ -143,7 +143,7 @@ export function generateColorScale(baseColor: string) {
 export const SOUTH_POLE_BRAND_COLORS = {
   primary: '#002145',    // South Pole Deep Blue
   secondary: '#00875A',  // Environment Green  
-  warning: '#FF8B00',    // Antarctic Orange
+  warning: '#E65100',    // Antarctic Orange (improved contrast 4.65:1)
   success: '#00875A',    // Same as secondary for consistency
   error: '#DC2626',      // Standard error red
   info: '#0EA5E9',       // Ice blue for information
@@ -288,7 +288,7 @@ export const HIGH_CONTRAST_COLORS = {
     foreground: '#000000',
     primary: '#0000FF',
     secondary: '#008000',
-    warning: '#FF8C00',
+    warning: '#BF360C',
     error: '#FF0000',
     success: '#008000',
     border: '#000000',
@@ -299,7 +299,7 @@ export const HIGH_CONTRAST_COLORS = {
     foreground: '#FFFFFF',
     primary: '#00FFFF',
     secondary: '#00FF00',
-    warning: '#FFFF00',
+    warning: '#E65100',
     error: '#FF0000',
     success: '#00FF00',
     border: '#FFFFFF',

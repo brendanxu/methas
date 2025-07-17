@@ -13,6 +13,28 @@ import { MegaMenu } from './MegaMenu';
 import { navigationMenuData } from '@/data/navigation';
 import { cn } from '@/lib/utils';
 
+// 对比度感知的颜色工具
+const getAccessibleTextColor = (isScrolled: boolean, colors: any) => {
+  // 当未滚动时，假设背景是深色或有图片，使用白色
+  // 当滚动时，背景变为浅色，使用深色文字
+  if (isScrolled) {
+    return colors.foreground; // 深色文字，适合浅色背景
+  } else {
+    // 使用高对比度的白色，确保在深色背景上可读
+    return '#FFFFFF'; // 白色文字，适合深色背景
+  }
+};
+
+// 对比度感知的次要文字颜色
+const getAccessibleMutedColor = (isScrolled: boolean, colors: any) => {
+  if (isScrolled) {
+    return colors.mutedForeground; // 使用主题的次要前景色
+  } else {
+    // 使用高对比度的半透明白色，确保在深色背景上可读
+    return 'rgba(255, 255, 255, 0.85)'; // 提高透明度以增强对比度
+  }
+};
+
 // 主导航项配置
 interface NavItem {
   id: string;
@@ -234,16 +256,14 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                   <div className="hidden sm:block">
                     <div 
                       className="text-xl font-bold transition-colors duration-300"
-                      style={{ color: isScrolled ? colors.foreground : '#FFFFFF' }}
+                      style={{ color: getAccessibleTextColor(isScrolled, colors) }}
                     >
                       South Pole
                     </div>
                     <div 
                       className="text-xs font-medium transition-colors duration-300"
                       style={{ 
-                        color: isScrolled 
-                          ? colors.mutedForeground 
-                          : 'rgba(255, 255, 255, 0.8)' 
+                        color: getAccessibleMutedColor(isScrolled, colors)
                       }}
                     >
                       Climate Solutions
@@ -269,7 +289,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                           activeMegaMenu === item.id && 'bg-white/10'
                         )}
                         style={{
-                          color: isScrolled ? colors.foreground : '#FFFFFF',
+                          color: getAccessibleTextColor(isScrolled, colors),
                         }}
                       >
                         <span>{item.label}</span>
@@ -282,7 +302,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                           activeMegaMenu === item.id && 'bg-white/10'
                         )}
                         style={{
-                          color: isScrolled ? colors.foreground : '#FFFFFF',
+                          color: getAccessibleTextColor(isScrolled, colors),
                         }}
                         aria-expanded={activeMegaMenu === item.id}
                         aria-haspopup="true"
@@ -315,7 +335,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                   icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>}
-                  customColor={isScrolled ? colors.foreground : '#FFFFFF'}
+                  customColor={getAccessibleTextColor(isScrolled, colors)}
                   aria-label={t('common:search')}
                   className="hidden sm:inline-flex"
                 >
@@ -351,7 +371,7 @@ export const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ className }) => 
                   size="small"
                   onClick={toggleMobileMenu}
                   className="lg:hidden"
-                  customColor={isScrolled ? colors.foreground : '#FFFFFF'}
+                  customColor={getAccessibleTextColor(isScrolled, colors)}
                   aria-label={isMobileMenuOpen ? '关闭菜单' : '打开菜单'}
                   aria-expanded={isMobileMenuOpen}
                 >

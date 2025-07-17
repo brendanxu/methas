@@ -21,7 +21,7 @@ export const southPoleColors = {
 export const southPoleDarkColors = {
   primary: '#4a9eff',      // Brighter blue for dark mode
   secondary: '#4ade80',    // Brighter green for dark mode  
-  warning: '#fbbf24',      // Brighter orange for dark mode
+  warning: '#E65100',      // Improved contrast orange
   success: '#4ade80',
   error: '#ef4444',
   info: '#38bdf8',
