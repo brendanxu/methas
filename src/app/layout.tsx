@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Providers, GlobalStylesProvider } from "./providers";
-import { Header } from "@/components/layouts/Header";
+import { SouthPoleNavigation } from "@/components/navigation/SouthPoleNavigation";
 import { Footer } from "@/components/layouts/Footer";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
@@ -66,7 +66,7 @@ export default function RootLayout({
                 <GlobalSearch />
                 <SEOChecker />
                 <div className="min-h-screen flex flex-col bg-background text-foreground">
-                  <Header />
+                  <SouthPoleNavigation />
                   <main className="flex-1">
                     {children}
                   </main>
