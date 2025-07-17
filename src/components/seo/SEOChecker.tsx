@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Collapse, Alert, Badge, Divider, Typography, Space, Button } from 'antd';
+import type { CardProps, CollapseProps, AlertProps, BadgeProps, DividerProps, TypographyProps, SpaceProps, ButtonProps } from 'antd';
 import { 
   CheckCircleOutlined, 
   WarningOutlined, 
@@ -12,8 +12,22 @@ import {
   EyeInvisibleOutlined
 } from '@ant-design/icons';
 
-const { Panel } = Collapse;
-const { Text, Paragraph } = Typography;
+// Use dynamic imports for Ant Design components to avoid SSR issues
+import dynamic from 'next/dynamic';
+
+const Card = dynamic(() => import('antd').then(mod => ({ default: mod.Card })), { ssr: false });
+const Collapse = dynamic(() => import('antd').then(mod => ({ default: mod.Collapse })), { ssr: false });
+const Alert = dynamic(() => import('antd').then(mod => ({ default: mod.Alert })), { ssr: false });
+const Badge = dynamic(() => import('antd').then(mod => ({ default: mod.Badge })), { ssr: false });
+const Divider = dynamic(() => import('antd').then(mod => ({ default: mod.Divider })), { ssr: false });
+const Typography = dynamic(() => import('antd').then(mod => ({ default: mod.Typography })), { ssr: false });
+const Space = dynamic(() => import('antd').then(mod => ({ default: mod.Space })), { ssr: false });
+const Button = dynamic(() => import('antd').then(mod => ({ default: mod.Button })), { ssr: false });
+
+// Dynamic imports for sub-components
+const Panel = dynamic(() => import('antd').then(mod => ({ default: mod.Collapse.Panel })), { ssr: false });
+const Text = dynamic(() => import('antd').then(mod => ({ default: mod.Typography.Text })), { ssr: false });
+const Paragraph = dynamic(() => import('antd').then(mod => ({ default: mod.Typography.Paragraph })), { ssr: false });
 
 interface SEOIssue {
   type: 'error' | 'warning' | 'info' | 'success';

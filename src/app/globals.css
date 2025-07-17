@@ -2,8 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* South Pole Navigation Colors */
-@import '../styles/south-pole-colors.css';
+/* South Pole Navigation Colors - Integrated from south-pole-colors.css */
+:root {
+  --primary-dark-blue: #003366;
+  --primary-blue: #0046FF;
+  --text-dark: #1a1a1a;
+  --text-gray: #666666;
+  --bg-light-gray: #F8F9FA;
+  --white: #FFFFFF;
+  --hover-blue: #0038CC;
+  --border-light: #E5E7EB;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --transition-fast: 200ms ease-in-out;
+  --transition-medium: 300ms ease-in-out;
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --border-radius-large: 12px;
+  --border-radius-pill: 30px;
+}
+
+/* 响应式断点 */
+@media (max-width: 1024px) {
+  :root {
+    --nav-height: 60px;
+  }
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --nav-height: 80px;
+  }
+}
 
 /* CSS Reset and Base Styles */
 *,
