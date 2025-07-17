@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* South Pole Navigation Colors */
+@import '../styles/south-pole-colors.css';
+
 /* CSS Reset and Base Styles */
 *,
 *::before,
