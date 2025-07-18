@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
-import { SouthPoleNavigation } from '@/components/navigation/SouthPoleNavigation';
+import { SouthPoleOfficialNav } from '@/components/navigation/SouthPoleOfficialNav';
 
 export default function NavigationDemo() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 新的South Pole导航栏 */}
-      <SouthPoleNavigation />
+      <SouthPoleOfficialNav />
       
       {/* 演示内容 */}
-      <main className="py-16">
+      <main className="py-16" style={{ paddingTop: '100px' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-8">
@@ -24,19 +24,19 @@ export default function NavigationDemo() {
               {/* 功能特性卡片 */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  完整的品牌设计
+                  白色背景设计
                 </h3>
                 <p className="text-gray-600">
-                  完全符合South Pole品牌色彩和设计语言，包括深蓝色Logo、正确的字体和间距
+                  纯白色背景，现代简洁设计，滚动时添加微妙阴影效果
                 </p>
               </div>
               
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  智能MegaMenu
+                  完整下拉菜单
                 </h3>
                 <p className="text-gray-600">
-                  悬停触发的全宽度下拉菜单，左侧子菜单列表，右侧内容展示区
+                  悬停触发的下拉菜单，包含完整的二级三级菜单内容和描述
                 </p>
               </div>
               
@@ -51,19 +51,19 @@ export default function NavigationDemo() {
               
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  交互体验
+                  流畅动画
                 </h3>
                 <p className="text-gray-600">
-                  平滑的过渡动画、智能的悬停检测、200ms延迟关闭机制
+                  平滑的过渡动画、智能的悬停检测、150ms延迟关闭机制
                 </p>
               </div>
               
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  搜索功能
+                  完整内容
                 </h3>
                 <p className="text-gray-600">
-                  点击搜索图标展开全屏搜索框，支持ESC键关闭
+                  每个主菜单包含4-5个子菜单，每个子菜单都有标题和描述
                 </p>
               </div>
               
@@ -72,7 +72,7 @@ export default function NavigationDemo() {
                   Contact按钮
                 </h3>
                 <p className="text-gray-600">
-                  胶囊形蓝色按钮，白色箭头图标，hover时有动画效果
+                  橙色CTA按钮，包含箭头图标，hover时有颜色变化效果
                 </p>
               </div>
             </div>
@@ -82,8 +82,8 @@ export default function NavigationDemo() {
                 使用说明
               </h3>
               <p className="text-blue-800">
-                1. 悬停主菜单项查看MegaMenu<br/>
-                2. 点击搜索图标打开搜索框<br/>
+                1. 悬停主菜单项查看下拉菜单<br/>
+                2. 每个菜单都有详细的子菜单和描述<br/>
                 3. 移动端点击汉堡菜单查看侧边栏<br/>
                 4. 所有组件都支持键盘导航和无障碍功能
               </p>

@@ -2,11 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from '@/lib/modern-animations';
-import { MegaMenu } from '@/components/layouts/MegaMenu';
-import { navigationMenuData } from '@/data/navigation';
-
 export default function AnimationTestPage() {
-  const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [showBasicAnimations, setShowBasicAnimations] = useState(false);
 
   return (
@@ -61,30 +57,13 @@ export default function AnimationTestPage() {
           </AnimatePresence>
         </div>
 
-        {/* MegaMenu测试 */}
+        {/* 导航栏测试 */}
         <div className="bg-white rounded-lg p-6 shadow-lg">
-          <h2 className="text-xl font-bold mb-4">MegaMenu 动画测试</h2>
-          <button
-            onClick={() => setShowMegaMenu(!showMegaMenu)}
-            className="bg-green-500 text-white px-4 py-2 rounded mb-4"
-          >
-            {showMegaMenu ? '关闭' : '打开'} MegaMenu
-          </button>
-          
-          <div className="relative">
-            <AnimatePresence>
-              {showMegaMenu && (
-                <MegaMenu
-                  menuKey="aboutUs"
-                  sections={navigationMenuData.aboutUs.sections}
-                  features={navigationMenuData.aboutUs.features}
-                  isOpen={showMegaMenu}
-                  onClose={() => setShowMegaMenu(false)}
-                  className="mt-4"
-                />
-              )}
-            </AnimatePresence>
-          </div>
+          <h2 className="text-xl font-bold mb-4">导航栏测试</h2>
+          <p className="text-gray-600">
+            导航栏的下拉菜单功能已集成到主导航组件中。<br/>
+            请前往首页或其他页面查看导航栏的下拉菜单功能。
+          </p>
         </div>
 
         {/* 悬停动画测试 */}
