@@ -3,13 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from '@/lib/modern-animations';
-import { MegaMenu } from './MegaMenu';
 
 interface NavItem {
   id: string;
   label: string;
   href: string;
   isActive?: boolean;
+  hasDropdown?: boolean;
+  dropdownItems?: DropdownItem[];
+}
+
+interface DropdownItem {
+  id: string;
+  label: string;
+  href: string;
+  description?: string;
 }
 
 interface SouthPoleOfficialNavProps {
@@ -17,10 +25,57 @@ interface SouthPoleOfficialNavProps {
 }
 
 const navItems: NavItem[] = [
-  { id: 'about', label: 'About us', href: '/about-us' },
-  { id: 'what-we-do', label: 'What we do', href: '/what-we-do' },
-  { id: 'work-impact', label: 'Our work & impact', href: '/work-and-impact' },
-  { id: 'news', label: 'News & insights', href: '/news-insights' },
+  { 
+    id: 'about', 
+    label: 'About us', 
+    href: '/about-us',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'about-us', label: 'About us', href: '/about-us', description: 'Learn about our mission and values' },
+      { id: 'leadership', label: 'Leadership', href: '/about-us/leadership', description: 'Meet our executive team' },
+      { id: 'careers', label: 'Careers', href: '/about-us/careers', description: 'Join our global team' },
+      { id: 'locations', label: 'Locations', href: '/about-us/locations', description: 'Our global presence' },
+      { id: 'integrity', label: 'Integrity commitment', href: '/about-us/integrity', description: 'Our commitment to market integrity' }
+    ]
+  },
+  { 
+    id: 'what-we-do', 
+    label: 'What we do', 
+    href: '/what-we-do',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'climate-consulting', label: 'Climate Consulting', href: '/what-we-do/climate-consulting', description: 'Strategic climate advisory services' },
+      { id: 'environmental-certificates', label: 'Environmental Certificates', href: '/what-we-do/environmental-certificates', description: 'Carbon credits and renewable energy certificates' },
+      { id: 'project-finance', label: 'Project Finance', href: '/what-we-do/project-finance', description: 'Funding for climate projects' },
+      { id: 'technology-solutions', label: 'Technology Solutions', href: '/what-we-do/technology', description: 'Digital climate solutions' },
+      { id: 'nature-based-solutions', label: 'Nature-based Solutions', href: '/what-we-do/nature-based', description: 'Forest and biodiversity projects' }
+    ]
+  },
+  { 
+    id: 'work-impact', 
+    label: 'Our work & impact', 
+    href: '/work-and-impact',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'case-studies', label: 'Case Studies', href: '/work-and-impact/case-studies', description: 'Real-world climate solutions' },
+      { id: 'impact-reports', label: 'Impact Reports', href: '/work-and-impact/reports', description: 'Annual impact and sustainability reports' },
+      { id: 'client-stories', label: 'Client Stories', href: '/work-and-impact/stories', description: 'Success stories from our clients' },
+      { id: 'projects', label: 'Projects', href: '/work-and-impact/projects', description: 'Climate projects we support' }
+    ]
+  },
+  { 
+    id: 'news', 
+    label: 'News & insights', 
+    href: '/news-insights',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'latest-news', label: 'Latest News', href: '/news-insights/news', description: 'Latest industry updates' },
+      { id: 'insights', label: 'Insights', href: '/news-insights/insights', description: 'Expert analysis and commentary' },
+      { id: 'reports', label: 'Reports', href: '/news-insights/reports', description: 'In-depth market reports' },
+      { id: 'events', label: 'Events', href: '/news-insights/events', description: 'Upcoming events and webinars' },
+      { id: 'media-center', label: 'Media Center', href: '/news-insights/media', description: 'Press releases and media resources' }
+    ]
+  },
 ];
 
 export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({ 
@@ -28,12 +83,11 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
-  const hoverTimeoutRef = useRef<NodeJS.Timeout>();
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // 滚动监听 - 防抖优化
+  // 滚动监听
   useEffect(() => {
     const handleScroll = () => {
       if (scrollTimeoutRef.current) {
@@ -73,40 +127,31 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
     };
   }, [isMobileMenuOpen]);
 
-  // 导航项悬停处理
-  const handleNavItemHover = (itemId: string) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
+  // 下拉菜单悬停处理
+  const handleDropdownEnter = (itemId: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
     }
-    setActiveItem(itemId);
-    setIsMegaMenuOpen(true);
+    setActiveDropdown(itemId);
   };
 
-  const handleNavItemLeave = () => {
-    // 延迟隐藏，给用户时间移动到MegaMenu上
-    hoverTimeoutRef.current = setTimeout(() => {
-      setActiveItem(null);
-      setIsMegaMenuOpen(false);
-    }, 200);
+  const handleDropdownLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150);
   };
 
-  // MegaMenu悬停处理
-  const handleMegaMenuEnter = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
+  const handleDropdownMouseEnter = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
     }
-  };
-
-  const handleMegaMenuLeave = () => {
-    setActiveItem(null);
-    setIsMegaMenuOpen(false);
   };
 
   // 清理定时器
   useEffect(() => {
     return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
       }
     };
   }, []);
@@ -114,134 +159,126 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
   return (
     <>
       <nav 
-        className={`sp-nav ${isScrolled ? 'is-sticky' : ''} ${className}`}
+        className={`fixed top-0 left-0 right-0 z-50 ${className}`}
         style={{
-          backgroundColor: 'var(--sp-bg-primary)',
-          borderBottom: '1px solid var(--sp-border-light)',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          height: isScrolled ? 'var(--sp-nav-height-sticky)' : 'var(--sp-nav-height)',
-          boxShadow: isScrolled ? 'var(--sp-nav-shadow)' : 'none',
-          transition: 'all var(--sp-transition-base)',
+          backgroundColor: 'white',
+          borderBottom: isScrolled ? '1px solid #e5e7eb' : '1px solid transparent',
+          boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none',
+          transition: 'all 0.3s ease',
+          height: '72px'
         }}
       >
-        <div className="sp-container-2xl">
-          <div className="sp-nav-container">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-18">
             {/* Logo */}
             <Link 
               href="/"
-              className="sp-nav-logo"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               aria-label="South Pole - The Climate Company"
             >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--sp-space-3)',
-                }}
+              {/* Logo Icon */}
+              <div 
+                className="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0"
               >
-                {/* Logo Icon */}
-                <div 
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: 'var(--sp-black)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="text-white"
                 >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ color: 'var(--sp-white)' }}
-                  >
-                    <path
-                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-                      fill="currentColor"
-                    />
-                    <circle cx="12" cy="16" r="2" fill="currentColor" />
-                    <path
-                      d="M12 2v8M2 12h20"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      opacity="0.6"
-                    />
-                  </svg>
-                </div>
-                
-                {/* Logo Text */}
-                <span
-                  style={{
-                    fontSize: 'var(--sp-text-xl)',
-                    fontWeight: 'var(--sp-fw-medium)',
-                    color: 'var(--sp-text-primary)',
-                    fontFamily: 'var(--sp-font-primary)',
-                  }}
-                >
-                  South Pole
-                </span>
-              </motion.div>
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                    fill="currentColor"
+                  />
+                  <circle cx="12" cy="16" r="2" fill="currentColor" />
+                  <path
+                    d="M12 2v8M2 12h20"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    opacity="0.6"
+                  />
+                </svg>
+              </div>
+              
+              {/* Logo Text */}
+              <span className="text-xl font-medium text-gray-900">
+                South Pole
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div 
-              className="hidden lg:flex items-center" 
-              style={{ gap: 'var(--sp-space-8)' }}
-              onMouseLeave={handleNavItemLeave}
-            >
-              <ul className="sp-nav-menu">
-                {navItems.map((item) => (
-                  <li key={item.id} className="sp-nav-item">
-                    <Link
-                      href={item.href}
-                      className="sp-nav-link"
-                      onMouseEnter={() => handleNavItemHover(item.id)}
-                      style={{
-                        position: 'relative',
-                        fontSize: 'var(--sp-text-base)',
-                        fontWeight: 'var(--sp-fw-medium)',
-                        color: 'var(--sp-text-primary)',
-                        padding: 'var(--sp-space-4) 0',
-                        borderBottom: `3px solid ${
-                          activeItem === item.id || item.isActive 
-                            ? 'var(--sp-accent)' 
-                            : 'transparent'
-                        }`,
-                        transition: 'var(--sp-transition-base)',
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <div className="hidden lg:flex items-center space-x-8">
+              {navItems.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="relative"
+                  onMouseEnter={() => item.hasDropdown && handleDropdownEnter(item.id)}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  <Link
+                    href={item.href}
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors relative ${
+                      activeDropdown === item.id ? 'text-gray-900' : ''
+                    }`}
+                  >
+                    {item.label}
+                    {item.hasDropdown && (
+                      <svg
+                        className={`ml-1 inline w-4 h-4 transition-transform ${
+                          activeDropdown === item.id ? 'rotate-180' : ''
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </Link>
+
+                  {/* Dropdown Menu */}
+                  {item.hasDropdown && (
+                    <AnimatePresence>
+                      {activeDropdown === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200"
+                          onMouseEnter={handleDropdownMouseEnter}
+                          onMouseLeave={handleDropdownLeave}
+                        >
+                          <div className="p-4">
+                            {item.dropdownItems?.map((dropdownItem) => (
+                              <Link
+                                key={dropdownItem.id}
+                                href={dropdownItem.href}
+                                className="block p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="font-medium text-gray-900 mb-1">
+                                  {dropdownItem.label}
+                                </div>
+                                {dropdownItem.description && (
+                                  <div className="text-sm text-gray-500">
+                                    {dropdownItem.description}
+                                  </div>
+                                )}
+                              </Link>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
+                </div>
+              ))}
 
               {/* Contact CTA Button */}
               <Link
                 href="/contact-us"
-                className="sp-nav-cta"
-                style={{
-                  backgroundColor: 'var(--sp-accent)',
-                  color: 'var(--sp-white)',
-                  padding: 'var(--sp-space-3) var(--sp-space-6)',
-                  borderRadius: 'var(--sp-radius-base)',
-                  fontSize: 'var(--sp-text-base)',
-                  fontWeight: 'var(--sp-fw-medium)',
-                  transition: 'var(--sp-transition-base)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 'var(--sp-space-2)',
-                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
               >
                 Contact us
                 <svg
@@ -249,15 +286,12 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  style={{ color: 'currentColor' }}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <path
-                    d="M9 5l7 7-7 7"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M9 5l7 7-7 7"/>
                 </svg>
               </Link>
             </div>
@@ -265,65 +299,25 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
             {/* Mobile Menu Toggle */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Toggle mobile menu"
               aria-expanded={isMobileMenuOpen}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 'var(--sp-space-2)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--sp-text-primary)',
-              }}
             >
-              <motion.div
-                animate={{ rotate: isMobileMenuOpen ? 45 : 0 }}
-                transition={{ duration: 0.2 }}
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  style={{ color: 'currentColor' }}
-                >
-                  {isMobileMenuOpen ? (
-                    <path
-                      d="M6 18L18 6M6 6l12 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  ) : (
-                    <path
-                      d="M4 6h16M4 12h16M4 18h16"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                </svg>
-              </motion.div>
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
           </div>
         </div>
-        {/* MegaMenu */}
-        <AnimatePresence>
-          {isMegaMenuOpen && (
-            <MegaMenu
-              isOpen={isMegaMenuOpen}
-              activeMenu={activeItem}
-              onClose={handleMegaMenuLeave}
-              onMouseEnter={handleMegaMenuEnter}
-              onMouseLeave={handleMegaMenuLeave}
-            />
-          )}
-        </AnimatePresence>
       </nav>
 
       {/* Mobile Menu Overlay */}
@@ -334,92 +328,49 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'var(--sp-bg-primary)',
-              zIndex: 999,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: 'var(--sp-space-4)',
-              paddingTop: 'var(--sp-nav-height)',
-            }}
+            className="fixed inset-0 z-40 bg-white"
+            style={{ paddingTop: '72px' }}
           >
-            {/* Mobile Menu Header */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--sp-space-8)',
-                paddingBottom: 'var(--sp-space-4)',
-                borderBottom: '1px solid var(--sp-border-light)',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 'var(--sp-text-xl)',
-                  fontWeight: 'var(--sp-fw-medium)',
-                  color: 'var(--sp-text-primary)',
-                }}
-              >
-                Menu
-              </span>
-            </div>
-
-            {/* Mobile Menu Items */}
-            <nav style={{ flex: 1 }}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {navItems.map((item, index) => (
-                  <motion.li
-                    key={item.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    style={{ marginBottom: 'var(--sp-space-4)' }}
-                  >
+            <div className="p-4 overflow-y-auto h-full">
+              {/* Mobile Menu Items */}
+              <nav className="space-y-4">
+                {navItems.map((item) => (
+                  <div key={item.id} className="border-b border-gray-200 pb-4">
                     <Link
                       href={item.href}
                       onClick={toggleMobileMenu}
-                      style={{
-                        display: 'block',
-                        fontSize: 'var(--sp-text-2xl)',
-                        fontWeight: 'var(--sp-fw-medium)',
-                        color: 'var(--sp-text-primary)',
-                        padding: 'var(--sp-space-4) 0',
-                        borderBottom: '1px solid var(--sp-border-light)',
-                        transition: 'var(--sp-transition-base)',
-                      }}
+                      className="block text-xl font-medium text-gray-900 mb-3"
                     >
                       {item.label}
                     </Link>
-                  </motion.li>
+                    {item.hasDropdown && item.dropdownItems && (
+                      <div className="pl-4 space-y-2">
+                        {item.dropdownItems.map((dropdownItem) => (
+                          <Link
+                            key={dropdownItem.id}
+                            href={dropdownItem.href}
+                            onClick={toggleMobileMenu}
+                            className="block text-gray-600 hover:text-gray-900 py-1"
+                          >
+                            {dropdownItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </ul>
-            </nav>
+              </nav>
 
-            {/* Mobile Contact CTA */}
-            <div style={{ marginTop: 'auto', paddingTop: 'var(--sp-space-8)' }}>
-              <Link
-                href="/contact-us"
-                onClick={toggleMobileMenu}
-                style={{
-                  display: 'block',
-                  backgroundColor: 'var(--sp-accent)',
-                  color: 'var(--sp-white)',
-                  padding: 'var(--sp-space-4) var(--sp-space-6)',
-                  borderRadius: 'var(--sp-radius-base)',
-                  fontSize: 'var(--sp-text-lg)',
-                  fontWeight: 'var(--sp-fw-medium)',
-                  textAlign: 'center',
-                  transition: 'var(--sp-transition-base)',
-                }}
-              >
-                Contact us
-              </Link>
+              {/* Mobile Contact CTA */}
+              <div className="mt-8">
+                <Link
+                  href="/contact-us"
+                  onClick={toggleMobileMenu}
+                  className="block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors"
+                >
+                  Contact us
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
