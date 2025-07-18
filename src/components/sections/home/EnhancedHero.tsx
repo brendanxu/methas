@@ -194,7 +194,7 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
             {/* 主标题 */}
             <motion.h1 
               className={cn(
-                'newhome-hero__title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight tracking-tight',
+                'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight tracking-tight font-sans',
                 textColorClass
               )}
               initial="hidden"
@@ -208,7 +208,7 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
             {/* 副标题 */}
             <motion.p 
               className={cn(
-                'newhome-hero__subtitle text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-8 leading-relaxed',
+                'text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-6 leading-relaxed font-sans',
                 textSecondaryClass
               )}
               initial="hidden"
@@ -222,7 +222,7 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
             {/* 描述文字 */}
             <motion.p 
               className={cn(
-                'text-lg sm:text-xl md:text-2xl lg:text-3xl mb-12 max-w-3xl leading-relaxed',
+                'text-base sm:text-lg md:text-xl lg:text-xl mb-10 max-w-4xl leading-relaxed font-sans',
                 visual.textAlignment === 'center' && 'mx-auto',
                 textTertiaryClass
               )}

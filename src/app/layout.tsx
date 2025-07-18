@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Providers, GlobalStylesProvider } from "./providers";
-import { SouthPoleOfficialNav } from "@/components/navigation/SouthPoleOfficialNav";
+import { EnhancedSouthPoleNav } from "@/components/navigation/EnhancedSouthPoleNav";
 import { Footer } from "@/components/layouts/Footer";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
@@ -66,7 +66,7 @@ export default function RootLayout({
                 <GlobalSearch />
                 <SEOChecker />
                 <div className="min-h-screen flex flex-col bg-background text-foreground">
-                  <SouthPoleOfficialNav />
+                  <EnhancedSouthPoleNav />
                   <main className="flex-1">
                     {children}
                   </main>

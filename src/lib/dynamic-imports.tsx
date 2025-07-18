@@ -179,6 +179,33 @@ export const DynamicServices = dynamic(() => import('@/components/sections/home/
   )
 });
 
+export const DynamicEnhancedServices = dynamic(() => import('@/components/sections/home/EnhancedServices'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-3"></div>
+          <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {[1, 2, 3, 4].map(i => (
+            <CardLoading key={i} />
+          ))}
+        </div>
+        <div className="text-center">
+          <div className="bg-gray-50 rounded-lg p-8">
+            <div className="h-6 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 mx-auto mb-6"></div>
+            <div className="h-10 bg-gray-200 rounded w-32 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+});
+
 export const DynamicCaseStudies = dynamic(() => import('@/components/sections/home/CaseStudies').then(mod => ({ default: mod.CaseStudies })), {
   ssr: false,
   loading: () => (
@@ -362,6 +389,7 @@ const dynamicImports = {
   DynamicHomeHero,
   DynamicEnhancedHero,
   DynamicServices,
+  DynamicEnhancedServices,
   DynamicCaseStudies,
   DynamicSuccessStories,
   DynamicCarbonIntelligence,
