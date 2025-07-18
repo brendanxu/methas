@@ -107,17 +107,17 @@ const publicationsData = [
 ];
 
 export default function SouthPoleHomePage() {
-  const { ref: servicesRef, visibleItems: servicesVisible } = useStaggeredScrollAnimation(servicesData.length, {
+  const { ref: servicesRef, visibleItems: servicesVisible } = useStaggeredScrollAnimation<HTMLDivElement>(servicesData.length, {
     threshold: 0.2,
     delay: 200,
   });
 
-  const { ref: caseStudiesRef, visibleItems: caseStudiesVisible } = useStaggeredScrollAnimation(caseStudiesData.length, {
+  const { ref: caseStudiesRef, visibleItems: caseStudiesVisible } = useStaggeredScrollAnimation<HTMLDivElement>(caseStudiesData.length, {
     threshold: 0.2,
     delay: 300,
   });
 
-  const { ref: publicationsRef, visibleItems: publicationsVisible } = useStaggeredScrollAnimation(publicationsData.length, {
+  const { ref: publicationsRef, visibleItems: publicationsVisible } = useStaggeredScrollAnimation<HTMLDivElement>(publicationsData.length, {
     threshold: 0.2,
     delay: 400,
   });

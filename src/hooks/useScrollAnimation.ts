@@ -11,15 +11,15 @@ interface ScrollAnimationOptions {
   easing?: string;
 }
 
-interface ScrollAnimationReturn {
-  ref: React.RefObject<HTMLElement>;
+interface ScrollAnimationReturn<T extends HTMLElement = HTMLElement> {
+  ref: React.RefObject<T>;
   isVisible: boolean;
   hasBeenVisible: boolean;
 }
 
-export const useScrollAnimation = (
+export const useScrollAnimation = <T extends HTMLElement = HTMLElement>(
   options: ScrollAnimationOptions = {}
-): ScrollAnimationReturn => {
+): ScrollAnimationReturn<T> => {
   const {
     threshold = 0.1,
     rootMargin = '0px',
@@ -29,7 +29,7 @@ export const useScrollAnimation = (
     easing = 'cubic-bezier(0.4, 0, 0.2, 1)',
   } = options;
 
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
 
@@ -70,7 +70,7 @@ export const useScrollAnimation = (
 };
 
 // Hook for staggered animations
-export const useStaggeredScrollAnimation = (
+export const useStaggeredScrollAnimation = <T extends HTMLElement = HTMLElement>(
   itemCount: number,
   options: ScrollAnimationOptions = {}
 ) => {
@@ -78,7 +78,7 @@ export const useStaggeredScrollAnimation = (
   const [visibleItems, setVisibleItems] = useState<boolean[]>(
     new Array(itemCount).fill(false)
   );
-  const { ref, isVisible } = useScrollAnimation(options);
+  const { ref, isVisible } = useScrollAnimation<T>(options);
 
   useEffect(() => {
     if (isVisible) {
@@ -156,11 +156,11 @@ export const useParallax = (speed: number = 0.5) => {
 };
 
 // Hook for scroll-triggered animations with CSS classes
-export const useScrollAnimationCSS = (
+export const useScrollAnimationCSS = <T extends HTMLElement = HTMLElement>(
   animationClass: string = 'animate-fade-in-up',
   options: ScrollAnimationOptions = {}
 ) => {
-  const { ref, isVisible } = useScrollAnimation(options);
+  const { ref, isVisible } = useScrollAnimation<T>(options);
 
   useEffect(() => {
     const element = ref.current;

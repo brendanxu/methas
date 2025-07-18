@@ -45,7 +45,7 @@ const demoCards = [
 ];
 
 export default function SouthPoleDemoPage() {
-  const { ref: cardsRef, visibleItems } = useStaggeredScrollAnimation(demoCards.length, {
+  const { ref: cardsRef, visibleItems } = useStaggeredScrollAnimation<HTMLDivElement>(demoCards.length, {
     threshold: 0.2,
     delay: 200,
   });
