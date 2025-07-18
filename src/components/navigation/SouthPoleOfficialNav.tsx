@@ -26,52 +26,60 @@ interface SouthPoleOfficialNavProps {
 
 const navItems: NavItem[] = [
   { 
+    id: 'home', 
+    label: '首页', 
+    href: '/',
+    hasDropdown: false
+  },
+  { 
+    id: 'service-types', 
+    label: '服务类型', 
+    href: '/service-types',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'carbon-asset-management', label: '碳资产管理', href: '/service-types/carbon-asset-management', description: '碳足迹核算、碳资产开发、碳交易管理' },
+      { id: 'methane-removal-investment', label: '甲烷清除投资', href: '/service-types/methane-removal-investment', description: '减排效果是CO₂的25-84倍' },
+      { id: 'esg-carbon-consulting', label: 'ESG与碳咨询', href: '/service-types/esg-carbon-consulting', description: '双碳战略规划、ESG报告编制、可持续发展咨询' },
+      { id: 'green-supply-chain', label: '绿色供应链', href: '/service-types/green-supply-chain', description: '供应商碳管理、产品碳足迹、绿色采购体系' }
+    ]
+  },
+  { 
+    id: 'solutions', 
+    label: '解决方案', 
+    href: '/solutions',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'solution-overview', label: '方案概览', href: '/solutions/overview', description: '按行业分类的解决方案' },
+      { id: 'energy-industry', label: '能源行业解决方案', href: '/solutions/energy-industry', description: '传统能源向清洁能源转型' },
+      { id: 'manufacturing', label: '制造业解决方案', href: '/solutions/manufacturing', description: '智能制造与碳减排' },
+      { id: 'retail', label: '零售业解决方案', href: '/solutions/retail', description: '供应链碳中和计划' },
+      { id: 'finance', label: '金融业解决方案', href: '/solutions/finance', description: 'ESG合规与绿色投资组合' },
+      { id: 'implementation-results', label: '实施成果', href: '/solutions/results', description: '客户成功案例与关键数据展示' }
+    ]
+  },
+  { 
+    id: 'carbon-intelligence', 
+    label: '碳智观察', 
+    href: '/carbon-intelligence',
+    hasDropdown: true,
+    dropdownItems: [
+      { id: 'enterprise-practice', label: '企业实践', href: '/carbon-intelligence/enterprise-practice', description: '各行业碳管理实践案例' },
+      { id: 'industry-insights', label: '行业洞察', href: '/carbon-intelligence/industry-insights', description: '政策解读、市场分析、趋势预测' },
+      { id: 'technology-frontier', label: '技术前沿', href: '/carbon-intelligence/technology-frontier', description: '碳管理技术、创新解决方案、甲烷减排技术' },
+      { id: 'carbon-intelligence-reports', label: '碳智报告', href: '/carbon-intelligence/reports', description: '研究报告与白皮书下载' }
+    ]
+  },
+  { 
     id: 'about', 
-    label: 'About us', 
+    label: '关于我们', 
     href: '/about-us',
     hasDropdown: true,
     dropdownItems: [
-      { id: 'about-us', label: 'About us', href: '/about-us', description: 'Leading climate impact since 2006' },
-      { id: 'mission', label: 'Mission', href: '/about-us/mission', description: 'Our mission and values' },
-      { id: 'leadership', label: 'Leadership', href: '/about-us/leadership', description: 'Meet our CEO, Chair, Board and team' },
-      { id: 'locations', label: 'Locations', href: '/about-us/locations', description: 'Over 800 employees in 30+ countries' },
-      { id: 'integrity', label: 'Our commitment to integrity', href: '/about-us/integrity', description: 'Driving integrity in the carbon market' }
-    ]
-  },
-  { 
-    id: 'what-we-do', 
-    label: 'What we do', 
-    href: '/what-we-do',
-    hasDropdown: true,
-    dropdownItems: [
-      { id: 'environmental-certificates', label: 'Environmental Certificates', href: '/what-we-do/environmental-certificates', description: 'Carbon credits, Energy Attribute Certificates, Biodiversity credits' },
-      { id: 'climate-consulting', label: 'Climate Consulting', href: '/what-we-do/climate-consulting', description: 'Environmental footprint & net zero, Reporting & compliance, Value chain & renewables' },
-      { id: 'project-finance', label: 'Project Finance', href: '/what-we-do/project-finance', description: 'Heavy industry, Nature-based removals, Tech-based removals' }
-    ]
-  },
-  { 
-    id: 'work-impact', 
-    label: 'Our work & impact', 
-    href: '/work-and-impact',
-    hasDropdown: true,
-    dropdownItems: [
-      { id: 'case-studies', label: 'Case Studies', href: '/work-and-impact/case-studies', description: 'Real-world climate solutions and client success stories' },
-      { id: 'impact-reports', label: 'Impact Reports', href: '/work-and-impact/reports', description: 'Annual impact and sustainability reports' },
-      { id: 'client-stories', label: 'Client Stories', href: '/work-and-impact/stories', description: 'Success stories from our clients' },
-      { id: 'projects', label: 'Projects', href: '/work-and-impact/projects', description: 'Discover our certified climate action projects' }
-    ]
-  },
-  { 
-    id: 'news', 
-    label: 'News & insights', 
-    href: '/news-insights',
-    hasDropdown: true,
-    dropdownItems: [
-      { id: 'latest-news', label: 'Latest News', href: '/news-insights/news', description: 'Latest industry updates and announcements' },
-      { id: 'insights', label: 'Insights', href: '/news-insights/insights', description: 'Expert analysis and commentary' },
-      { id: 'reports', label: 'Reports', href: '/news-insights/reports', description: 'In-depth market reports and publications' },
-      { id: 'events', label: 'Events', href: '/news-insights/events', description: 'Upcoming events and webinars' },
-      { id: 'media-center', label: 'Media Center', href: '/news-insights/media', description: 'Press releases and media resources' }
+      { id: 'company-introduction', label: '公司介绍', href: '/about-us', description: '专注双碳目标的科技公司' },
+      { id: 'mission-vision', label: '使命愿景', href: '/about-us/mission', description: '推动碳中和事业发展' },
+      { id: 'team', label: '团队介绍', href: '/about-us/team', description: '专业的碳管理专家团队' },
+      { id: 'partners', label: '合作伙伴', href: '/about-us/partners', description: '全球合作伙伴网络' },
+      { id: 'contact', label: '联系我们', href: '/contact-us', description: '与我们取得联系' }
     ]
   },
 ];
@@ -278,7 +286,7 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
                 href="/contact-us"
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
               >
-                Contact us
+                联系我们
                 <svg
                   width="16"
                   height="16"
@@ -366,7 +374,7 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
                   onClick={toggleMobileMenu}
                   className="block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors"
                 >
-                  Contact us
+                  联系我们
                 </Link>
               </div>
             </div>

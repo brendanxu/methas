@@ -36,11 +36,11 @@ export default function Home() {
             }}
             backgroundImage="/images/homepage-main-hero-option-3_640x1036.jpg"
             content={{
-              title: "It's time for a net zero world.",
-              subtitle: "Hello, we're South Pole. The Climate Company.",
-              description: "We've been helping organisations decarbonise and navigate the complexities of climate since 2006.",
-              ctaText: "Learn more",
-              ctaLink: "/what-we-do"
+              title: "甲烷清除投资，引领碳中和未来",
+              subtitle: "专业的甲烷减排解决方案",
+              description: "甲烷温室效应是CO₂的25-84倍，我们专注于甲烷减排投资，为企业提供高效的碳中和解决方案。",
+              ctaText: "了解甲烷减排",
+              ctaLink: "/service-types/methane-removal-investment"
             }}
             visual={{
               overlayOpacity: 0.5,
