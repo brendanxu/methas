@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from '@/lib/modern-animations';
+import { MegaMenu } from './MegaMenu';
 
 interface NavItem {
   id: string;
@@ -28,7 +29,9 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>(null);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const hoverTimeoutRef = useRef<NodeJS.Timeout>();
 
   // 滚动监听 - 防抖优化
   useEffect(() => {
@@ -72,12 +75,41 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
 
   // 导航项悬停处理
   const handleNavItemHover = (itemId: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
     setActiveItem(itemId);
+    setIsMegaMenuOpen(true);
   };
 
   const handleNavItemLeave = () => {
-    setActiveItem(null);
+    // 延迟隐藏，给用户时间移动到MegaMenu上
+    hoverTimeoutRef.current = setTimeout(() => {
+      setActiveItem(null);
+      setIsMegaMenuOpen(false);
+    }, 200);
   };
+
+  // MegaMenu悬停处理
+  const handleMegaMenuEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  const handleMegaMenuLeave = () => {
+    setActiveItem(null);
+    setIsMegaMenuOpen(false);
+  };
+
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -162,7 +194,11 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center" style={{ gap: 'var(--sp-space-8)' }}>
+            <div 
+              className="hidden lg:flex items-center" 
+              style={{ gap: 'var(--sp-space-8)' }}
+              onMouseLeave={handleNavItemLeave}
+            >
               <ul className="sp-nav-menu">
                 {navItems.map((item) => (
                   <li key={item.id} className="sp-nav-item">
@@ -170,7 +206,6 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
                       href={item.href}
                       className="sp-nav-link"
                       onMouseEnter={() => handleNavItemHover(item.id)}
-                      onMouseLeave={handleNavItemLeave}
                       style={{
                         position: 'relative',
                         fontSize: 'var(--sp-text-base)',
@@ -277,6 +312,18 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
             </button>
           </div>
         </div>
+        {/* MegaMenu */}
+        <AnimatePresence>
+          {isMegaMenuOpen && (
+            <MegaMenu
+              isOpen={isMegaMenuOpen}
+              activeMenu={activeItem}
+              onClose={handleMegaMenuLeave}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
+            />
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Mobile Menu Overlay */}
