@@ -251,7 +251,7 @@ export default function FilesManagementPage() {
   });
 
   // 获取文件列表
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -275,11 +275,11 @@ export default function FilesManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchFiles();
-  }, [filters]);
+  }, [fetchFiles]);
 
   // 处理表格变化
   const handleTableChange = (pagination: any, tableFilters: any, sorter: any) => {

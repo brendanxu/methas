@@ -536,6 +536,8 @@ export const Stagger: React.FC<StaggerProps> = React.memo(({
   );
 });
 
+Stagger.displayName = 'Stagger';
+
 // ===== Parallax Component =====
 
 interface ParallaxProps {
@@ -595,6 +597,8 @@ export const Parallax: React.FC<ParallaxProps> = React.memo(({
     </div>
   );
 });
+
+Parallax.displayName = 'Parallax';
 
 // ===== Magnetic Component =====
 
@@ -670,5 +674,7 @@ export const Magnetic: React.FC<MagneticProps> = React.memo(({
     </div>
   );
 });
+
+Magnetic.displayName = 'Magnetic';
 
 export default motion;

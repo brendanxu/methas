@@ -219,7 +219,7 @@ export default function ContentManagementPage() {
   const [form] = Form.useForm();
 
   // Fetch contents
-  const fetchContents = async () => {
+  const fetchContents = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -243,11 +243,11 @@ export default function ContentManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchContents();
-  }, [filters]);
+  }, [fetchContents]);
 
   // Handle table changes
   const handleTableChange = (pagination: any, tableFilters: any, sorter: any) => {

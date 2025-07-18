@@ -122,7 +122,7 @@ export const useVideoOptimization = (
     };
 
     testAutoplay();
-  }, []);
+  }, [videoRef]);
 
   // 重试机制
   const retry = useCallback(() => {
@@ -139,7 +139,7 @@ export const useVideoOptimization = (
         video.load();
       }
     }, retryDelay);
-  }, [retryCount, maxRetries, retryDelay]);
+  }, [retryCount, maxRetries, retryDelay, videoRef]);
 
   // 强制播放
   const forcePlay = useCallback(async () => {
@@ -153,7 +153,7 @@ export const useVideoOptimization = (
       console.warn('Force play failed:', error);
       setHasError(true);
     }
-  }, []);
+  }, [videoRef]);
 
   // 暂停播放
   const pause = useCallback(() => {
@@ -162,7 +162,7 @@ export const useVideoOptimization = (
       video.pause();
       setIsPlaying(false);
     }
-  }, []);
+  }, [videoRef]);
 
   // 视频事件处理
   useEffect(() => {
@@ -219,7 +219,7 @@ export const useVideoOptimization = (
       video.removeEventListener('error', handleError);
       video.removeEventListener('stalled', handleStalled);
     };
-  }, [retryCount, maxRetries, retryDelay, retry, preloadStrategy]);
+  }, [retryCount, maxRetries, retryDelay, retry, preloadStrategy, videoRef]);
 
   // Intersection Observer 设置
   useEffect(() => {
@@ -244,7 +244,7 @@ export const useVideoOptimization = (
         intersectionObserverRef.current.disconnect();
       }
     };
-  }, [hasError, canAutoplay, forcePlay, pause]);
+  }, [hasError, canAutoplay, forcePlay, pause, videoRef]);
 
   // 清理定时器
   useEffect(() => {
