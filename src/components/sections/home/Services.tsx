@@ -10,45 +10,31 @@ import { Button } from '@/components/ui/Button';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
 const getServiceIcons = () => ({
-  carbonFootprint: (
+  carbonAssetManagement: (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
         d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" 
       />
     </svg>
   ),
-  carbonReduction: (
+  methaneRemovalInvestment: (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
-        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+        d="M13 10V3L4 14h7v7l9-11h-7z" 
       />
     </svg>
   ),
-  strategyConsulting: (
+  esgCarbonConsulting: (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" 
       />
     </svg>
   ),
-  carbonNeutral: (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
-        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" 
-      />
-    </svg>
-  ),
-  supplyChain: (
+  greenSupplyChain: (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
         d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" 
-      />
-    </svg>
-  ),
-  esgReporting: (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
-        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
       />
     </svg>
   ),
@@ -65,46 +51,32 @@ export const Services: React.FC = () => {
   
   const services = [
     {
-      id: 'carbon-footprint',
-      icon: icons.carbonFootprint,
-      title: t('items.carbonFootprint.title'),
-      description: t('items.carbonFootprint.description'),
-      href: '/services/carbon-footprint'
+      id: 'carbon-asset-management',
+      icon: icons.carbonAssetManagement,
+      title: '碳资产管理',
+      description: '碳足迹核算、碳资产开发、碳交易管理，助力企业实现碳资产价值最大化',
+      href: '/service-types/carbon-asset-management'
     },
     {
-      id: 'carbon-reduction',
-      icon: icons.carbonReduction,
-      title: t('items.carbonReduction.title'),
-      description: t('items.carbonReduction.description'),
-      href: '/services/carbon-reduction'
+      id: 'methane-removal-investment',
+      icon: icons.methaneRemovalInvestment,
+      title: '甲烷清除投资',
+      description: '减排效果是CO₂的25-84倍，专注甲烷减排投资，引领碳中和未来',
+      href: '/service-types/methane-removal-investment'
     },
     {
-      id: 'strategy-consulting',
-      icon: icons.strategyConsulting,
-      title: t('items.strategyConsulting.title'),
-      description: t('items.strategyConsulting.description'),
-      href: '/services/strategy-consulting'
+      id: 'esg-carbon-consulting',
+      icon: icons.esgCarbonConsulting,
+      title: 'ESG与碳咨询',
+      description: '双碳战略规划、ESG报告编制、可持续发展咨询，全方位支持企业绿色转型',
+      href: '/service-types/esg-carbon-consulting'
     },
     {
-      id: 'carbon-neutral',
-      icon: icons.carbonNeutral,
-      title: t('items.carbonNeutral.title'),
-      description: t('items.carbonNeutral.description'),
-      href: '/services/carbon-neutral-certification'
-    },
-    {
-      id: 'supply-chain',
-      icon: icons.supplyChain,
-      title: t('items.supplyChain.title'),
-      description: t('items.supplyChain.description'),
-      href: '/services/sustainable-supply-chain'
-    },
-    {
-      id: 'esg-reporting',
-      icon: icons.esgReporting,
-      title: t('items.esgReporting.title'),
-      description: t('items.esgReporting.description'),
-      href: '/services/esg-reporting'
+      id: 'green-supply-chain',
+      icon: icons.greenSupplyChain,
+      title: '绿色供应链',
+      description: '供应商碳管理、产品碳足迹、绿色采购体系，构建可持续供应链生态',
+      href: '/service-types/green-supply-chain'
     }
   ];
 
@@ -143,9 +115,9 @@ export const Services: React.FC = () => {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-primary font-medium mb-4">{t('subtitle')}</p>
+          <p className="text-primary font-medium mb-4">Our Services</p>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-            {t('title')}
+            四大核心服务
           </h2>
         </motion.div>
 
@@ -155,7 +127,7 @@ export const Services: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
         >
           {services.map((service, index) => (
             <motion.div
@@ -207,9 +179,9 @@ export const Services: React.FC = () => {
               </motion.div>
             }
             iconPosition="right"
-            onClick={() => window.location.href = '/services'}
+            onClick={() => window.location.href = '/service-types'}
           >
-            {t('viewAllServices')}
+            查看全部服务
           </Button>
         </motion.div>
       </div>

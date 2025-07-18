@@ -90,30 +90,40 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollAnimationRef = useRef<number>();
   const dropdownTimeoutRef = useRef<NodeJS.Timeout>();
+  const lastScrollY = useRef(0);
 
-  // 滚动监听
+  // 滚动监听 - 使用 requestAnimationFrame 优化性能
   useEffect(() => {
     const handleScroll = () => {
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
+      const currentScrollY = window.scrollY;
       
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsScrolled(window.scrollY > 50);
-      }, 10);
+      // 防抖：只有滚动距离变化超过阈值才更新
+      if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
+        if (scrollAnimationRef.current) {
+          cancelAnimationFrame(scrollAnimationRef.current);
+        }
+        
+        scrollAnimationRef.current = requestAnimationFrame(() => {
+          const shouldBeScrolled = currentScrollY > 50;
+          if (shouldBeScrolled !== isScrolled) {
+            setIsScrolled(shouldBeScrolled);
+          }
+          lastScrollY.current = currentScrollY;
+        });
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      if (scrollAnimationRef.current) {
+        cancelAnimationFrame(scrollAnimationRef.current);
       }
     };
-  }, []);
+  }, [isScrolled]);
 
   // 移动端菜单控制
   const toggleMobileMenu = () => {
@@ -133,23 +143,28 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
     };
   }, [isMobileMenuOpen]);
 
-  // 下拉菜单悬停处理
+  // 下拉菜单悬停处理 - 优化延迟和状态管理
   const handleDropdownEnter = (itemId: string) => {
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = undefined;
     }
     setActiveDropdown(itemId);
   };
 
   const handleDropdownLeave = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
     dropdownTimeoutRef.current = setTimeout(() => {
       setActiveDropdown(null);
-    }, 150);
+    }, 200); // 增加延迟到200ms，减少闪烁
   };
 
   const handleDropdownMouseEnter = () => {
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = undefined;
     }
   };
 
@@ -170,8 +185,10 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
           backgroundColor: 'white',
           borderBottom: isScrolled ? '1px solid #e5e7eb' : '1px solid transparent',
           boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none',
-          transition: 'all 0.3s ease',
-          height: '72px'
+          transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)', // 更流畅的过渡
+          height: '72px',
+          willChange: 'box-shadow, border-bottom', // 优化重绘
+          transform: 'translate3d(0, 0, 0)' // 硬件加速
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,11 +265,20 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
                     <AnimatePresence>
                       {activeDropdown === item.id && (
                         <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ 
+                            duration: 0.3, 
+                            ease: [0.23, 1, 0.32, 1], // 更流畅的贝塞尔曲线
+                            scale: { duration: 0.2 }
+                          }}
                           className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200"
+                          style={{ 
+                            willChange: 'transform, opacity',
+                            backfaceVisibility: 'hidden',
+                            transform: 'translate3d(0, 0, 0)' // 硬件加速
+                          }}
                           onMouseEnter={handleDropdownMouseEnter}
                           onMouseLeave={handleDropdownLeave}
                         >
@@ -333,9 +359,18 @@ export const SouthPoleOfficialNav: React.FC<SouthPoleOfficialNavProps> = ({
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ 
+              duration: 0.4, 
+              ease: [0.23, 1, 0.32, 1], // 更流畅的贝塞尔曲线
+              x: { type: 'spring', stiffness: 300, damping: 30 }
+            }}
             className="fixed inset-0 z-40 bg-white"
-            style={{ paddingTop: '72px' }}
+            style={{ 
+              paddingTop: '72px',
+              willChange: 'transform, opacity',
+              backfaceVisibility: 'hidden',
+              transform: 'translate3d(0, 0, 0)' // 硬件加速
+            }}
           >
             <div className="p-4 overflow-y-auto h-full">
               {/* Mobile Menu Items */}

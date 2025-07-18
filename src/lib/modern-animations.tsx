@@ -151,7 +151,7 @@ const createKeyframes = (initial: any, animate: any): Keyframe[] => {
 };
 
 const getAnimationConfig = (transition?: AnimationConfig): KeyframeAnimationOptions => {
-  let easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  let easing = 'cubic-bezier(0.23, 1, 0.32, 1)'; // 更流畅的默认贝塞尔曲线
   
   if (transition?.easing) {
     easing = transition.easing;
@@ -247,13 +247,13 @@ const createMotionComponent = (tagName: string) => {
         }
       }, [isInView, initial, whileInView, transition]);
 
-      // Regular animate effect
+      // Regular animate effect - 优化性能
       useEffect(() => {
         const element = elementRef.current;
         if (!element || !animate || whileInView) return;
 
-        // 添加小延迟确保DOM已准备好
-        const timer = setTimeout(() => {
+        // 使用requestAnimationFrame替代setTimeout
+        const animationFrame = requestAnimationFrame(() => {
           const initialState = typeof initial === 'string' ? animationPresets[initial as keyof typeof animationPresets] : initial || {};
           const animateState = typeof animate === 'string' ? animationPresets[animate as keyof typeof animationPresets] : animate;
 
@@ -266,67 +266,113 @@ const createMotionComponent = (tagName: string) => {
             
             // 动画完成后设置最终状态
             animation.addEventListener('finish', () => {
-              Object.assign(element.style, {
-                opacity: animateState.opacity ?? 1,
-                transform: createKeyframes({}, animateState)[1].transform,
+              // 使用requestAnimationFrame确保DOM更新在下一帧
+              requestAnimationFrame(() => {
+                Object.assign(element.style, {
+                  opacity: animateState.opacity ?? 1,
+                  transform: createKeyframes({}, animateState)[1].transform,
+                  willChange: 'auto' // 动画完成后重置will-change
+                });
               });
             });
 
-            return () => animation.cancel();
+            // 设置will-change以优化性能
+            element.style.willChange = 'transform, opacity';
           }
-        }, 50);
+        });
 
-        return () => clearTimeout(timer);
-      }, [initial, animate, transition, whileInView]);
+        return () => {
+          cancelAnimationFrame(animationFrame);
+          if (currentAnimation) {
+            currentAnimation.cancel();
+          }
+        };
+      }, [initial, animate, transition, whileInView, currentAnimation]);
 
-      // Hover effects
+      // Hover effects - 优化性能和流畅度
+      const hoverAnimationRef = useRef<Animation | null>(null);
+      
       const handleMouseEnter = useCallback(() => {
         const element = elementRef.current;
         if (!element || !whileHover) return;
 
+        // 取消之前的动画
+        if (hoverAnimationRef.current) {
+          hoverAnimationRef.current.cancel();
+        }
+
         const hoverState = typeof whileHover === 'string' ? animationPresets[whileHover as keyof typeof animationPresets] : whileHover;
         const keyframes = createKeyframes({}, hoverState);
-        const config = getAnimationConfig({ duration: 200, easing: 'ease-out' });
+        const config = getAnimationConfig({ duration: 0.3, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
 
-        element.animate(keyframes, config);
+        element.style.willChange = 'transform, opacity';
+        hoverAnimationRef.current = element.animate(keyframes, config);
       }, [whileHover]);
 
       const handleMouseLeave = useCallback(() => {
         const element = elementRef.current;
         if (!element || !whileHover) return;
 
+        // 取消之前的动画
+        if (hoverAnimationRef.current) {
+          hoverAnimationRef.current.cancel();
+        }
+
         const keyframes = createKeyframes(
           typeof whileHover === 'string' ? animationPresets[whileHover as keyof typeof animationPresets] : whileHover,
           {}
         );
-        const config = getAnimationConfig({ duration: 200, easing: 'ease-out' });
+        const config = getAnimationConfig({ duration: 0.3, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
 
-        element.animate(keyframes, config);
+        hoverAnimationRef.current = element.animate(keyframes, config);
+        
+        // 动画完成后重置will-change
+        hoverAnimationRef.current.addEventListener('finish', () => {
+          element.style.willChange = 'auto';
+        });
       }, [whileHover]);
 
-      // Tap effects
+      // Tap effects - 优化触摸反馈
+      const tapAnimationRef = useRef<Animation | null>(null);
+      
       const handleMouseDown = useCallback(() => {
         const element = elementRef.current;
         if (!element || !whileTap) return;
 
+        // 取消之前的动画
+        if (tapAnimationRef.current) {
+          tapAnimationRef.current.cancel();
+        }
+
         const tapState = typeof whileTap === 'string' ? animationPresets[whileTap as keyof typeof animationPresets] : whileTap;
         const keyframes = createKeyframes({}, tapState);
-        const config = getAnimationConfig({ duration: 100, easing: 'ease-out' });
+        const config = getAnimationConfig({ duration: 0.1, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' });
 
-        element.animate(keyframes, config);
+        element.style.willChange = 'transform';
+        tapAnimationRef.current = element.animate(keyframes, config);
       }, [whileTap]);
 
       const handleMouseUp = useCallback(() => {
         const element = elementRef.current;
         if (!element || !whileTap) return;
 
+        // 取消之前的动画
+        if (tapAnimationRef.current) {
+          tapAnimationRef.current.cancel();
+        }
+
         const keyframes = createKeyframes(
           typeof whileTap === 'string' ? animationPresets[whileTap as keyof typeof animationPresets] : whileTap,
           {}
         );
-        const config = getAnimationConfig({ duration: 100, easing: 'ease-out' });
+        const config = getAnimationConfig({ duration: 0.2, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
 
-        element.animate(keyframes, config);
+        tapAnimationRef.current = element.animate(keyframes, config);
+        
+        // 动画完成后重置will-change
+        tapAnimationRef.current.addEventListener('finish', () => {
+          element.style.willChange = 'auto';
+        });
       }, [whileTap]);
 
       // Filter out motion props
@@ -459,7 +505,8 @@ interface StaggerProps {
   className?: string;
 }
 
-export const Stagger: React.FC<StaggerProps> = ({
+// 使用React.memo优化Stagger组件
+export const Stagger: React.FC<StaggerProps> = React.memo(({
   children,
   staggerDelay = 100,
   initial = 'hidden',
@@ -475,15 +522,19 @@ export const Stagger: React.FC<StaggerProps> = ({
           key={index}
           initial={initial}
           whileInView={animate}
-          transition={{ delay: index * staggerDelay }}
-          viewport={{ once: true }}
+          transition={{ 
+            delay: index * (staggerDelay / 1000), // 转换为秒
+            duration: 0.6,
+            ease: [0.23, 1, 0.32, 1]
+          }}
+          viewport={{ once: true, margin: '0px 0px -50px 0px' }}
         >
           {child}
         </motion.div>
       ))}
     </div>
   );
-};
+});
 
 // ===== Parallax Component =====
 
@@ -493,33 +544,57 @@ interface ParallaxProps {
   className?: string;
 }
 
-export const Parallax: React.FC<ParallaxProps> = ({
+// 使用React.memo优化Parallax组件
+export const Parallax: React.FC<ParallaxProps> = React.memo(({
   children,
   speed = 0.5,
   className,
 }) => {
   const elementRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
+    element.style.willChange = 'transform';
+    element.style.backfaceVisibility = 'hidden';
+
     const updateParallax = () => {
-      const scrollY = window.scrollY;
-      const rate = scrollY * -speed;
-      element.style.transform = `translateY(${rate}px)`;
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+
+      animationRef.current = requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        const rate = scrollY * -speed;
+        element.style.transform = `translate3d(0, ${rate}px, 0)`;
+      });
     };
 
     window.addEventListener('scroll', updateParallax, { passive: true });
-    return () => window.removeEventListener('scroll', updateParallax);
+    return () => {
+      window.removeEventListener('scroll', updateParallax);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      element.style.willChange = 'auto';
+    };
   }, [speed]);
 
   return (
-    <div ref={elementRef} className={className}>
+    <div 
+      ref={elementRef} 
+      className={className}
+      style={{
+        transform: 'translate3d(0, 0, 0)', // 启用硬件加速
+        backfaceVisibility: 'hidden'
+      }}
+    >
       {children}
     </div>
   );
-};
+});
 
 // ===== Magnetic Component =====
 
@@ -529,32 +604,53 @@ interface MagneticProps {
   className?: string;
 }
 
-export const Magnetic: React.FC<MagneticProps> = ({
+// 使用React.memo优化Magnetic组件
+export const Magnetic: React.FC<MagneticProps> = React.memo(({
   children,
   strength = 0.3,
   className,
 }) => {
   const elementRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     const element = elementRef.current;
     if (!element) return;
 
-    const rect = element.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const deltaX = (e.clientX - centerX) * strength;
-    const deltaY = (e.clientY - centerY) * strength;
+    // 使用requestAnimationFrame优化性能
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
 
-    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    animationRef.current = requestAnimationFrame(() => {
+      const rect = element.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const deltaX = (e.clientX - centerX) * strength;
+      const deltaY = (e.clientY - centerY) * strength;
+
+      element.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+    });
   }, [strength]);
 
   const handleMouseLeave = useCallback(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    element.style.transform = 'translate(0px, 0px)';
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    element.style.transform = 'translate3d(0px, 0px, 0px)';
+    element.style.willChange = 'auto';
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    element.style.willChange = 'transform';
   }, []);
 
   return (
@@ -563,11 +659,16 @@ export const Magnetic: React.FC<MagneticProps> = ({
       className={className}
       onMouseMove={handleMouseMove as any}
       onMouseLeave={handleMouseLeave}
-      style={{ transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+      onMouseEnter={handleMouseEnter}
+      style={{ 
+        transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
+        backfaceVisibility: 'hidden',
+        transform: 'translate3d(0, 0, 0)' // 启用硬件加速
+      }}
     >
       {children}
     </div>
   );
-};
+});
 
 export default motion;

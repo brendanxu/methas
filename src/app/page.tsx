@@ -7,7 +7,6 @@ import {
   DynamicServices,
   DynamicCaseStudies 
 } from '@/lib/dynamic-imports';
-import SuccessStories from '@/components/sections/home/SuccessStories';
 import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_SEO } from '@/lib/seo-config';
@@ -68,16 +67,6 @@ export default function Home() {
             scrollThreshold={50}
           >
             <DynamicCaseStudies />
-          </ComponentPreloader>
-          
-          {/* Success Stories Section */}
-          <ComponentPreloader
-            importFn={() => import('@/components/sections/home/SuccessStories')}
-            componentName="SuccessStories"
-            trigger="scroll"
-            scrollThreshold={60}
-          >
-            <SuccessStories />
           </ComponentPreloader>
           
           </div>
