@@ -21,12 +21,12 @@ export const ContactButton: React.FC<ContactButtonProps> = ({
 }) => {
   const sizeClasses = {
     small: 'px-4 py-2 text-sm',
-    medium: 'px-6 py-2.5 text-sm',
+    medium: 'text-sm',
     large: 'px-8 py-3 text-base',
   };
 
   const baseClasses = `
-    inline-flex items-center justify-center space-x-2 font-medium rounded-full
+    inline-flex items-center justify-center space-x-2 font-medium
     transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
     ${sizeClasses[size]} ${className}
   `;
@@ -55,6 +55,8 @@ export const ContactButton: React.FC<ContactButtonProps> = ({
         backgroundColor: variantStyles[variant].backgroundColor,
         color: variantStyles[variant].color,
         border: variantStyles[variant].border,
+        borderRadius: '30px', // 需求规范：圆角30px
+        padding: '12px 24px', // 需求规范：内边距12px 24px
       }}
       onClick={onClick}
       whileHover={{ 

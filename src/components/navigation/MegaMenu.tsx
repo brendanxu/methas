@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from '@/lib/modern-animations';
+import { motion } from '@/lib/modern-animations';
 import { megaMenuData, MegaMenuData } from '@/data/megaMenuData';
 
 interface MegaMenuProps {
@@ -111,33 +111,35 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
   if (!menuData) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="absolute top-full left-0 w-full z-50 bg-white border-t-2 border-gray-100"
-        style={{ 
-          boxShadow: 'var(--shadow-medium)',
-          borderTopColor: 'var(--border-light)'
-        }}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.2, ease: 'easeInOut' }}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        <div className="max-w-6xl mx-auto">
+    <motion.div
+      className="absolute top-full left-0 w-full z-50 bg-white border-t-2 border-gray-100"
+      style={{ 
+        boxShadow: 'var(--shadow-medium)',
+        borderTopColor: 'var(--border-light)'
+      }}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+        <div className="mx-auto" style={{ maxWidth: '1400px' }}>
           <div className="grid grid-cols-3 gap-0">
             {/* 左侧子菜单列表 (1/3 宽度) */}
             <div 
-              className="col-span-1 p-10"
-              style={{ backgroundColor: 'var(--bg-light-gray)' }}
+              className="col-span-1"
+              style={{ 
+                backgroundColor: 'var(--bg-light-gray)',
+                padding: '40px' // 按需求规范设置内边距
+              }}
             >
-              <nav className="space-y-4">
+              <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {menuData.menuItems.map((item) => (
                   <Link
                     key={item.id}
                     href={item.href}
-                    className="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-white transition-colors duration-200 group"
+                    className="block py-3 px-4 rounded-lg hover:bg-white transition-colors duration-200"
                     onClick={onClose}
                   >
                     <span 
@@ -146,15 +148,6 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                     >
                       {item.label}
                     </span>
-                    <svg 
-                      className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-200"
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                      style={{ color: 'var(--primary-dark-blue)' }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
                   </Link>
                 ))}
               </nav>
@@ -162,8 +155,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
 
             {/* 右侧内容展示区 (2/3 宽度) */}
             <div 
-              className="col-span-2 p-10"
-              style={{ backgroundColor: 'var(--white)' }}
+              className="col-span-2"
+              style={{ 
+                backgroundColor: 'var(--white)',
+                padding: '40px' // 按需求规范设置内边距
+              }}
             >
               <div className="space-y-6">
                 {menuData.cards.map((card) => (
@@ -174,7 +170,6 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
           </div>
         </div>
       </motion.div>
-    </AnimatePresence>
   );
 };
 

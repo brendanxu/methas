@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from '@/lib/modern-animations';
+import { motion, AnimatePresence } from '@/lib/modern-animations';
 import { SouthPoleLogo } from './SouthPoleLogo';
 import { MainNavigation } from './MainNavigation';
 import { MegaMenu } from './MegaMenu';
@@ -77,7 +77,7 @@ export const SouthPoleNavigation: React.FC<SouthPoleNavigationProps> = ({
           boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
         }}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: '1400px' }}>
           <div className="flex items-center justify-between h-20">
             {/* Logo 区域 */}
             <SouthPoleLogo />
@@ -134,13 +134,17 @@ export const SouthPoleNavigation: React.FC<SouthPoleNavigationProps> = ({
         </div>
 
         {/* MegaMenu */}
-        <MegaMenu
-          isOpen={!!activeMenu}
-          activeMenu={activeMenu}
-          onClose={handleMenuClose}
-          onMouseEnter={handleMenuKeepOpen}
-          onMouseLeave={handleMenuClose}
-        />
+        <AnimatePresence>
+          {activeMenu && (
+            <MegaMenu
+              isOpen={true}
+              activeMenu={activeMenu}
+              onClose={handleMenuClose}
+              onMouseEnter={handleMenuKeepOpen}
+              onMouseLeave={handleMenuClose}
+            />
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* 移动端菜单 */}

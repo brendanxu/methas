@@ -21,23 +21,23 @@ export interface MegaMenuData {
   cards: MegaMenuCard[];
 }
 
-// MegaMenu 数据配置
+// MegaMenu 数据配置 - 按需求文档精确配置
 export const megaMenuData: Record<string, MegaMenuData> = {
   'about': {
     menuItems: [
       {
         id: 'about-us',
-        label: 'About us',
+        label: 'About us →',
         href: '/about-us',
       },
       {
         id: 'what-we-do',
-        label: 'What we do',
+        label: 'What we do →',
         href: '/what-we-do',
       },
       {
         id: 'work-impact',
-        label: 'Work & impact',
+        label: 'Work & impact →',
         href: '/work-and-impact',
       },
     ],
@@ -66,17 +66,17 @@ export const megaMenuData: Record<string, MegaMenuData> = {
     menuItems: [
       {
         id: 'climate-consulting',
-        label: 'Climate Consulting',
+        label: 'Climate Consulting →',
         href: '/what-we-do/climate-consulting',
       },
       {
         id: 'environmental-certificates',
-        label: 'Environmental Certificates',
+        label: 'Environmental Certificates →',
         href: '/what-we-do/environmental-certificates',
       },
       {
         id: 'project-finance',
-        label: 'Project Finance',
+        label: 'Project Finance →',
         href: '/what-we-do/project-finance',
       },
     ],

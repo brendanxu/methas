@@ -90,7 +90,8 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
 
   return (
     <nav 
-      className={`hidden lg:flex items-center space-x-8 ${className}`}
+      className={`hidden lg:flex items-center ${className}`}
+      style={{ gap: '36px' }} // 精确控制菜单项间距为36px（30-40px范围内）
       role="navigation"
       aria-label="Main navigation"
     >
