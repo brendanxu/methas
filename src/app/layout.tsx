@@ -10,6 +10,7 @@ import { PreloadStrategy, RoutePreloader } from "@/components/optimization/Prelo
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo-metadata";
 import { HOME_SEO } from "@/lib/seo-config";
 import { SEOChecker } from "@/components/seo/SEOChecker";
+import { PerformanceDebug } from "@/lib/animation-performance";
 import "./globals.css";
 
 // Enhanced metadata with proper SEO configuration
@@ -71,6 +72,10 @@ export default function RootLayout({
                     {children}
                   </main>
                   <Footer />
+                  <PerformanceDebug 
+                    position="bottom-right" 
+                    enabled={process.env.NODE_ENV === 'development'} 
+                  />
                 </div>
               </GlobalStylesProvider>
             </PreloadStrategy>

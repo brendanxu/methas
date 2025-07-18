@@ -277,6 +277,39 @@ export const DynamicCarbonIntelligence = dynamic(() => import('@/components/sect
 });
 
 
+export const DynamicAlternatingServices = dynamic(() => import('@/components/sections/home/AlternatingServices'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-16">
+          <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-3"></div>
+          <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+        </div>
+        <div className="space-y-20">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map(j => (
+                    <div key={j} className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  ))}
+                </div>
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+              </div>
+              <div className="aspect-[4/3] bg-gray-200 rounded-2xl"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+});
+
 export const DynamicProfessionalInsights = dynamic(() => import('@/components/sections/home/ProfessionalInsights'), {
   ssr: false,
   loading: () => (
@@ -420,6 +453,7 @@ const dynamicImports = {
   DynamicEnhancedHero,
   DynamicServices,
   DynamicEnhancedServices,
+  DynamicAlternatingServices,
   DynamicCaseStudies,
   DynamicSuccessStories,
   DynamicCarbonIntelligence,

@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   DynamicEnhancedHero,
-  DynamicEnhancedServices,
+  DynamicAlternatingServices,
   DynamicCaseStudies,
   DynamicProfessionalInsights 
 } from '@/lib/dynamic-imports';
@@ -53,12 +53,12 @@ export default function Home() {
           {/* Add padding-top to subsequent sections to account for fixed header */}
           <div className="pt-20">
           <ComponentPreloader
-            importFn={() => import('@/components/sections/home/EnhancedServices')}
-            componentName="EnhancedServices"
+            importFn={() => import('@/components/sections/home/AlternatingServices')}
+            componentName="AlternatingServices"
             trigger="scroll"
             scrollThreshold={30}
           >
-            <DynamicEnhancedServices />
+            <DynamicAlternatingServices />
           </ComponentPreloader>
           
           <ComponentPreloader
