@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from '@/lib/modern-animations';
-import { advancedMotion, AdvancedStagger } from '@/lib/animation-system';
 import Link from 'next/link';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -72,21 +71,17 @@ const services = [
   }
 ];
 
-export const AlternatingServices: React.FC<AlternatingServicesProps> = React.memo(({ className }) => {
-
+export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = React.memo(({ className }) => {
   return (
     <section className={cn('py-24 bg-white', className)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <advancedMotion.div
+        <motion.div
           className="text-center mb-16"
-          initial="hiddenDown"
+          initial="hidden"
           whileInView="fadeIn"
           viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-          transition={{ 
-            duration: 0.8, 
-            easing: 'cubic-bezier(0.23, 1, 0.32, 1)'
-          }}
+          transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
         >
           <p className="text-green-600 font-semibold mb-3 text-sm uppercase tracking-wide font-sans">
             核心服务
@@ -97,27 +92,25 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
           <p className="text-lg text-gray-600 max-w-3xl mx-auto font-sans">
             专注甲烷减排投资，提供全方位碳中和解决方案
           </p>
-        </advancedMotion.div>
+        </motion.div>
 
         {/* Alternating Services Layout */}
-        <AdvancedStagger
-          staggerDelay={200}
-          from="start"
-          initial="hiddenScale"
-          animate="fadeIn"
-          transition={{ 
-            duration: 0.8, 
-            easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-          }}
-          className="space-y-20"
-        >
+        <div className="space-y-20">
           {services.map((service, index) => {
             const isEven = index % 2 === 0;
             
             return (
-              <div
+              <motion.div
                 key={service.id}
                 className="relative"
+                initial="hidden"
+                whileInView="fadeIn"
+                viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: index * 0.15,
+                  ease: [0.23, 1, 0.32, 1]
+                }}
               >
                 <div className={cn(
                   'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center',
@@ -130,12 +123,22 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                   )}>
                     {/* Featured Badge */}
                     {service.featured && (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <motion.div
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                        initial="hiddenScale"
+                        whileInView="scaleIn"
+                        viewport={{ once: true }}
+                        transition={{ 
+                          duration: 0.5, 
+                          delay: index * 0.15 + 0.2,
+                          ease: [0.23, 1, 0.32, 1]
+                        }}
+                      >
                         <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                         </svg>
                         核心差异化服务
-                      </div>
+                      </motion.div>
                     )}
                     
                     <div>
@@ -148,36 +151,32 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                     </div>
 
                     {/* Features List */}
-                    <AdvancedStagger
-                      staggerDelay={100}
-                      initial="hiddenLeft"
-                      animate="slideRight"
-                      transition={{ 
-                        duration: 0.5, 
-                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                      }}
-                      className="space-y-3"
-                    >
+                    <div className="space-y-3">
                       {service.features.map((feature, featureIndex) => (
-                        <div
+                        <motion.div
                           key={featureIndex}
                           className="flex items-center space-x-3"
+                          initial="hiddenLeft"
+                          whileInView="slideRight"
+                          viewport={{ once: true }}
+                          transition={{ 
+                            duration: 0.5, 
+                            delay: index * 0.15 + featureIndex * 0.1 + 0.3,
+                            ease: [0.23, 1, 0.32, 1]
+                          }}
                         >
                           <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                           <span className="text-gray-700 font-sans">{feature}</span>
-                        </div>
+                        </motion.div>
                       ))}
-                    </AdvancedStagger>
+                    </div>
 
                     {/* CTA Button */}
                     <div className="pt-4">
-                      <advancedMotion.div
+                      <motion.div
                         whileHover="lift"
                         whileTap="tap"
-                        transition={{ 
-                          duration: 0.3, 
-                          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-                        }}
+                        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                       >
                         <Link
                           href={service.href}
@@ -186,7 +185,7 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                           了解更多
                           <ArrowRightOutlined className="ml-2 transition-transform group-hover:translate-x-1" />
                         </Link>
-                      </advancedMotion.div>
+                      </motion.div>
                     </div>
                   </div>
 
@@ -195,7 +194,17 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                     'relative',
                     !isEven && 'lg:col-start-1'
                   )}>
-                    <div className="relative overflow-hidden rounded-2xl shadow-xl">
+                    <motion.div
+                      className="relative overflow-hidden rounded-2xl shadow-xl"
+                      initial="hiddenScale"
+                      whileInView="scaleIn"
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.8, 
+                        delay: index * 0.15 + 0.2,
+                        ease: [0.23, 1, 0.32, 1]
+                      }}
+                    >
                       <div className="aspect-[4/3]">
                         <OptimizedImage
                           src={service.image}
@@ -234,23 +243,24 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                           </svg>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </AdvancedStagger>
+        </div>
 
         {/* Bottom CTA */}
-        <advancedMotion.div
+        <motion.div
           className="text-center mt-20"
           initial="hiddenScale"
           whileInView="scaleIn"
           viewport={{ once: true, margin: '0px 0px -100px 0px' }}
           transition={{ 
             duration: 0.8, 
-            easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+            delay: 0.6,
+            ease: [0.23, 1, 0.32, 1]
           }}
         >
           <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 md:p-12">
@@ -261,13 +271,10 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
               我们的专家团队将根据您的具体需求，为您量身定制最适合的碳中和解决方案
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <advancedMotion.div
-                whileHover="glow"
+              <motion.div
+                whileHover="lift"
                 whileTap="tap"
-                transition={{ 
-                  duration: 0.3, 
-                  easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
+                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
               >
                 <Link
                   href="/service-types"
@@ -276,14 +283,11 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                   查看全部服务
                   <ArrowRightOutlined className="ml-2 transition-transform group-hover:translate-x-1" />
                 </Link>
-              </advancedMotion.div>
-              <advancedMotion.div
+              </motion.div>
+              <motion.div
                 whileHover="bounce"
                 whileTap="tap"
-                transition={{ 
-                  duration: 0.3, 
-                  easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                }}
+                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
               >
                 <Link
                   href="/contact-us"
@@ -291,15 +295,15 @@ export const AlternatingServices: React.FC<AlternatingServicesProps> = React.mem
                 >
                   联系我们
                 </Link>
-              </advancedMotion.div>
+              </motion.div>
             </div>
           </div>
-        </advancedMotion.div>
+        </motion.div>
       </div>
     </section>
   );
 });
 
-AlternatingServices.displayName = 'AlternatingServices';
+AlternatingServicesFixed.displayName = 'AlternatingServicesFixed';
 
-export default AlternatingServices;
+export default AlternatingServicesFixed;

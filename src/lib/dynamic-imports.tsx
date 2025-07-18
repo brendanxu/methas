@@ -277,7 +277,7 @@ export const DynamicCarbonIntelligence = dynamic(() => import('@/components/sect
 });
 
 
-export const DynamicAlternatingServices = dynamic(() => import('@/components/sections/home/AlternatingServices'), {
+export const DynamicAlternatingServices = dynamic(() => import('@/components/sections/home/AlternatingServicesFixed'), {
   ssr: false,
   loading: () => (
     <div className="py-24 bg-white">

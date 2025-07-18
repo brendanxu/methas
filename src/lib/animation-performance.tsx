@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 // ===== Animation Performance Monitor =====
 
@@ -89,7 +89,7 @@ class AnimationPerformanceMonitor {
       memoryUsage = memory.usedJSHeapSize / (1024 * 1024); // Convert to MB
     }
 
-    this.metrics = {
+    const newMetrics = {
       frameRate,
       dropCount,
       memoryUsage,
@@ -97,17 +97,28 @@ class AnimationPerformanceMonitor {
       lastUpdate: currentTime,
     };
 
-    // 通知观察者
-    this.observers.forEach(observer => observer(this.metrics));
+    // 只有在指标真正改变时才更新和通知
+    const metricsChanged = 
+      Math.abs(this.metrics.frameRate - newMetrics.frameRate) > 5 || // 帧率变化超过5
+      this.metrics.dropCount !== newMetrics.dropCount ||
+      Math.abs(this.metrics.memoryUsage - newMetrics.memoryUsage) > 10 || // 内存变化超过10MB
+      this.metrics.animationCount !== newMetrics.animationCount;
 
-    // 自动优化
-    if (this.config.autoOptimize) {
-      this.autoOptimize();
+    if (metricsChanged) {
+      this.metrics = newMetrics;
+      
+      // 通知观察者
+      this.observers.forEach(observer => observer(this.metrics));
+
+      // 自动优化
+      if (this.config.autoOptimize) {
+        this.autoOptimize();
+      }
     }
 
     // 调试模式
     if (this.config.debugMode) {
-      console.log('Animation Performance:', this.metrics);
+      console.log('Animation Performance:', newMetrics);
     }
   }
 
@@ -250,29 +261,39 @@ export const useOptimizedAnimation = (options: OptimizedAnimationOptions = {}) =
     // 根据性能指标调整动画质量
     const { frameRate, memoryUsage, animationCount } = metrics;
     
+    let newQuality: 'high' | 'medium' | 'low' = 'high';
+    
     if (frameRate < 30 || memoryUsage > 100 || animationCount > 20) {
-      setQuality('low');
+      newQuality = 'low';
     } else if (frameRate < 45 || memoryUsage > 75 || animationCount > 15) {
-      setQuality('medium');
-    } else {
-      setQuality('high');
+      newQuality = 'medium';
     }
 
     // 根据性能模式调整
     switch (options.performanceMode) {
       case 'battery':
-        setQuality('low');
+        newQuality = 'low';
         break;
       case 'balanced':
-        setQuality(quality === 'high' ? 'medium' : quality);
+        if (newQuality === 'high') {
+          newQuality = 'medium';
+        }
         break;
       case 'high':
-        setQuality('high');
+        newQuality = 'high';
         break;
       default:
         // 'auto' - 使用上面的逻辑
         break;
     }
+    
+    // 只在质量真正改变时更新
+    setQuality(prevQuality => {
+      if (prevQuality !== newQuality) {
+        return newQuality;
+      }
+      return prevQuality;
+    });
 
     // 限制并发动画数量
     if (options.maxConcurrent && animationCount > options.maxConcurrent) {
@@ -280,9 +301,9 @@ export const useOptimizedAnimation = (options: OptimizedAnimationOptions = {}) =
     } else {
       setShouldAnimate(true);
     }
-  }, [metrics, options, quality]);
+  }, [metrics, options]); // 移除quality依赖
 
-  const getOptimizedConfig = (baseConfig: any = {}) => {
+  const getOptimizedConfig = useCallback((baseConfig: any = {}) => {
     if (!shouldAnimate) {
       return { ...baseConfig, duration: 0 };
     }
@@ -302,7 +323,7 @@ export const useOptimizedAnimation = (options: OptimizedAnimationOptions = {}) =
       default:
         return baseConfig;
     }
-  };
+  }, [shouldAnimate, quality]);
 
   return {
     shouldAnimate,

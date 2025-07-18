@@ -53,8 +53,8 @@ export default function Home() {
           {/* Add padding-top to subsequent sections to account for fixed header */}
           <div className="pt-20">
           <ComponentPreloader
-            importFn={() => import('@/components/sections/home/AlternatingServices')}
-            componentName="AlternatingServices"
+            importFn={() => import('@/components/sections/home/AlternatingServicesFixed')}
+            componentName="AlternatingServicesFixed"
             trigger="scroll"
             scrollThreshold={30}
           >

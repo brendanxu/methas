@@ -132,25 +132,34 @@ export const EASING = {
 // ===== Performance Optimized Intersection Observer =====
 
 const createIntersectionObserver = (() => {
-  let observer: IntersectionObserver | null = null;
-  const elements = new Map<Element, (isIntersecting: boolean) => void>();
+  const observerMap = new Map<string, IntersectionObserver>();
+  const elementsMap = new Map<string, Map<Element, { callback: (isIntersecting: boolean) => void; once: boolean }>>();
   
   return (
     element: Element,
     callback: (isIntersecting: boolean) => void,
     options: { threshold?: number; margin?: string; once?: boolean } = {}
   ) => {
-    if (!observer) {
+    // 创建配置键值
+    const configKey = `${options.threshold || 0.1}-${options.margin || '0px'}`;
+    
+    let observer = observerMap.get(configKey);
+    let elements = elementsMap.get(configKey);
+    
+    if (!observer || !elements) {
+      elements = new Map();
+      elementsMap.set(configKey, elements);
+      
       observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            const callback = elements.get(entry.target);
-            if (callback) {
-              callback(entry.isIntersecting);
+            const elementData = elements!.get(entry.target);
+            if (elementData) {
+              elementData.callback(entry.isIntersecting);
               
               // 如果是一次性观察，移除元素
-              if (options.once && entry.isIntersecting) {
-                elements.delete(entry.target);
+              if (elementData.once && entry.isIntersecting) {
+                elements!.delete(entry.target);
                 observer!.unobserve(entry.target);
               }
             }
@@ -161,14 +170,23 @@ const createIntersectionObserver = (() => {
           rootMargin: options.margin || '0px',
         }
       );
+      
+      observerMap.set(configKey, observer);
     }
     
-    elements.set(element, callback);
+    elements.set(element, { callback, once: options.once || false });
     observer.observe(element);
     
     return () => {
       elements.delete(element);
       observer?.unobserve(element);
+      
+      // 如果没有元素了，清理observer
+      if (elements.size === 0) {
+        observer?.disconnect();
+        observerMap.delete(configKey);
+        elementsMap.delete(configKey);
+      }
     };
   };
 })();
@@ -296,7 +314,7 @@ const createAdvancedMotionComponent = (tagName: string) => {
         isInitializedRef.current = true;
       }, [initial]);
 
-      // Intersection Observer setup
+      // Intersection Observer setup - 优化依赖
       useEffect(() => {
         const element = elementRef.current;
         if (!element || !whileInView) return;
@@ -312,47 +330,51 @@ const createAdvancedMotionComponent = (tagName: string) => {
         );
 
         return cleanup;
-      }, [whileInView, viewport]);
+      }, [whileInView, viewport?.threshold, viewport?.margin, viewport?.once]);
 
-      // InView animation
+      // InView animation - 优化依赖和性能
       useEffect(() => {
         const element = elementRef.current;
         if (!element || !whileInView || !isInView) return;
 
-        const initialState = typeof initial === 'string' 
-          ? ANIMATION_PRESETS[initial as keyof typeof ANIMATION_PRESETS] 
-          : initial || {};
-          
-        const animateState = typeof whileInView === 'string' 
-          ? ANIMATION_PRESETS[whileInView as keyof typeof ANIMATION_PRESETS] 
-          : whileInView;
+        // 使用requestAnimationFrame确保平滑动画
+        const animationFrame = requestAnimationFrame(() => {
+          const initialState = typeof initial === 'string' 
+            ? ANIMATION_PRESETS[initial as keyof typeof ANIMATION_PRESETS] 
+            : initial || {};
+            
+          const animateState = typeof whileInView === 'string' 
+            ? ANIMATION_PRESETS[whileInView as keyof typeof ANIMATION_PRESETS] 
+            : whileInView;
 
-        const keyframes = createOptimizedKeyframes(initialState, animateState);
-        const options = getAnimationOptions(transition);
+          const keyframes = createOptimizedKeyframes(initialState, animateState);
+          const options = getAnimationOptions(transition);
 
-        // 添加交错延迟
-        if (stagger?.delay) {
-          const children = element.parentElement?.children;
-          if (children) {
-            const index = Array.from(children).indexOf(element);
-            options.delay = (options.delay || 0) + index * (stagger.delay * 1000);
+          // 添加交错延迟
+          if (stagger?.delay) {
+            const children = element.parentElement?.children;
+            if (children) {
+              const index = Array.from(children).indexOf(element);
+              options.delay = (options.delay || 0) + index * (stagger.delay * 1000);
+            }
           }
-        }
 
-        element.style.willChange = 'transform, opacity, filter, box-shadow';
-        const animation = element.animate(keyframes, options);
-        animationsRef.current.push(animation);
+          element.style.willChange = 'transform, opacity, filter, box-shadow';
+          const animation = element.animate(keyframes, options);
+          animationsRef.current.push(animation);
 
-        animation.addEventListener('finish', () => {
-          element.style.willChange = 'auto';
-          animationsRef.current = animationsRef.current.filter(a => a !== animation);
+          animation.addEventListener('finish', () => {
+            element.style.willChange = 'auto';
+            animationsRef.current = animationsRef.current.filter(a => a !== animation);
+          });
         });
 
         return () => {
-          animation.cancel();
-          animationsRef.current = animationsRef.current.filter(a => a !== animation);
+          cancelAnimationFrame(animationFrame);
+          animationsRef.current.forEach(animation => animation.cancel());
+          animationsRef.current = [];
         };
-      }, [isInView, initial, whileInView, transition, stagger]);
+      }, [isInView]); // 减少依赖，只监听isInView
 
       // Regular animate effect
       useEffect(() => {
