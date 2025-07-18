@@ -198,7 +198,8 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
                 textColorClass
               )}
               initial="hidden"
-              animate="fadeIn"
+              whileInView="fadeIn"
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               {content.title}
@@ -211,7 +212,8 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
                 textSecondaryClass
               )}
               initial="hidden"
-              animate="fadeIn"
+              whileInView="fadeIn"
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               {content.subtitle}
@@ -225,7 +227,8 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
                 textTertiaryClass
               )}
               initial="hidden"
-              animate="fadeIn"
+              whileInView="fadeIn"
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               {content.description}
@@ -234,7 +237,8 @@ const EnhancedHero: React.FC<EnhancedHeroProps> = ({
             {/* CTA按钮 */}
             <motion.div
               initial="hiddenScale"
-              animate="scaleIn"
+              whileInView="scaleIn"
+              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.8 }}
               className={cn(
                 visual.textAlignment === 'center' && 'flex justify-center',
