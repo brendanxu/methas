@@ -31,11 +31,11 @@ const navItems: NavItem[] = [
     href: '/about-us',
     hasDropdown: true,
     dropdownItems: [
-      { id: 'about-us', label: 'About us', href: '/about-us', description: 'Learn about our mission and values' },
-      { id: 'leadership', label: 'Leadership', href: '/about-us/leadership', description: 'Meet our executive team' },
-      { id: 'careers', label: 'Careers', href: '/about-us/careers', description: 'Join our global team' },
-      { id: 'locations', label: 'Locations', href: '/about-us/locations', description: 'Our global presence' },
-      { id: 'integrity', label: 'Integrity commitment', href: '/about-us/integrity', description: 'Our commitment to market integrity' }
+      { id: 'about-us', label: 'About us', href: '/about-us', description: 'Leading climate impact since 2006' },
+      { id: 'mission', label: 'Mission', href: '/about-us/mission', description: 'Our mission and values' },
+      { id: 'leadership', label: 'Leadership', href: '/about-us/leadership', description: 'Meet our CEO, Chair, Board and team' },
+      { id: 'locations', label: 'Locations', href: '/about-us/locations', description: 'Over 800 employees in 30+ countries' },
+      { id: 'integrity', label: 'Our commitment to integrity', href: '/about-us/integrity', description: 'Driving integrity in the carbon market' }
     ]
   },
   { 
@@ -44,11 +44,9 @@ const navItems: NavItem[] = [
     href: '/what-we-do',
     hasDropdown: true,
     dropdownItems: [
-      { id: 'climate-consulting', label: 'Climate Consulting', href: '/what-we-do/climate-consulting', description: 'Strategic climate advisory services' },
-      { id: 'environmental-certificates', label: 'Environmental Certificates', href: '/what-we-do/environmental-certificates', description: 'Carbon credits and renewable energy certificates' },
-      { id: 'project-finance', label: 'Project Finance', href: '/what-we-do/project-finance', description: 'Funding for climate projects' },
-      { id: 'technology-solutions', label: 'Technology Solutions', href: '/what-we-do/technology', description: 'Digital climate solutions' },
-      { id: 'nature-based-solutions', label: 'Nature-based Solutions', href: '/what-we-do/nature-based', description: 'Forest and biodiversity projects' }
+      { id: 'environmental-certificates', label: 'Environmental Certificates', href: '/what-we-do/environmental-certificates', description: 'Carbon credits, Energy Attribute Certificates, Biodiversity credits' },
+      { id: 'climate-consulting', label: 'Climate Consulting', href: '/what-we-do/climate-consulting', description: 'Environmental footprint & net zero, Reporting & compliance, Value chain & renewables' },
+      { id: 'project-finance', label: 'Project Finance', href: '/what-we-do/project-finance', description: 'Heavy industry, Nature-based removals, Tech-based removals' }
     ]
   },
   { 
@@ -57,10 +55,10 @@ const navItems: NavItem[] = [
     href: '/work-and-impact',
     hasDropdown: true,
     dropdownItems: [
-      { id: 'case-studies', label: 'Case Studies', href: '/work-and-impact/case-studies', description: 'Real-world climate solutions' },
+      { id: 'case-studies', label: 'Case Studies', href: '/work-and-impact/case-studies', description: 'Real-world climate solutions and client success stories' },
       { id: 'impact-reports', label: 'Impact Reports', href: '/work-and-impact/reports', description: 'Annual impact and sustainability reports' },
       { id: 'client-stories', label: 'Client Stories', href: '/work-and-impact/stories', description: 'Success stories from our clients' },
-      { id: 'projects', label: 'Projects', href: '/work-and-impact/projects', description: 'Climate projects we support' }
+      { id: 'projects', label: 'Projects', href: '/work-and-impact/projects', description: 'Discover our certified climate action projects' }
     ]
   },
   { 
@@ -69,9 +67,9 @@ const navItems: NavItem[] = [
     href: '/news-insights',
     hasDropdown: true,
     dropdownItems: [
-      { id: 'latest-news', label: 'Latest News', href: '/news-insights/news', description: 'Latest industry updates' },
+      { id: 'latest-news', label: 'Latest News', href: '/news-insights/news', description: 'Latest industry updates and announcements' },
       { id: 'insights', label: 'Insights', href: '/news-insights/insights', description: 'Expert analysis and commentary' },
-      { id: 'reports', label: 'Reports', href: '/news-insights/reports', description: 'In-depth market reports' },
+      { id: 'reports', label: 'Reports', href: '/news-insights/reports', description: 'In-depth market reports and publications' },
       { id: 'events', label: 'Events', href: '/news-insights/events', description: 'Upcoming events and webinars' },
       { id: 'media-center', label: 'Media Center', href: '/news-insights/media', description: 'Press releases and media resources' }
     ]
