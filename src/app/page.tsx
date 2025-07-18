@@ -4,9 +4,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   DynamicEnhancedHero,
-  DynamicEnhancedServices,
+  DynamicAlternatingServices,
   DynamicCaseStudies,
-  DynamicCarbonIntelligence 
+  DynamicProfessionalInsights 
 } from '@/lib/dynamic-imports';
 import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -53,12 +53,12 @@ export default function Home() {
           {/* Add padding-top to subsequent sections to account for fixed header */}
           <div className="pt-20">
           <ComponentPreloader
-            importFn={() => import('@/components/sections/home/EnhancedServices')}
-            componentName="EnhancedServices"
+            importFn={() => import('@/components/sections/home/AlternatingServices')}
+            componentName="AlternatingServices"
             trigger="scroll"
             scrollThreshold={30}
           >
-            <DynamicEnhancedServices />
+            <DynamicAlternatingServices />
           </ComponentPreloader>
           
           <ComponentPreloader
@@ -71,12 +71,12 @@ export default function Home() {
           </ComponentPreloader>
           
           <ComponentPreloader
-            importFn={() => import('@/components/sections/home/CarbonIntelligence')}
-            componentName="CarbonIntelligence"
+            importFn={() => import('@/components/sections/home/ProfessionalInsights')}
+            componentName="ProfessionalInsights"
             trigger="scroll"
             scrollThreshold={70}
           >
-            <DynamicCarbonIntelligence />
+            <DynamicProfessionalInsights />
           </ComponentPreloader>
           
           </div>

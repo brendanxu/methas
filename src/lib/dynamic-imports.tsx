@@ -276,6 +276,63 @@ export const DynamicCarbonIntelligence = dynamic(() => import('@/components/sect
   )
 });
 
+export const DynamicAlternatingServices = dynamic(() => import('@/components/sections/home/AlternatingServices'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-20">
+          <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-4"></div>
+          <div className="h-10 bg-gray-200 rounded w-96 mx-auto mb-6"></div>
+          <div className="h-4 bg-gray-200 rounded w-full max-w-4xl mx-auto"></div>
+        </div>
+        <div className="space-y-32">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-8">
+                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-20 bg-gray-200 rounded w-full"></div>
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+              </div>
+              <div className="h-96 bg-gray-200 rounded-2xl"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+});
+
+export const DynamicProfessionalInsights = dynamic(() => import('@/components/sections/home/ProfessionalInsights'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-24 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-16">
+          <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-4"></div>
+          <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-6"></div>
+          <div className="h-4 bg-gray-200 rounded w-full max-w-4xl mx-auto"></div>
+        </div>
+        <div className="mb-20">
+          <div className="bg-white rounded-2xl shadow-xl h-96"></div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            {[1, 2].map(i => (
+              <div key={i} className="bg-white rounded-xl shadow-lg h-48"></div>
+            ))}
+          </div>
+          <div className="space-y-8">
+            <div className="bg-white rounded-xl shadow-lg p-6 h-64"></div>
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 h-32"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+});
+
 // Demo pages (non-critical) - ThemeShowcase moved to admin panel
 
 // Form components
@@ -390,9 +447,11 @@ const dynamicImports = {
   DynamicEnhancedHero,
   DynamicServices,
   DynamicEnhancedServices,
+  DynamicAlternatingServices,
   DynamicCaseStudies,
   DynamicSuccessStories,
   DynamicCarbonIntelligence,
+  DynamicProfessionalInsights,
   
   // Utilities
   createDynamicComponent,
