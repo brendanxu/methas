@@ -171,7 +171,7 @@ export const useScrollAnimationCSS = (
     } else {
       element.classList.remove(animationClass);
     }
-  }, [isVisible, animationClass]);
+  }, [isVisible, animationClass, ref]);
 
   return { ref, isVisible };
 };

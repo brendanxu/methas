@@ -71,7 +71,7 @@ export default function SouthPoleDemoPage() {
                 lineHeight: 'var(--sp-leading-tight)',
               }}
             >
-              It's time for a net zero world.
+              It&apos;s time for a net zero world.
             </h1>
             
             <p 
@@ -84,7 +84,7 @@ export default function SouthPoleDemoPage() {
                 margin: '0 auto var(--sp-space-8) auto',
               }}
             >
-              Hello, we're South Pole. The Climate Company.
+              Hello, we&apos;re South Pole. The Climate Company.
             </p>
             
             <p 
@@ -97,7 +97,7 @@ export default function SouthPoleDemoPage() {
                 lineHeight: 'var(--sp-leading-relaxed)',
               }}
             >
-              We've been helping organisations decarbonise and navigate the complexities of climate since 2006.
+              We&apos;ve been helping organisations decarbonise and navigate the complexities of climate since 2006.
             </p>
             
             <div className="sp-animate-fade-in-up sp-animation-delay-500">

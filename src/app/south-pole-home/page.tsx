@@ -62,7 +62,7 @@ const caseStudiesData = [
   {
     id: 'bentley-plastic',
     title: 'Driving net zero plastic to nature for Bentley',
-    description: 'With South Pole\'s help, Bentley Motors has set an unprecedented standard in the luxury car industry: Net Zero Plastic to Nature.',
+    description: 'With South Pole&apos;s help, Bentley Motors has set an unprecedented standard in the luxury car industry: Net Zero Plastic to Nature.',
     image: '/images/hero-poster.jpg',
     href: '/work/bentley-achieving-net-zero-plastic-to-nature',
     ctaText: 'Read more',
@@ -149,7 +149,7 @@ export default function SouthPoleHomePage() {
                 lineHeight: 'var(--sp-leading-tight)',
               }}
             >
-              It's time for a net zero world.
+              It&apos;s time for a net zero world.
             </h1>
             
             <p 
@@ -162,7 +162,7 @@ export default function SouthPoleHomePage() {
                 margin: '0 auto var(--sp-space-8) auto',
               }}
             >
-              Hello, we're South Pole. The Climate Company.
+              Hello, we&apos;re South Pole. The Climate Company.
             </p>
             
             <p 
@@ -175,7 +175,7 @@ export default function SouthPoleHomePage() {
                 lineHeight: 'var(--sp-leading-relaxed)',
               }}
             >
-              We've been helping organisations decarbonise and navigate the complexities of climate since 2006.
+              We&apos;ve been helping organisations decarbonise and navigate the complexities of climate since 2006.
             </p>
             
             <div className="sp-animate-fade-in-up sp-animation-delay-500">
@@ -428,7 +428,7 @@ export default function SouthPoleHomePage() {
                       color: 'var(--sp-text-secondary)',
                       lineHeight: 'var(--sp-leading-relaxed)',
                     }}>
-                      Climate is not something we do, it's what we do.
+                      Climate is not something we do, it&apos;s what we do.
                     </p>
                   </div>
 
