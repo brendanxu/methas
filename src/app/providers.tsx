@@ -46,20 +46,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return () => memoryMonitor.stop();
   }, []);
 
-  // Initialize theme from localStorage or default
+  // Initialize theme from localStorage or default - 强制使用光主题
   useEffect(() => {
-    const savedTheme = localStorage.getItem('southpole-theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    const initialTheme = savedTheme 
-      ? savedTheme === 'dark'
-      : defaultTheme === 'dark' || systemPrefersDark;
+    // 强制使用光主题，忽略系统偏好和localStorage
+    const initialTheme = false; // 始终使用光主题
     
     setIsDark(initialTheme);
     setMounted(true);
 
-    // Apply theme to document
-    document.documentElement.classList.toggle('dark', initialTheme);
+    // Apply theme to document - 确保移除dark类
+    document.documentElement.classList.remove('dark');
   }, [defaultTheme]);
 
   // Toggle theme function with performance optimization
