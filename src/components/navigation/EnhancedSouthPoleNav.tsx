@@ -236,6 +236,8 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
   }, [isMobileMenuOpen]);
 
   // 下拉菜单悬停处理 - 修复悬停bug
+  const HOVER_DELAY = 150; // 统一延迟时间
+
   const handleNavItemEnter = (itemId: string) => {
     // 清除所有现有的超时
     if (dropdownTimeoutRef.current) {
@@ -248,6 +250,7 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
     }
     
     setActiveDropdown(itemId);
+    setIsDropdownHovered(false); // 重置dropdown hover状态
   };
 
   const handleNavItemLeave = () => {
@@ -259,7 +262,7 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
       if (!isDropdownHovered) {
         setActiveDropdown(null);
       }
-    }, 150);
+    }, HOVER_DELAY);
   };
 
   const handleDropdownEnter = () => {
@@ -278,7 +281,7 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
     
     dropdownTimeoutRef.current = setTimeout(() => {
       setActiveDropdown(null);
-    }, 150);
+    }, HOVER_DELAY);
   };
 
   // 清理定时器
@@ -296,17 +299,17 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
   return (
     <>
       <nav 
-        className={`fixed top-0 left-0 right-0 z-50 ${className}`}
+        className={`fixed top-0 left-0 right-0 z-50 h-18 bg-white transition-all duration-300 ${className}`}
         style={{
-          backgroundColor: 'white',
           borderBottom: isScrolled ? '1px solid #e5e7eb' : '1px solid transparent',
           boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none',
-          transition: 'all 0.3s ease',
-          height: '72px'
+          willChange: 'transform, opacity',
+          backfaceVisibility: 'hidden',
+          transform: 'translate3d(0, 0, 0)'
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-18">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex items-center justify-between h-full">
             {/* Logo */}
             <Link 
               href="/"
@@ -381,9 +384,14 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2, ease: 'easeOut' }}
-                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[800px] bg-white rounded-lg shadow-xl border border-gray-200"
+                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[800px] bg-white rounded-lg shadow-xl border border-gray-200 z-[60]"
                           onMouseEnter={handleDropdownEnter}
                           onMouseLeave={handleDropdownLeave}
+                          style={{
+                            willChange: 'transform, opacity',
+                            backfaceVisibility: 'hidden',
+                            transform: 'translate3d(-50%, 0, 0)'
+                          }}
                         >
                           <div className="flex">
                             {/* 左侧链接列表 */}
@@ -514,7 +522,7 @@ export const EnhancedSouthPoleNav: React.FC<EnhancedSouthPoleNavProps> = ({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-[72px] left-0 right-0 z-40 bg-white border-b border-gray-200 lg:hidden"
+            className="fixed top-[72px] left-0 right-0 z-[55] bg-white border-b border-gray-200 lg:hidden"
           >
             <div className="max-w-7xl mx-auto px-4 py-6">
               <div className="space-y-4">
