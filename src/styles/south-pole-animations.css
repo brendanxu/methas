@@ -1,0 +1,541 @@
+/* South Pole Animation System */
+
+/* === KEYFRAMES === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40%, 43% {
+    transform: translateY(-10px);
+  }
+  70% {
+    transform: translateY(-5px);
+  }
+  90% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* === ANIMATION CLASSES === */
+/* Fade Animations */
+.sp-animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-fade-in-down {
+  animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-fade-in-left {
+  animation: fadeInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-fade-in-right {
+  animation: fadeInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Scale Animations */
+.sp-animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Slide Animations */
+.sp-animate-slide-in-up {
+  animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-slide-in-down {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-slide-in-left {
+  animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.sp-animate-slide-in-right {
+  animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Utility Animations */
+.sp-animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.sp-animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.sp-animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.sp-animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--sp-bg-light) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    var(--sp-bg-light) 100%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* === STAGGER ANIMATIONS === */
+/* Staggered fade in animations with delays */
+.sp-animate-stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.sp-animate-stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.sp-animate-stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.sp-animate-stagger-4 {
+  animation-delay: 0.4s;
+}
+
+.sp-animate-stagger-5 {
+  animation-delay: 0.5s;
+}
+
+.sp-animate-stagger-6 {
+  animation-delay: 0.6s;
+}
+
+/* === HOVER ANIMATIONS === */
+.sp-hover-lift {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.sp-hover-scale {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.sp-hover-grow {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-grow:hover {
+  transform: scale(1.1);
+}
+
+.sp-hover-shrink {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-shrink:hover {
+  transform: scale(0.95);
+}
+
+.sp-hover-rotate {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-rotate:hover {
+  transform: rotate(5deg);
+}
+
+.sp-hover-tilt {
+  transition: transform var(--sp-transition-base);
+}
+
+.sp-hover-tilt:hover {
+  transform: perspective(1000px) rotateX(10deg);
+}
+
+/* === FOCUS ANIMATIONS === */
+.sp-focus-ring {
+  outline: none;
+  transition: box-shadow var(--sp-transition-base);
+}
+
+.sp-focus-ring:focus {
+  box-shadow: 0 0 0 3px var(--sp-accent);
+}
+
+.sp-focus-ring:focus-visible {
+  box-shadow: 0 0 0 3px var(--sp-accent);
+}
+
+/* === LOADING ANIMATIONS === */
+.sp-loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--sp-bg-light) 25%,
+    var(--sp-bg-secondary) 50%,
+    var(--sp-bg-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.sp-loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.sp-loading-dots::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.5s infinite;
+}
+
+.sp-loading-dots::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.5s infinite 0.5s;
+}
+
+.sp-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--sp-bg-light);
+  border-top: 2px solid var(--sp-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* === SCROLL ANIMATIONS === */
+.sp-scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sp-scroll-reveal-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-scroll-reveal-left.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sp-scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-scroll-reveal-right.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sp-scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-scroll-reveal-scale.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* === PARALLAX ANIMATIONS === */
+.sp-parallax-slow {
+  transform: translateY(var(--parallax-offset, 0));
+  transition: transform 0.1s ease-out;
+}
+
+.sp-parallax-medium {
+  transform: translateY(calc(var(--parallax-offset, 0) * 0.5));
+  transition: transform 0.1s ease-out;
+}
+
+.sp-parallax-fast {
+  transform: translateY(calc(var(--parallax-offset, 0) * 0.8));
+  transition: transform 0.1s ease-out;
+}
+
+/* === RESPONSIVE ANIMATIONS === */
+@media (max-width: 768px) {
+  /* Reduce animation intensity on mobile */
+  .sp-animate-fade-in-up {
+    animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  
+  .sp-hover-lift:hover {
+    transform: translateY(-2px);
+  }
+  
+  .sp-hover-scale:hover {
+    transform: scale(1.02);
+  }
+  
+  .sp-scroll-reveal {
+    transform: translateY(20px);
+  }
+  
+  .sp-scroll-reveal-left {
+    transform: translateX(-20px);
+  }
+  
+  .sp-scroll-reveal-right {
+    transform: translateX(20px);
+  }
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable animations for users who prefer reduced motion */
+  .sp-animate-fade-in,
+  .sp-animate-fade-in-up,
+  .sp-animate-fade-in-down,
+  .sp-animate-fade-in-left,
+  .sp-animate-fade-in-right,
+  .sp-animate-scale-in,
+  .sp-animate-slide-in-up,
+  .sp-animate-slide-in-down,
+  .sp-animate-slide-in-left,
+  .sp-animate-slide-in-right {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .sp-hover-lift,
+  .sp-hover-scale,
+  .sp-hover-grow,
+  .sp-hover-shrink,
+  .sp-hover-rotate,
+  .sp-hover-tilt {
+    transition: none;
+  }
+  
+  .sp-hover-lift:hover,
+  .sp-hover-scale:hover,
+  .sp-hover-grow:hover,
+  .sp-hover-shrink:hover,
+  .sp-hover-rotate:hover,
+  .sp-hover-tilt:hover {
+    transform: none;
+  }
+  
+  .sp-scroll-reveal,
+  .sp-scroll-reveal-left,
+  .sp-scroll-reveal-right,
+  .sp-scroll-reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* === UTILITY CLASSES === */
+.sp-will-change-transform {
+  will-change: transform;
+}
+
+.sp-will-change-opacity {
+  will-change: opacity;
+}
+
+.sp-will-change-auto {
+  will-change: auto;
+}
+
+.sp-animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.sp-animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.sp-animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.sp-animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.sp-animation-delay-700 {
+  animation-delay: 0.7s;
+}
+
+.sp-animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.sp-animation-duration-fast {
+  animation-duration: 0.3s;
+}
+
+.sp-animation-duration-slow {
+  animation-duration: 1s;
+}
+
+.sp-animation-fill-both {
+  animation-fill-mode: both;
+}
+
+.sp-animation-fill-forwards {
+  animation-fill-mode: forwards;
+}
+
+.sp-animation-fill-backwards {
+  animation-fill-mode: backwards;
+}

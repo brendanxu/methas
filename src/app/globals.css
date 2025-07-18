@@ -2,7 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* South Pole Navigation Colors - Integrated from south-pole-colors.css */
+/* South Pole Design System - Complete Integration */
+@import '../styles/south-pole-design-system.css';
+@import '../styles/south-pole-animations.css';
+
+/* South Pole Navigation Colors - Integrated from south-pole-colors.css (Legacy) */
 :root {
   --primary-dark-blue: #003366;
   --primary-blue: #0046FF;
