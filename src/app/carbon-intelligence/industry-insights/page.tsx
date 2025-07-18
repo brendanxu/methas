@@ -189,14 +189,14 @@ export default function IndustryInsightsPage() {
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-semibold text-gray-900 mb-3">碳市场发展</h3>
               <p className="text-gray-600 text-sm mb-4">
-                "未来三年将是中国碳市场快速发展的关键期，市场流动性和价格发现机制将显著改善。"
+                &ldquo;未来三年将是中国碳市场快速发展的关键期，市场流动性和价格发现机制将显著改善。&rdquo;
               </p>
               <div className="text-xs text-gray-500">— 碳市场专家 张教授</div>
             </div>
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-semibold text-gray-900 mb-3">技术创新</h3>
               <p className="text-gray-600 text-sm mb-4">
-                "甲烷减排技术将成为下一个投资热点，其减排效果远超传统CO₂减排项目。"
+                &ldquo;甲烷减排技术将成为下一个投资热点，其减排效果远超传统CO₂减排项目。&rdquo;
               </p>
               <div className="text-xs text-gray-500">— 技术专家 李博士</div>
             </div>
