@@ -222,6 +222,33 @@ export const DynamicSuccessStories = dynamic(() => import('@/components/sections
   )
 });
 
+export const DynamicCarbonIntelligence = dynamic(() => import('@/components/sections/home/CarbonIntelligence'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-16">
+          <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {[1, 2, 3, 4].map(i => (
+            <CardLoading key={i} />
+          ))}
+        </div>
+        <div className="bg-white rounded-lg p-8">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <CardLoading key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+});
+
 // Demo pages (non-critical) - ThemeShowcase moved to admin panel
 
 // Form components
@@ -337,6 +364,7 @@ const dynamicImports = {
   DynamicServices,
   DynamicCaseStudies,
   DynamicSuccessStories,
+  DynamicCarbonIntelligence,
   
   // Utilities
   createDynamicComponent,

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { 
   DynamicEnhancedHero,
   DynamicServices,
-  DynamicCaseStudies 
+  DynamicCaseStudies,
+  DynamicCarbonIntelligence 
 } from '@/lib/dynamic-imports';
 import { ComponentPreloader } from '@/components/optimization/PreloadProvider';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -67,6 +68,15 @@ export default function Home() {
             scrollThreshold={50}
           >
             <DynamicCaseStudies />
+          </ComponentPreloader>
+          
+          <ComponentPreloader
+            importFn={() => import('@/components/sections/home/CarbonIntelligence')}
+            componentName="CarbonIntelligence"
+            trigger="scroll"
+            scrollThreshold={70}
+          >
+            <DynamicCarbonIntelligence />
           </ComponentPreloader>
           
           </div>
