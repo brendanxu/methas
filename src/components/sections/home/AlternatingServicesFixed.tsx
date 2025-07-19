@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { cn } from '@/lib/utils';
+import { southPoleAnimations } from '@/lib/southpole-animations';
 
 interface AlternatingServicesProps {
   className?: string;
@@ -78,10 +79,7 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
         {/* Header */}
         <motion.div
           className="text-center mb-16"
-          initial="hidden"
-          whileInView="fadeIn"
-          viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-          transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          {...southPoleAnimations.scroll.fadeInOnScroll}
         >
           <p className="text-green-600 font-semibold mb-3 text-sm uppercase tracking-wide font-sans">
             核心服务
@@ -103,14 +101,16 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
               <motion.div
                 key={service.id}
                 className="relative"
-                initial="hidden"
-                whileInView="fadeIn"
-                viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-                transition={{ 
-                  duration: 0.8, 
-                  delay: index * 0.15,
-                  ease: [0.23, 1, 0.32, 1]
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ 
+                  opacity: 1, 
+                  y: 0,
+                  transition: {
+                    ...southPoleAnimations.timing.elegant,
+                    delay: index * 0.2,
+                  }
                 }}
+                viewport={southPoleAnimations.viewports.standard}
               >
                 <div className={cn(
                   'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center',
@@ -125,13 +125,10 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
                     {service.featured && (
                       <motion.div
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-                        initial="hiddenScale"
-                        whileInView="scaleIn"
-                        viewport={{ once: true }}
+                        {...southPoleAnimations.content.scaleIn}
                         transition={{ 
-                          duration: 0.5, 
-                          delay: index * 0.15 + 0.2,
-                          ease: [0.23, 1, 0.32, 1]
+                          ...southPoleAnimations.timing.spring,
+                          delay: index * 0.2 + 0.3,
                         }}
                       >
                         <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
@@ -156,13 +153,10 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
                         <motion.div
                           key={featureIndex}
                           className="flex items-center space-x-3"
-                          initial="hiddenLeft"
-                          whileInView="slideRight"
-                          viewport={{ once: true }}
+                          {...southPoleAnimations.content.slideInLeft}
                           transition={{ 
-                            duration: 0.5, 
-                            delay: index * 0.15 + featureIndex * 0.1 + 0.3,
-                            ease: [0.23, 1, 0.32, 1]
+                            ...southPoleAnimations.timing.elegant,
+                            delay: index * 0.2 + featureIndex * 0.1 + 0.4,
                           }}
                         >
                           <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
@@ -174,9 +168,8 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
                     {/* CTA Button */}
                     <div className="pt-4">
                       <motion.div
-                        whileHover="lift"
-                        whileTap="tap"
-                        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                        whileHover={southPoleAnimations.interactions.buttonHover}
+                        whileTap={southPoleAnimations.navigation.tap}
                       >
                         <Link
                           href={service.href}
@@ -196,14 +189,12 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
                   )}>
                     <motion.div
                       className="relative overflow-hidden rounded-2xl shadow-xl"
-                      initial="hiddenScale"
-                      whileInView="scaleIn"
-                      viewport={{ once: true }}
+                      {...southPoleAnimations.content.imageLoad}
                       transition={{ 
-                        duration: 0.8, 
-                        delay: index * 0.15 + 0.2,
-                        ease: [0.23, 1, 0.32, 1]
+                        ...southPoleAnimations.timing.elegant,
+                        delay: index * 0.2 + 0.2,
                       }}
+                      whileHover={southPoleAnimations.interactions.cardHover}
                     >
                       <div className="aspect-[4/3]">
                         <OptimizedImage
@@ -254,13 +245,10 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
         {/* Bottom CTA */}
         <motion.div
           className="text-center mt-20"
-          initial="hiddenScale"
-          whileInView="scaleIn"
-          viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+          {...southPoleAnimations.content.riseUp}
           transition={{ 
-            duration: 0.8, 
-            delay: 0.6,
-            ease: [0.23, 1, 0.32, 1]
+            ...southPoleAnimations.timing.layout,
+            delay: 0.8,
           }}
         >
           <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 md:p-12">
@@ -272,9 +260,8 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div
-                whileHover="lift"
-                whileTap="tap"
-                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                whileHover={southPoleAnimations.interactions.buttonHover}
+                whileTap={southPoleAnimations.navigation.tap}
               >
                 <Link
                   href="/service-types"
@@ -285,9 +272,8 @@ export const AlternatingServicesFixed: React.FC<AlternatingServicesProps> = Reac
                 </Link>
               </motion.div>
               <motion.div
-                whileHover="bounce"
-                whileTap="tap"
-                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                whileHover={southPoleAnimations.interactions.cardHover}
+                whileTap={southPoleAnimations.navigation.tap}
               >
                 <Link
                   href="/contact-us"

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Providers, GlobalStylesProvider } from "./providers";
-import { FixedSouthPoleNav } from "@/components/navigation/FixedSouthPoleNav";
+import { SouthPoleNavAnimated } from "@/components/navigation/SouthPoleNavAnimated";
 import { Footer } from "@/components/layouts/Footer";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
@@ -67,7 +67,7 @@ export default function RootLayout({
                 <GlobalSearch />
                 <SEOChecker />
                 <div className="min-h-screen flex flex-col bg-background text-foreground">
-                  <FixedSouthPoleNav />
+                  <SouthPoleNavAnimated />
                   <main className="flex-1">
                     {children}
                   </main>
