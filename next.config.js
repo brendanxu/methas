@@ -5,7 +5,13 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es'],
+    optimizePackageImports: ['@ant-design/icons', 'antd', 'lodash-es', 'framer-motion'],
+    scrollRestoration: true,
+  },
+  
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 
   // Modularize imports for better tree shaking
